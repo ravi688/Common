@@ -1,2 +1,2 @@
-# TemplateRepository
-This repository contains template for a project in C language
+# Common utility library
+This repository contains the common being used across all my projects.
