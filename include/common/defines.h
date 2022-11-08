@@ -77,6 +77,8 @@ typedef u32 uint;
 
 #define DREF_TO(type, ptr) (*(type*)(ptr))
 #define DREF(ptr) (*(ptr))
+#define DEREF DREF
+#define DEREF_TO DREF_TO
 #define CAST_TO(to, s) ((to)(s))
 #define REINTERPRET_TO(to, s) (*(to*)(&s))
 
