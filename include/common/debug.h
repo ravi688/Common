@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <template_repo/defines.h>
+#include <common/defines.h>
 
 #define DEBUG_LOG_INFO(...) debug_log("[Info] ", __LINE__, __FUNCTION__, __FILE__,  __VA_ARGS__)
 #define DEBUG_LOG_WARNING(...) debug_log("[Warning] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
@@ -24,10 +24,10 @@ BEGIN_CPP_COMPATIBLE
 
 #include <stdarg.h>
 
-TEMPLATE_REPO_API void debug_assert_wrn(u32 line, const char* function, const char* file, u64 assertion, ...);
-TEMPLATE_REPO_API void debug_assert(u32 line, const char* function, const char* file, u64 assertion, ...);
-TEMPLATE_REPO_API void debug_logv(const char* description, u32 line, const char* function, const char* file, const char* format, va_list args);
-TEMPLATE_REPO_API void debug_log(const char* description, u32 line, const char* function, const char* file, const char* format, ...);
-TEMPLATE_REPO_API void debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...);
+COMMON_API void debug_assert_wrn(u32 line, const char* function, const char* file, u64 assertion, ...);
+COMMON_API void debug_assert(u32 line, const char* function, const char* file, u64 assertion, ...);
+COMMON_API void debug_logv(const char* description, u32 line, const char* function, const char* file, const char* format, va_list args);
+COMMON_API void debug_log(const char* description, u32 line, const char* function, const char* file, const char* format, ...);
+COMMON_API void debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...);
 
 END_CPP_COMPATIBLE

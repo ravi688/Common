@@ -11,9 +11,9 @@
 #-------------------------------------------
 #		Project Configuration
 #-------------------------------------------
-PROJECT_NAME = TemplateRepo
-STATIC_LIB_NAME = templaterepo.a
-DYNAMIC_LIB_NAME = templaterepo.dll
+PROJECT_NAME = Common
+STATIC_LIB_NAME = common.a
+DYNAMIC_LIB_NAME = common.dll
 EXECUTABLE_NAME = main
 EXTERNAL_INCLUDES = 
 EXTERNAL_LIBS = 

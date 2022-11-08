@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <template_repo/debug.h>
+#include <common/debug.h>
 
 #define ASSERT(...) debug_assert(__LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
 #define ASSERT_WRN(...) debug_assert_wrn(__LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)

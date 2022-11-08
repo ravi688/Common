@@ -15,6 +15,10 @@ typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
 
+typedef float f32;
+typedef double f64;
+typedef u32 uint;
+
 #define U8_MAX UINT8_MAX
 #define U16_MAX UINT16_MAX
 #define U32_MAX UINT32_MAX
@@ -44,21 +48,23 @@ typedef int64_t s64;
 #define WARN_UNUSED_RESULT_FUNCTION __attribute__((warn_unused_result))
 #define INLINE_FUNCTION inline
 
+#define DEPRECATED DEPRECATED_FUNCTION
 #define INLINE INLINE_FUNCTION
 #define FORCE_INLINE FORCE_INLINE_FUNCTION
 #define CONSTRUCTOR CONSTRUCTOR_FUNCTION
 #define DESTRUCTOR DESTRUCTOR_FUNCTION
 #define HOT HOT_FUNCTION
 #define COLD COLD_FUNCTION
+#define AUTO __auto_type
 
-#ifdef TEMPLATE_REPO_STATIC_LIBRARY
-#	define TEMPLATE_REPO_API
-#elif TEMPLATE_REPO_DYNAMIC_LIBRARY
-#	define TEMPLATE_REPO_API __declspec(dllimport)
+#ifdef COMMON_STATIC_LIBRARY
+#	define COMMON_API
+#elif COMMON_DYNAMIC_LIBRARY
+#	define COMMON_API __declspec(dllimport)
 #elif BUILD_DYNAMIC_LIBRARY
-#	define TEMPLATE_REPO_API __declspec(dllexport)
+#	define COMMON_API __declspec(dllexport)
 #else
-#	define TEMPLATE_REPO_API
+#	define COMMON_API
 #endif
 
 #ifdef __cplusplus
@@ -74,6 +80,14 @@ typedef int64_t s64;
 #define CAST_TO(to, s) ((to)(s))
 #define REINTERPRET_TO(to, s) (*(to*)(&s))
 
-#define OUT * const
+#define OUT *
 #define IN const *
 
+#define BIT64(index) (1ULL << index)
+#define BIT32(index) (1UL << index)
+#define BIT_MASK32(count) (CAST_TO(u32, ~((~0UL) << count)))
+
+#define DEG2RAD 0.01745f
+#define RAD2DEG 57.29577f
+
+#define DEG * DEG2RAD

@@ -1,10 +1,10 @@
 
-#include <template_repo/debug.h>
-#include <template_repo/assert.h>
+#include <common/debug.h>
+#include <common/assert.h>
 
 int main(int argc, char** argv)
 {
-	debug_log_info("Template Repository!");
+	debug_log_info("Common Repository!");
 
 	return 0;
 }
