@@ -33,6 +33,7 @@ COMMON_API void debug_logv(const char* description, u32 line, const char* functi
 	printf("%s", description);
 	vprintf(format, args);
 	printf(" | %u, %s, %s\n", line, function, file);
+	fflush(stdout);
 }
 
 COMMON_API void debug_log(const char* description, u32 line, const char* function, const char* file, const char* format, ...)
