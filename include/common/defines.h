@@ -75,6 +75,12 @@ typedef u32 uint;
 #	define END_CPP_COMPATIBLE
 #endif
 
+#ifdef GLOBAL_DEBUG
+#	define DEBUG_BLOCK(x) x
+#else
+#	define DEBUG_BLOCK(x)
+#endif /*GLOBAL_DEBUG*/
+
 #define DREF_TO(type, ptr) (*(type*)(ptr))
 #define DREF(ptr) (*(ptr))
 #define DEREF DREF
