@@ -18,8 +18,8 @@ EXECUTABLE_NAME = main
 EXTERNAL_INCLUDES = 
 EXTERNAL_LIBS = 
 
-DEPENDENCIES = BufferLib BufferLib/dependencies/CallTrace
-DEPENDENCY_LIBS = BufferLib/lib/bufferlib.a BufferLib/dependencies/CallTrace/lib/calltrace.a
+DEPENDENCIES = ../../../shared-dependencies/BufferLib ../../../dependencies/SafeMemory/shared-dependencies/CallTrace
+DEPENDENCY_LIBS = ../../../shared-dependencies/BufferLib/lib/bufferlib.a ../../../dependencies/SafeMemory/shared-dependencies/CallTrace/lib/calltrace.a
 DEPENDENCIES_DIR = ./dependencies
 SHARED_DEPENDENCIES = 
 SHARED_DEPENDENCY_LIBS = 
@@ -231,7 +231,8 @@ bin-clean:
 	$(RM) $(TARGET_DYNAMIC_IMPORT_LIB)
 	$(RM_DIR) $(TARGET_LIB_DIR)
 	@echo [Log] Binaries cleaned successfully!
-	$(MAKE) --directory=./dependencies/BufferLib clean
+	$(MAKE) --directory=./../../shared-dependencies/BufferLib clean
+	$(MAKE) --directory=./../../dependencies/SafeMemory/shared-dependencies/CallTrace clean
 # 	$(MAKE) --directory=./dependencies/HPML clean
 # 	$(MAKE) --directory=../../shared-dependencies/HPML clean
 #  	$(MAKE) --directory=./dependencies/tgc clean
