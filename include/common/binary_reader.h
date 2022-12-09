@@ -3,7 +3,7 @@
  * Examples:
  * 
  * BUFFER* data = load_binary_from_file("myFile.bin");				// include <disk_manager/file_reader.h>
- * binary_reader_t* reader = binary_reader_create()
+ * binary_reader_t* reader = binary_reader_create(buf_get_ptr(data), buf_get_element_count(data))
  */
 
 
