@@ -159,7 +159,7 @@ static void mark(binary_writer_t* writer, u32 mark_id, mark_type_t type)
 	)
 
 	/* add the mark info into the mark table */
-	mark_entry_t info = { mark_id, curr_write_pos, type };
+	mark_entry_t info = { mark_id, curr_write_pos, type, buf_get_element_count(&writer->mark_table) };
 	buf_push(&writer->mark_table, &info);
 
 	/* 	allocate some bytes to accomodate the data to be written later; 
@@ -201,13 +201,17 @@ static void set_or_insert(binary_writer_t* writer, u32 mark_id, const void* byte
 			/* insert the bytes */
 			writer->insert(writer->user_data, entry->pos, bytes, size);
 
-			/* adjust (increment) all the mark positions that are coming after the mark id 'mark_id' */
+			/* adjust (increment) all the mark positions which are coming after the mark id 'mark_id' */
 			u32 mark_count = buf_get_element_count(&writer->mark_table);
 			for(u32 i = 0; i < mark_count; i++)
 			{
 				mark_entry_t* _entry = buf_get_ptr_at_typeof(&writer->mark_table, mark_entry_t, i);
-				if((_entry->pos > entry->pos) || ((_entry->pos == entry->pos) && (_entry != entry)))
+				if((_entry->pos >= entry->pos) && (_entry != entry))
+				{
+					if((_entry->pos == entry->pos) && (_entry->priority < entry->priority))
+							continue;
 					_entry->pos += size;
+				}
 			}
 			break;
 		}
@@ -219,7 +223,7 @@ static void set_or_insert(binary_writer_t* writer, u32 mark_id, const void* byte
 			/* get the pointer to the internal memory buffer */
 			void* ptr = writer->get_ptr(writer->user_data);
 			/* copy the data from the marked positon */
-			memcpy(ptr + index, bytes, _size);
+			memcpy(ptr + entry->pos, bytes, _size);
 			break;
 		}
 	}

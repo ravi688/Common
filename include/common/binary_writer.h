@@ -45,6 +45,8 @@ typedef struct mark_entry_t
 	u32 pos;
 	/* type of the mark (it's information about memory stride in the buffer) */
 	mark_type_t type;
+	/* priority or rather the time stamp of this mark */
+	u32 priority;
 } mark_entry_t;
 
 BEGIN_CPP_COMPATIBLE
