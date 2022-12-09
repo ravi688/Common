@@ -130,7 +130,7 @@ COMMON_API const void* __binary_reader_read(binary_reader_t* reader, u32 size)
 {
 	u32 pos = reader->read_cursor;
 	reader->read_cursor += size;
-	_ASSERT(reader->read_cursor < reader->size);
+	_ASSERT(reader->read_cursor <= reader->size);
 	return reader->data + pos;
 }
 
