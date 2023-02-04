@@ -99,3 +99,11 @@ typedef u32 uint;
 #define RAD2DEG 57.29577f
 
 #define DEG * DEG2RAD
+
+#ifndef DEBUG_BLOCK
+#	ifdef GLOBAL_DEBUG
+#		define DEBUG_BLOCK(x) x
+#	else
+#		define DEBUG_BLOCK(x)
+#	endif /* GLOBAL_DEBUG */
+#endif /* DEBUG_BLOCK */
