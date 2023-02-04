@@ -20,7 +20,7 @@ EXTERNAL_LIBS =
 
 DEPENDENCIES = BufferLib BufferLib/dependencies/CallTrace
 DEPENDENCY_LIBS = BufferLib/lib/bufferlib.a BufferLib/dependencies/CallTrace/lib/calltrace.a
-DEPENDENCIES_DIR = ./dependencies
+DEPENDENCIES_DIR = ../
 SHARED_DEPENDENCIES = 
 SHARED_DEPENDENCY_LIBS = 
 SHARED_DEPENDENCIES_DIR = ./shared-dependencies
@@ -231,7 +231,7 @@ bin-clean:
 	$(RM) $(TARGET_DYNAMIC_IMPORT_LIB)
 	$(RM_DIR) $(TARGET_LIB_DIR)
 	@echo [Log] Binaries cleaned successfully!
-	$(MAKE) --directory=./dependencies/BufferLib clean
+	$(MAKE) --directory=../BufferLib clean
 # 	$(MAKE) --directory=./dependencies/HPML clean
 # 	$(MAKE) --directory=../../shared-dependencies/HPML clean
 #  	$(MAKE) --directory=./dependencies/tgc clean
