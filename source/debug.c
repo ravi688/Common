@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <common/third_party/debug_break.h>
+
 COMMON_API void debug_assert_wrn(u32 line, const char* function, const char* file, u64 assertion, ...)
 {
 	if(assertion & 1ULL) return;
@@ -25,7 +27,7 @@ COMMON_API void debug_assert(u32 line, const char* function, const char* file, u
 	if(assertion & (1ULL << 16)) format = va_arg(args, const char*);
 	debug_logv("[Assertion Failed] ", line, function, file, format, args);
 	va_end(args);
-	exit(0);
+	debug_break();
 }
 
 COMMON_API void debug_logv(const char* description, u32 line, const char* function, const char* file, const char* format, va_list args)
