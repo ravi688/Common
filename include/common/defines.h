@@ -86,7 +86,7 @@ typedef u32 uint;
 #define DEREF DREF
 #define DEREF_TO DREF_TO
 #define CAST_TO(to, s) ((to)(s))
-#define REINTERPRET_TO(to, s) (*(to*)(&s))
+#define REINTERPRET_TO(to, s) (*(to*)(&(s)))
 
 #define OUT *
 #define IN const *
@@ -99,3 +99,13 @@ typedef u32 uint;
 #define RAD2DEG 57.29577f
 
 #define DEG * DEG2RAD
+
+#define ALIGN_AS(alignment) __attribute__((aligned(alignment)))
+#define DERIVE_FROM(type) type __base
+#define BASE(ptr) (&((ptr)->__base))
+#define BIT16_PACK8(v1, v2) ((CAST_TO(u16, v1) << 8) | CAST_TO(u16, v2))
+#define BIT16_UNPACK8(bits, index) ((bits) >> (CAST_TO(u32, index) << 3))
+#define BIT32_PACK16(v1, v2) ((CAST_TO(u32, v1) << 16) | CAST_TO(u32, v2))
+#define BIT32_UNPACK16(bits, index) ((bits) >> (CAST_TO(u32, index) << 4))
+#define BIT64_PACK32(v1, v2) ((CAST_TO(u64, v1) << 32) | CAST_TO(u64, v2))
+#define BIT64_UNPACK32(bits, index) ((bits) >> (CAST_TO(u32, index) << 5))
