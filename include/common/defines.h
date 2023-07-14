@@ -104,8 +104,8 @@ typedef u32 uint;
 #define DERIVE_FROM(type) type __base
 #define BASE(ptr) (&((ptr)->__base))
 #define BIT16_PACK8(v1, v2) ((CAST_TO(u16, v1) << 8) | CAST_TO(u16, v2))
-#define BIT16_UNPACK8(bits, index) ((bits) >> (CAST_TO(u32, index) << 3))
+#define BIT16_UNPACK8(bits, index) CAST_TO(u8, (((bits) >> (CAST_TO(u32, index) << 3)) & 0xFFUL))
 #define BIT32_PACK16(v1, v2) ((CAST_TO(u32, v1) << 16) | CAST_TO(u32, v2))
-#define BIT32_UNPACK16(bits, index) ((bits) >> (CAST_TO(u32, index) << 4))
+#define BIT32_UNPACK16(bits, index) CAST_TO(u16, (((bits) >> (CAST_TO(u32, index) << 4)) & 0xFFFFUL))
 #define BIT64_PACK32(v1, v2) ((CAST_TO(u64, v1) << 32) | CAST_TO(u64, v2))
-#define BIT64_UNPACK32(bits, index) ((bits) >> (CAST_TO(u32, index) << 5))
+#define BIT64_UNPACK32(bits, index) CAST_TO(u32, (((bits) >> (CAST_TO(u32, index) << 5)) & 0xFFFFFFFFUL))
