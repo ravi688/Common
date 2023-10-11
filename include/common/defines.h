@@ -102,7 +102,7 @@ typedef u32 uint;
 #   define STATIC_CAST(type, source) CAST_TO(type, __static_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
     COMMON_API void* __static_cast(u32 sizeof_type, u32 sizeof_source, void* source);
 #else
-#   define STATIC_CAST(target, source) CAST_TO(target, source)
+#   define STATIC_CAST(type, source) CAST_TO(type, source)
 #endif /* GLOBAL_DEBUG */
 
 /* REINTERPRET_CAST: casts on type of pointer to another where the corresponding non-pointer types may not have the
