@@ -88,6 +88,33 @@ typedef u32 uint;
 #define CAST_TO(to, s) ((to)(s))
 #define REINTERPRET_TO(to, s) (*(to*)(&(s)))
 
+/* REINTERPRET: coerces the data in 'source' into 'target', where 'source' and 'target' hold the data.
+ * Use REINTERPRET when you're sure that target's size is less than or equal to that of source */
+#define REINTERPRET(target, source) REINTERPRET_TO(target, source)
+
+/* SIZEOF_NON_PTR_TYPE: returns the size of non pointer type when a pointer type is passed */
+#define SIZEOF_NON_PTR_TYPE(ptr_type) sizeof(DREF(CAST_TO(ptr_type, NULL)))
+
+/* STATIC_CAST: casts one type of pointer to another where the corresponding non-pointer types have the same size.
+ * Use STATIC_CAST when you're sure both the pointers point to same sized objects
+ * If the size mistmatched, it throws an error at runtime. */
+#ifdef GLOBAL_DEBUG
+#   define STATIC_CAST(type, source) CAST_TO(type, __static_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
+    COMMON_API void* __static_cast(u32 sizeof_type, u32 sizeof_source, void* source);
+#else
+#   define STATIC_CAST(target, source) CAST_TO(target, source)
+#endif /* GLOBAL_DEBUG */
+
+/* REINTERPRET_CAST: casts on type of pointer to another where the corresponding non-pointer types may not have the
+                     same size. However the size of the non-pointer type of the target must be less than or equal to that of source.
+ * Use REINTERPRET_CAST when you're sure the size of the non-pointer type of the target is less than or equal to that of source. */
+#ifdef GLOBAL_DEBUG
+#   define REINTERPRET_CAST(type, source) CAST_TO(type, __reinterpret_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
+    COMMON_API void* __reinterpret_cast(u32 sizeof_type, u32 sizeof_source, void* source);
+#else
+#   define REINTERPRET_CAST(type, source) CAST_TO(type, source)
+#endif /* GLOBAL_DEBUG */
+
 #define OUT *
 #define IN const *
 

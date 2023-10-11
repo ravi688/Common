@@ -1,5 +1,6 @@
 
 #include <common/debug.h>
+#include <common/assert.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -54,3 +55,17 @@ COMMON_API void debug_log_exit(const char* description, u32 line, const char* fu
 	va_end(args);
 	exit(0);
 }
+
+#ifdef GLOBAL_DEBUG
+COMMON_API void* __static_cast(u32 sizeof_type, u32 sizeof_source, void* source)
+{
+	assert(sizeof_type == sizeof_source, "Invalid static_cast. You might run into reading corrupted data.");
+	return source;
+}
+
+COMMON_API void* __reinterpret_cast(u32 sizeof_type, u32 sizeof_source, void* source)
+{
+	assert(sizeof_type <= sizeof_source, "Invalid reinterpret_cast. You might run into reading corrupted data.");
+	return source;
+}
+#endif /* GLOBAL_DEBUG */
