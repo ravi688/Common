@@ -56,6 +56,15 @@ COMMON_API void debug_log_exit(const char* description, u32 line, const char* fu
 	exit(0);
 }
 
+COMMON_API void debug_log_break(const char* description, u32 line, const char* function, const char* file, const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	debug_logv(description, line, function, file, format, args);
+	va_end(args);
+	debug_break();
+}
+
 #ifdef GLOBAL_DEBUG
 COMMON_API void* __static_cast(u32 sizeof_type, u32 sizeof_source, void* source)
 {
