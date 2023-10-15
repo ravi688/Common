@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <float.h>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -19,6 +20,18 @@ typedef float f32;
 typedef double f64;
 typedef u32 uint;
 
+typedef u8* u8_ptr_t;
+typedef u16* u16_ptr_t;
+typedef u32* u32_ptr_t;
+typedef u64* u64_ptr_t;
+typedef s8* s8_ptr_t;
+typedef s16* s16_ptr_t;
+typedef s32* s32_ptr_t;
+typedef s64* s64_ptr_t;
+typedef f32* f32_ptr_t;
+typedef f64* f64_ptr_t;
+typedef void* void_ptr_t;
+
 #define U8_MAX UINT8_MAX
 #define U16_MAX UINT16_MAX
 #define U32_MAX UINT32_MAX
@@ -32,6 +45,11 @@ typedef u32 uint;
 #define S32_MIN INT32_MIN
 #define S64_MAX INT64_MAX
 #define S64_MIN INT64_MIN
+
+#define F32_MIN FLT_MIN
+#define F32_MAX FLT_MAX
+#define F64_MIN DBL_MIN
+#define F64_MAX DBL_MAX
 
 #define DEPRECATED_FUNCTION __attribute__((deprecated))
 #define REMOVED_FUNCTION __attribute__((unavailable))
