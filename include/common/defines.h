@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <float.h>
+#include <common/platform.h>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
