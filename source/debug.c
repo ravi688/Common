@@ -15,7 +15,7 @@ COMMON_API void debug_assert_wrn(u32 line, const char* function, const char* fil
 	va_start(args, assertion);
 	const char* format = "";
 	if(assertion & (1ULL << 16)) format = va_arg(args, const char*);
-	debug_logv("[Assertion Failed] ", line, function, file, format, args);
+	debug_logv("[Assertion Failed] Warning: ", line, function, file, format, args);
 	va_end(args);
 }
 
