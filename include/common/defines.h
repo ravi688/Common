@@ -134,8 +134,13 @@ typedef void* void_ptr_t;
 #   define REINTERPRET_CAST(type, source) CAST_TO(type, source)
 #endif /* GLOBAL_DEBUG */
 
-#define OUT *
-#define IN const *
+#define __COM_OUT__ *
+#define __COM_IN__ const *
+
+#ifndef COMMON_HINT_OUT_IN_ALREADY_DEFINED
+#   define OUT __COM_OUT__
+#   define IN __COM_IN__
+#endif
 
 #define BIT64(index) (1ULL << index)
 #define BIT32(index) (1UL << index)
