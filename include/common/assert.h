@@ -14,6 +14,30 @@
 #define _ASSERT(assertion) ASSERT(DESCRIPTION(assertion), #assertion)
 #define _ASSERT_WRN(assertion) ASSERT_WRN(DESCRIPTION(assertion), #assertion)
 
+#ifdef assert
+#	undef assert
+#endif 
+
+#ifdef assert_wrn
+#	undef assert_wrn
+#endif
+
+#ifdef assert_called_once
+#	undef assert_called_once
+#endif
+
+#ifdef assert_not_implemented
+#	undef assert_not_implemented
+#endif
+
+#ifdef _assert
+#	undef _assert
+#endif
+
+#ifdef _assert_wrn
+#	undef _assert_wrn
+#endif
+
 #ifdef GLOBAL_DEBUG
 #	define assert(...) ASSERT(__VA_ARGS__)
 #	define assert_wrn(...) ASSERT_WRN(__VA_ARGS__)
