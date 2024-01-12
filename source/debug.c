@@ -47,7 +47,7 @@ COMMON_API void debug_log(const char* description, u32 line, const char* functio
 	va_end(args);
 }
 
-COMMON_API void debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...)
+COMMON_API void __debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...)
 {
 	va_list args;
 	va_start(args, format);
