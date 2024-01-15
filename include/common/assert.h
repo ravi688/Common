@@ -8,8 +8,14 @@
 #define ASSERT_CALLED_ONCE(...) static int __FUNCTION__##count = 0; __FUNCTION__##count++; ASSERT(DESCRIPTION(__FUNCTION__##count < 2), "The Function \"%s\" has been called more than once", __FUNCTION__)
 #define ASSERT_NOT_IMPLEMENTED(...) ASSERT(DESCRIPTION(false), "Function \"%s\" isn't implemented yet but you're still trying to call it", __FUNCTION__)
 
+#define COM_ASSERT(...) ASSERT(__VA_ARGS__)
+#define COM_ASSERT_WRN(...) ASSERT_WRN(__VA_ARGS__)
+#define COM_ASSERT_CALLED_ONCE(...) ASSERT_CALLED_ONCE(__VA_ARGS__)
+#define COM_ASSERT_NOT_IMPLEMENTED(...) ASSERT_NOT_IMPLEMENTED(__VA_ARGS__)
 
 #define DESCRIPTION(bool_value) (CAST_TO(u64, (bool_value)) | (1ULL << 16))
+
+#define COM_DESCRIPTION(...) DESCRIPTION(__VA_ARGS__)
 
 #define _ASSERT(assertion) ASSERT(DESCRIPTION(assertion), #assertion)
 #define _ASSERT_WRN(assertion) ASSERT_WRN(DESCRIPTION(assertion), #assertion)
@@ -38,6 +44,9 @@
 #	undef _assert_wrn
 #endif
 
+#define _COM_ASSERT(...) _ASSERT(__VA_ARGS__)
+#define _COM_ASSERT_WRN(...) ASSERT_WRN(__VA_ARGS__)
+
 #ifdef GLOBAL_DEBUG
 #	define assert(...) ASSERT(__VA_ARGS__)
 #	define assert_wrn(...) ASSERT_WRN(__VA_ARGS__)
@@ -53,3 +62,11 @@
 #	define _assert(...)
 #	define _assert_wrn(...)
 #endif
+
+
+#define com_assert(...) assert(__VA_ARGS__)
+#define com_assert_wrn(...) assert_wrn(__VA_ARGS__)
+#define com_assert_called_once(...) assert_called_once(__VA_ARGS__)
+#define com_assert_not_implemented(...) assert_not_implemented(__VA_ARGS__)
+#define _com_assert(...) _assert(__VA_ARGS__)
+#define _com_assert_wrn(...) _assert_wrn(__VA_ARGS__)
