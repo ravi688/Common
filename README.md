@@ -31,3 +31,14 @@ This repository contains the common being used across all my projects.
 * `com_assert_not_implemented()` when called inside any function, it issues an error when the function is called indicating the function is not implemented yet and not suitable for any use, and it only works in `GLOBAL_DEBUG` mode
 * `_com_assert(condition)` works same as `com_assert` function, however it doesn't require a description, it prints the condition expression as it is, and it only works in `GLOBAL_DEBUG` mode
 * `_com_assert_wrn(condition)` works same as `com_assert_wrn` function, however it doesn't require a description as second argument, it prints the condition expression as it is, and it only works in `GLOBAL_DEBUG` mode
+
+## Binary Reader
+### Header file: common/binary_reader.h
+Given a string of bytes, either loaded from file residing in disk or already existing in the memory as `BUFFER` (a.k.a `buffer_t`) object, the set of functions in `common/binary_reader.h` header can be used to read formatted data out of those bytes. <br>
+Example:
+```c
+BUFFER* data = load_binary_from_file("myFile.bin");				// include <disk_manager/file_reader.h>
+binary_reader_t* reader = binary_reader_create(buf_get_ptr(data), buf_get_element_count(data)) // create binary_reader_t object from the base pointer and the number of bytes it points to
+binary_reader_destroy(reader) // destroy the binary_reader_t object
+buf_free(data) // destroy the BUFFER object
+```
