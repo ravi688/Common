@@ -37,8 +37,12 @@ This repository contains the common being used across all my projects.
 Given a string of bytes, either loaded from file residing in disk or already existing in the memory as `BUFFER` (a.k.a `buffer_t`) object, the set of functions in `common/binary_reader.h` header can be used to read formatted data out of those bytes. <br>
 Example:
 ```c
-BUFFER* data = load_binary_from_file("myFile.bin");				// include <disk_manager/file_reader.h>
-binary_reader_t* reader = binary_reader_create(buf_get_ptr(data), buf_get_element_count(data)) // create binary_reader_t object from the base pointer and the number of bytes it points to
-binary_reader_destroy(reader) // destroy the binary_reader_t object
-buf_free(data) // destroy the BUFFER object
+// include <disk_manager/file_reader.h> to use load_binary_from_file() function
+BUFFER* data = load_binary_from_file("myFile.bin");
+// create binary_reader_t object from the base pointer and the number of bytes it points to
+binary_reader_t* reader = binary_reader_create(buf_get_ptr(data), buf_get_element_count(data))
+// destroy the binary_reader_t object
+binary_reader_destroy(reader)
+// destroy the BUFFER object
+buf_free(data)
 ```
