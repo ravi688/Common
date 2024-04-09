@@ -22,3 +22,12 @@ This repository contains the common being used across all my projects.
 * `BIT32_UNPACK8(bits, index)` macro returns 8-bit unsigned integer corresponding to the 8 bits starting at `index x 8` from the left
 * `BIT64_PACK32(v1, v2)` macro returns 64-bit unsigned integer having packed 32-bit values `v1`, and `v2` from left to right
 * `BIT64_UNPACK32(bits, index)` macro returns 32-bit unsigned integer corresponding to the 32-bits starting at `index x 32` from the left
+
+## Assertions
+### Header file: common/assert.h
+* `com_assert(condition, description)` prints description and breaks the execution when `condition` is false, and it only works in `GLOBAL_DEBUG` mode
+* `com_assert_wrn(condition, description)` issues only a warning when `condition` is false, and it only works in `GLOBAL_DEBUG` mode
+* `com_assert_called_once()` when called inside any function, it make sures the function is called only once in the lifetime  of a program otherwise it prints an error and breaks the execution, and it only works in `GLOBAL_DEBUG` mode
+* `com_assert_not_implemented()` when called inside any function, it issues an error when the function is called indicating the function is not implemented yet and not suitable for any use, and it only works in `GLOBAL_DEBUG` mode
+* `_com_assert(condition)` works same as `com_assert` function, however it doesn't require a description, it prints the condition expression as it is, and it only works in `GLOBAL_DEBUG` mode
+* `_com_assert_wrn(condition)` works same as `com_assert_wrn` function, however it doesn't require a description as second argument, it prints the condition expression as it is, and it only works in `GLOBAL_DEBUG` mode
