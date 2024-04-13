@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <float.h>
+#include <common/platform.h>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -133,11 +134,18 @@ typedef void* void_ptr_t;
 #   define REINTERPRET_CAST(type, source) CAST_TO(type, source)
 #endif /* GLOBAL_DEBUG */
 
-#define OUT *
-#define IN const *
+#define __COM_OUT__ *
+#define __COM_IN__ const *
+
+#ifndef COMMON_HINT_OUT_IN_ALREADY_DEFINED
+#   define OUT __COM_OUT__
+#   define IN __COM_IN__
+#endif
 
 #define BIT64(index) (1ULL << index)
 #define BIT32(index) (1UL << index)
+#define BIT16(index) (CAST_TO(u16, 1U) << index)
+#define BIT8(index) (CAST_TO(u8, 1U) << index)
 #define BIT_MASK32(count) (CAST_TO(u32, ~((~0UL) << count)))
 
 #define DEG2RAD 0.01745f
@@ -152,5 +160,10 @@ typedef void* void_ptr_t;
 #define BIT16_UNPACK8(bits, index) CAST_TO(u8, (((bits) >> (CAST_TO(u32, index) << 3)) & 0xFFUL))
 #define BIT32_PACK16(v1, v2) ((CAST_TO(u32, v1) << 16) | CAST_TO(u32, v2))
 #define BIT32_UNPACK16(bits, index) CAST_TO(u16, (((bits) >> (CAST_TO(u32, index) << 4)) & 0xFFFFUL))
+#define BIT32_PACK8(v1, v2, v3, v4) BIT32_PACK16(BIT16_PACK8(v1, v2), BIT16_PACK8(v3, v4))
+#define BIT32_UNPACK8(bits, index) CAST_TO(u8, (((bits) >> (CAST_TO(u32, index) << 3)) & 0xFFU))
 #define BIT64_PACK32(v1, v2) ((CAST_TO(u64, v1) << 32) | CAST_TO(u64, v2))
 #define BIT64_UNPACK32(bits, index) CAST_TO(u32, (((bits) >> (CAST_TO(u32, index) << 5)) & 0xFFFFFFFFUL))
+
+
+#define HAS_FLAG(flags, flag) (((flags) & (flag)) == (flag))

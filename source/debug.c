@@ -15,7 +15,7 @@ COMMON_API void debug_assert_wrn(u32 line, const char* function, const char* fil
 	va_start(args, assertion);
 	const char* format = "";
 	if(assertion & (1ULL << 16)) format = va_arg(args, const char*);
-	debug_logv("[Assertion Failed] ", line, function, file, format, args);
+	debug_logv("[Assertion Failed] Warning: ", line, function, file, format, args);
 	va_end(args);
 }
 
@@ -47,7 +47,7 @@ COMMON_API void debug_log(const char* description, u32 line, const char* functio
 	va_end(args);
 }
 
-COMMON_API void debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...)
+COMMON_API void __debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...)
 {
 	va_list args;
 	va_start(args, format);
