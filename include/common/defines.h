@@ -167,3 +167,11 @@ typedef void* void_ptr_t;
 
 
 #define HAS_FLAG(flags, flag) (((flags) & (flag)) == (flag))
+
+#ifdef COMMON_PORTABLE_STDLIB
+    #ifdef PLATFORM_WINDOWS
+    #   define strtoull(...) _strtoui64(__VA_ARGS__)
+    #elif defined(PLATFORM_LINUX)
+    #   define _strtoui64(...) strtoull(__VA_ARGS__)
+    #endif
+#endif
