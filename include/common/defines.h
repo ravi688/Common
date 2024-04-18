@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <float.h>
+#include <stddef.h> // NULL
 #include <common/platform.h>
 
 typedef uint8_t u8;
