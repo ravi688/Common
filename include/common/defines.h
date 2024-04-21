@@ -65,8 +65,10 @@ typedef void* void_ptr_t;
 #define CONSTRUCTOR_FUNCTION __attribute__((constructor))
 #define DESTRUCTOR_FUNCTION __attribute__((destructor))
 #define UNUSED_FUNCTION __attribute__((unused))
+#define UNUSED_VARIABLE __attribute__((unused))
 #define WARN_UNUSED_RESULT_FUNCTION __attribute__((warn_unused_result))
 #define INLINE_FUNCTION inline
+#define UNREACHABLE() __builtin_unreachable()
 
 #define DEPRECATED DEPRECATED_FUNCTION
 #define INLINE INLINE_FUNCTION
@@ -130,6 +132,8 @@ typedef void* void_ptr_t;
  * Use REINTERPRET_CAST when you're sure the size of the non-pointer type of the target is less than or equal to that of source. */
 #ifdef GLOBAL_DEBUG
 #   define REINTERPRET_CAST(type, source) CAST_TO(type, __reinterpret_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
+#   define REINTERPRET_CONST_CAST(type, source) CAST_TO(type, __reinterpret_const_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
+    COMMON_API const void* __reinterpret_const_cast(u32 sizeof_type, u32 sizeof_source, const void* source);
     COMMON_API void* __reinterpret_cast(u32 sizeof_type, u32 sizeof_source, void* source);
 #else
 #   define REINTERPRET_CAST(type, source) CAST_TO(type, source)

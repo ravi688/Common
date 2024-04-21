@@ -31,7 +31,7 @@ COMMON_API void debug_assert_wrn(u32 line, const char* function, const char* fil
 COMMON_API void debug_assert(u32 line, const char* function, const char* file, u64 assertion, ...);
 COMMON_API void debug_logv(const char* description, u32 line, const char* function, const char* file, const char* format, va_list args);
 COMMON_API void debug_log(const char* description, u32 line, const char* function, const char* file, const char* format, ...);
-COMMON_API void __debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...);
+COMMON_API NO_RETURN_FUNCTION void __debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...);
 COMMON_API void debug_log_break(const char* description, u32 line, const char* function, const char* file, const char* format, ...);
 
 END_CPP_COMPATIBLE

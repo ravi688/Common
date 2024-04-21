@@ -47,7 +47,7 @@ COMMON_API void debug_log(const char* description, u32 line, const char* functio
 	va_end(args);
 }
 
-COMMON_API void __debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...)
+COMMON_API NO_RETURN_FUNCTION void __debug_log_exit(const char* description, u32 line, const char* function, const char* file, const char* format, ...)
 {
 	va_list args;
 	va_start(args, format);
@@ -73,6 +73,12 @@ COMMON_API void* __static_cast(u32 sizeof_type, u32 sizeof_source, void* source)
 }
 
 COMMON_API void* __reinterpret_cast(u32 sizeof_type, u32 sizeof_source, void* source)
+{
+	assert(sizeof_type <= sizeof_source, "Invalid reinterpret_cast. You might run into reading corrupted data.");
+	return source;
+}
+
+COMMON_API const void* __reinterpret_const_cast(u32 sizeof_type, u32 sizeof_source, const void* source)
 {
 	assert(sizeof_type <= sizeof_source, "Invalid reinterpret_cast. You might run into reading corrupted data.");
 	return source;
