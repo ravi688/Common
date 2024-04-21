@@ -1,5 +1,22 @@
 #pragma once
 
+/* compiler identification */
+#if defined(__MINGW32__)
+#	define COMPILER_MINGW32	 		// MING32
+#elif defined(__MINGW64__)
+#	define COMPILER_MINGW64 			// MINGW64
+#elif defined(__clang__)
+#	define COMPILER_CLANG 				// CLANG
+#elif defined(__GNUC__)
+#	define COMPILER_GCC				// GCC
+#elif defined(_MSC_VER)
+#	define COMPILER_MSVC 				// MSVC
+#endif
+
+#if defined(COMPILER_MINGW64) || defined(COMPILER_MINGW32)
+#	define COMPILER_MINGW
+#endif // MINGW
+
 #if !defined(__GNUC__)
 #	error "GNU compiler is expected"
 #endif /* __GNUC__ */
