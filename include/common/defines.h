@@ -67,6 +67,8 @@ typedef void* void_ptr_t;
 #define DESTRUCTOR_FUNCTION __attribute__((destructor))
 #define UNUSED_FUNCTION __attribute__((unused))
 #define UNUSED_VARIABLE __attribute__((unused))
+#define CAN_BE_UNUSED_FUNCTION UNUSED_FUNCTION
+#define CAN_BE_UNUSED_VARIABLE UNUSED_VARIABLE
 #define WARN_UNUSED_RESULT_FUNCTION __attribute__((warn_unused_result))
 #define INLINE_FUNCTION inline
 #define UNREACHABLE() __builtin_unreachable()
@@ -138,6 +140,7 @@ typedef void* void_ptr_t;
     COMMON_API void* __reinterpret_cast(u32 sizeof_type, u32 sizeof_source, void* source);
 #else
 #   define REINTERPRET_CAST(type, source) CAST_TO(type, source)
+#   define REINTERPRET_CONST_CAST(type, source) CAST_TO(type, source)
 #endif /* GLOBAL_DEBUG */
 
 #define __COM_OUT__ *
