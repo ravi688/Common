@@ -153,11 +153,11 @@ typedef void* void_ptr_t;
 #   define IN __COM_IN__
 #endif
 
-#define BIT64(index) (1ULL << index)
-#define BIT32(index) (1UL << index)
-#define BIT16(index) (CAST_TO(u16, 1U) << index)
-#define BIT8(index) (CAST_TO(u8, 1U) << index)
-#define BIT_MASK32(count) (CAST_TO(u32, ~((~0UL) << count)))
+#define BIT64(index) (1ULL << (index))
+#define BIT32(index) (1UL << (index))
+#define BIT16(index) (CAST_TO(u16, 1U) << (index))
+#define BIT8(index) (CAST_TO(u8, 1U) << (index))
+#define BIT_MASK32(count) (CAST_TO(u32, ~((~0UL) << (count))))
 
 #define DEG2RAD 0.01745f
 #define RAD2DEG 57.29577f
