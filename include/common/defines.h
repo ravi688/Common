@@ -186,3 +186,11 @@ typedef void* void_ptr_t;
     #   define _strtoui64(...) strtoull(__VA_ARGS__)
     #endif
 #endif
+
+#ifndef INLINE_IF_RELEASE_MODE
+#   if !defined(GLOBAL_DEBUG) && !defined(DEBUG)
+#       define INLINE_IF_RELEASE_MODE FORCE_INLINE
+#   else
+#       define INLINE_IF_RELEASE_MODE
+#   endif
+#endif /* INLINE_IF_RELEASE_MODE */
