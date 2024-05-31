@@ -113,6 +113,8 @@ typedef void* void_ptr_t;
 #define CAST_TO(to, s) ((to)(s))
 #define REINTERPRET_TO(to, s) (*(to*)(&(s)))
 
+#define SIZEOF_ARRAY(array) (sizeof(array) / sizeof((array)[0]))
+
 #define IS_PTR_EQUAL(ptr1, ptr2) (CAST_TO(void*, ptr1) == CAST_TO(void*, ptr2))
 
 /* REINTERPRET: coerces the data in 'source' into 'target', where 'source' and 'target' hold the data.
