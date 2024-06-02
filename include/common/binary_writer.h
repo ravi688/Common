@@ -111,6 +111,9 @@ COMMON_API void binary_writer_u8_set(binary_writer_t* writer, u32 mark_id, u8 v)
 
 /* marks the current position with mark_id, for variable number of bytes, to be written later */
 COMMON_API void binary_writer_mark(binary_writer_t* writer, u32 mark_id);
+/* unmarks the position which the mark_id was pointing, this function is used to reuse the mark_id, 
+ * and should not be any offset mark ids as it might have unintended side-effects */
+COMMON_API void binary_writer_unmark(binary_writer_t* writer, u32 mark_id);
 /* writes the bytes pointed by 'bytes' with size 'size' from the write position marked with mark_id */
 COMMON_API void binary_writer_insert(binary_writer_t* writer, u32 mark_id, const void* bytes, u32 size);
 
