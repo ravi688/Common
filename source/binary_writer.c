@@ -264,6 +264,21 @@ COMMON_API void binary_writer_mark(binary_writer_t* writer, u32 mark_id)
 	mark(writer, mark_id, MARK_TYPE_UNDEFINED);
 }
 
+COMMON_API void binary_writer_unmark(binary_writer_t* writer, u32 mark_id)
+{
+	/* check if the mark ID exists in the mark table */
+	buf_ucount_t index = buf_find_index_of(&writer->mark_table, &mark_id, mark_id_comparer);
+	if(index == BUF_INVALID_INDEX)
+	{
+		debug_log_warning("[Binary Writer] There is no such mark exists with mark ID %lu", mark_id);
+		return;
+	}
+
+	/* remove the mark */
+	bool result = buf_remove_at(&writer->mark_table, index, NULL);
+	_assert(result == true);
+}
+
 COMMON_API void binary_writer_insert(binary_writer_t* writer, u32 mark_id, const void* bytes, u32 size)
 {
 	set_or_insert(writer, mark_id, bytes, size);
