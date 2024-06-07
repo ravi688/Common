@@ -196,3 +196,7 @@ typedef void* void_ptr_t;
 #       define INLINE_IF_RELEASE_MODE
 #   endif
 #endif /* INLINE_IF_RELEASE_MODE */
+
+
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_min(u32 x, u32 y) { return (x < y) ? x : y; }
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_max(u32 x, u32 y) { return (x > y) ? x : y; }
