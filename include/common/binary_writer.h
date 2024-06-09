@@ -3,27 +3,6 @@
 #include <common/defines.h>
 #include <bufferlib/buffer.h>
 
-/* binary writer is an interface to write binary data into a memory buffer conveniently */
-typedef struct binary_writer_t
-{
-	/* 	user data (automatically resizable buffer instance, such as BUFFER)	*/
-	void* user_data;
-	/* 	ptr to a function which pushes a number of contiguous bytes on top of the memory buffer */
-	void (*push)(void* user_data, const void* bytes, u32 size);
-	/* 	ptr to a function which inserts a number of contiguous bytes somewhere in the memory buffer 
-		index: the index where to to start inserting the bytes
-		bytes: ptr to the contiguous bytes
-		size: the number of bytes pointed by the pointer 'bytes'
-	 */
-	void (*insert)(void* user_data, u32 index, const void* bytes, u32 size);
-	/* ptr to a function which returns internal memory buffer pointer */
-	void* (*get_ptr)(void* user_data);
-	/* ptr to a function which returns current position (number of elements) */
-	u32 (*write_pos)(void* user_data);
-	/* a table to map mark IDs to write positions */
-	BUFFER mark_table;
-} binary_writer_t;
-
 /* type fo data to be written at the marked write position */
 typedef enum mark_type_t
 {
@@ -48,6 +27,29 @@ typedef struct mark_entry_t
 	/* priority or rather the time stamp of this mark */
 	u32 priority;
 } mark_entry_t;
+
+typedef BUFFER mark_entry_list_t;
+
+/* binary writer is an interface to write binary data into a memory buffer conveniently */
+typedef struct binary_writer_t
+{
+	/* 	user data (automatically resizable buffer instance, such as BUFFER)	*/
+	void* user_data;
+	/* 	ptr to a function which pushes a number of contiguous bytes on top of the memory buffer */
+	void (*push)(void* user_data, const void* bytes, u32 size);
+	/* 	ptr to a function which inserts a number of contiguous bytes somewhere in the memory buffer 
+		index: the index where to to start inserting the bytes
+		bytes: ptr to the contiguous bytes
+		size: the number of bytes pointed by the pointer 'bytes'
+	 */
+	void (*insert)(void* user_data, u32 index, const void* bytes, u32 size);
+	/* ptr to a function which returns internal memory buffer pointer */
+	void* (*get_ptr)(void* user_data);
+	/* ptr to a function which returns current position (number of elements) */
+	u32 (*write_pos)(void* user_data);
+	/* a table to map mark IDs to write positions */
+	mark_entry_list_t mark_table;
+} binary_writer_t;
 
 BEGIN_CPP_COMPATIBLE
 
@@ -95,6 +97,11 @@ COMMON_API void binary_writer_write(binary_writer_t* writer, void* bytes, u32 si
 /* returns the current write position (number of bytes written till now) */
 COMMON_API u32 binary_writer_pos(binary_writer_t* writer);
 
+/* returns current offset value for the mark id 'mark_id', this function is useful to query the current offset value 
+ * as it might have been changed because of insertion of data preceding it
+ * NOTE: the returned value shouldn't be cached, whenever you need this value just call it again */
+COMMON_API u32 binary_writer_pos_from_mark_id(binary_writer_t* writer, u32 mark_id);
+
 /* marks the 2 bytes from the current position with mark_id to be writen later */
 COMMON_API void binary_writer_u16_mark(binary_writer_t* writer, u32 mark_id);
 /* writes 2 bytes from the write position marked with mark_id */
@@ -117,6 +124,8 @@ COMMON_API void binary_writer_unmark(binary_writer_t* writer, u32 mark_id);
 /* writes the bytes pointed by 'bytes' with size 'size' from the write position marked with mark_id */
 COMMON_API void binary_writer_insert(binary_writer_t* writer, u32 mark_id, const void* bytes, u32 size);
 
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 binary_writer_get_mark_entry_count(binary_writer_t* writer) { return CAST_TO(u32, buf_get_element_count(&writer->mark_table)); }
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE mark_entry_t* binary_writer_get_mark_entries(binary_writer_t* writer) { return CAST_TO(mark_entry_t*, buf_get_ptr(&writer->mark_table)); }
 
 COMMON_API bool mark_id_comparer(void* ours, void* theirs);
 COMMON_API bool mark_pos_comparer(void* ours, void* theirs);

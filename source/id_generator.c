@@ -1,0 +1,28 @@
+#include <common/id_generator.h>
+
+COMMON_API u32 id_generator_get(id_generator_t* generator)
+{
+	/* if the unreserved list can be created and there are some elements in it */
+	if((generator->unreserved != NULL) && (buf_get_element_count(generator->unreserved) > 0))
+	{
+		/* then pop the last element (right-most element) and return it */
+		u32 id;
+		buf_pop(generator->unreserved, &id);
+		return id;
+	}
+	/* otherwise, return the counter value and increment it for the next unique id generation */
+	return generator->counter++;
+}
+
+COMMON_API void id_generator_return(id_generator_t* generator, u32 id)
+{
+	if(generator->unreserved == NULL)
+		generator->unreserved = BUFcreate_with_callbacks(generator->callbacks, NULL, sizeof(u32), 1, 0);
+	buf_push(generator->unreserved, &id);
+}
+COMMON_API void id_generator_reset(id_generator_t* generator, u32 begin)
+{
+	if(generator->unreserved != NULL)
+		buf_clear_fast(generator->unreserved);
+	generator->counter = begin;
+}
