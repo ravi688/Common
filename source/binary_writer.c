@@ -118,6 +118,37 @@ COMMON_API u32 binary_writer_pos(binary_writer_t* writer)
 	return CAST_TO(u32, writer->write_pos(writer->user_data));
 }
 
+static INLINE_IF_RELEASE_MODE buf_ucount_t get_mark_entry_index_from_mark_id(binary_writer_t* writer, u32 mark_id)
+{
+	/* check if the mark ID exists in the mark table */
+	buf_ucount_t index = buf_find_index_of(&writer->mark_table, &mark_id, mark_id_comparer);
+	if(index == BUF_INVALID_INDEX)
+		debug_log_warning("[Binary Writer] There is no such mark exists with mark ID %lu", mark_id);
+	return index;
+}
+
+static INLINE_IF_RELEASE_MODE mark_entry_t* get_mark_entry_from_mark_index(binary_writer_t* writer, buf_ucount_t index)
+{
+	_com_assert(buf_get_element_count(&writer->mark_table) > index);
+	/* get the mark_entry_t for the mark ID */
+	return buf_get_ptr_at_typeof(&writer->mark_table, mark_entry_t, index);
+}
+
+static mark_entry_t* get_mark_entry_from_mark_id(binary_writer_t* writer, u32 mark_id)
+{
+	AUTO index = get_mark_entry_index_from_mark_id(writer, mark_id);
+	if(index == BUF_INVALID_INDEX)
+		return NULL;
+	return get_mark_entry_from_mark_index(writer, index);
+}
+
+COMMON_API u32 binary_writer_pos_from_mark_id(binary_writer_t* writer, u32 mark_id)
+{
+	AUTO entry = get_mark_entry_from_mark_id(writer, mark_id);
+	_com_assert(entry != NULL);
+	return entry->pos;
+}
+
 static u32 _sizeof(mark_type_t type)
 {
 	switch(type)
@@ -178,16 +209,8 @@ COMMON_API bool mark_id_comparer(void* ours, void* theirs)
 /* sets or inserts a number of bytes from the marked write position with markID 'mark_id' */
 static void set_or_insert(binary_writer_t* writer, u32 mark_id, const void* bytes, u32 size)
 {
-	/* check if the mark ID exists in the mark table */
-	buf_ucount_t index = buf_find_index_of(&writer->mark_table, &mark_id, mark_id_comparer);
-	if(index == BUF_INVALID_INDEX)
-	{
-		debug_log_warning("[Binary Writer] There is no such mark exists with mark ID %lu", mark_id);
-		return;
-	}
-	
 	/* get the mark_entry_t for the mark ID */
-	mark_entry_t* entry = buf_get_ptr_at_typeof(&writer->mark_table, mark_entry_t, index);
+	mark_entry_t* entry = get_mark_entry_from_mark_id(writer, mark_id);
 	switch(entry->type)
 	{
 		/* if marked for variable number of bytes */
