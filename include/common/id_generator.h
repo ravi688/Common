@@ -9,7 +9,7 @@ typedef buffer_t unreserved_id_list_t;
 typedef struct id_generator_t
 {
 	/* it will be needed when creating the unreserved list */
-	allocation_callbacks_t* callbacks;
+	com_allocation_callbacks_t* callbacks;
 	/* list of u32 types, it contains the ids which are unclaimed by calling id_generator_return() 
 	 * it is lazely allocated, i.e. the buffer_t object will be created upon the very first call to id_generator_return() */
 	unreserved_id_list_t* unreserved;
@@ -21,7 +21,7 @@ BEGIN_CPP_COMPATIBLE
 
 /* creatse id_generator_t object
  * begin: no ids will be less than this, i.e. it will be starting value for 'counter' */
-static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE id_generator_t id_generator_create(u32 begin, allocation_callbacks_t* callbacks)
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE id_generator_t id_generator_create(u32 begin, com_allocation_callbacks_t* callbacks)
 {
 	id_generator_t generator = { };
 	generator.callbacks = callbacks;
