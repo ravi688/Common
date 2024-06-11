@@ -18,6 +18,16 @@ static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE COM_STATIC_STRING_N_T(SIZE)
 	return sstr; \
 }
 
+#define COM_STATIC_STRING_N_N(SIZE) \
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE COM_STATIC_STRING_N_T(SIZE) static_string_##SIZE##_n(const char* str, u32 len) \
+{ \
+	_com_assert(len < SIZE); \
+	COM_STATIC_STRING_N_T(SIZE) sstr; \
+	memcpy(sstr.data, str, len); \
+	sstr.data[len] = 0; \
+	return sstr; \
+}
+
 #define COM_STATIC_STRING_N_CPY(SIZE) \
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE const char* static_string_##SIZE##_cpy(COM_STATIC_STRING_N_T(SIZE)* dst, const COM_STATIC_STRING_N_T(SIZE)* src) \
 { \
@@ -48,6 +58,7 @@ static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 static_string_##SIZE##_
 #define COM_STATIC_STRING_N_EXPAND(SIZE) \
 COM_TYPEDEF_STATIC_STRING_N(SIZE); \
 COM_STATIC_STRING_N(SIZE) \
+COM_STATIC_STRING_N_N(SIZE) \
 COM_STATIC_STRING_N_CPY(SIZE) \
 COM_STATIC_STRING_N_CMP(SIZE) \
 COM_STATIC_STRING_N_LEN(SIZE) \
