@@ -77,4 +77,9 @@ COMMON_API void binary_reader_push(binary_reader_t* reader);
 /* pops out the state on top of the stack and applies it to the reader */
 COMMON_API void binary_reader_pop(binary_reader_t* reader);
 
+/* returns current position (in bytes) in the read buffer  */
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 binary_reader_pos(binary_reader_t* reader) { return reader->read_cursor; }
+/* returns the minimum position at which reading is not possible, i.e. past the last byte */
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 binary_reader_end(binary_reader_t* reader) { return reader->size; }
+
 END_CPP_COMPATIBLE
