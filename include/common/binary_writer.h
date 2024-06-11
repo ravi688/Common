@@ -66,7 +66,7 @@ COMMON_API void binary_writer_release_resources(binary_writer_t* writer);
 
 /* writers */
 
-/* 	writes a null terminated string */
+/* 	writes a null terminated string (including the null character) */
 COMMON_API void binary_writer_string(binary_writer_t* writer, const char* str);
 /* 	writes a non-null termianted string, 
 	automatically appends a null character at the end of the string */
