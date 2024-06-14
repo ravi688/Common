@@ -200,3 +200,4 @@ typedef void* void_ptr_t;
 
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_min(u32 x, u32 y) { return (x < y) ? x : y; }
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_max(u32 x, u32 y) { return (x > y) ? x : y; }
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_round_next_multiple(u32 value, u32 multiple_of) { return value + multiple_of - (value % multiple_of); }
