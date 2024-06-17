@@ -167,6 +167,7 @@ typedef void* void_ptr_t;
 #define DEG * DEG2RAD
 
 #define ALIGN_AS(alignment) __attribute__((aligned(alignment)))
+#define ALIGN_OF(type) __alignof(type)
 #define DERIVE_FROM(type) type __base
 #define BASE(ptr) (&((ptr)->__base))
 #define BIT16_PACK8(v1, v2) ((CAST_TO(u16, v1) << 8) | CAST_TO(u16, v2))
@@ -200,4 +201,9 @@ typedef void* void_ptr_t;
 
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_min(u32 x, u32 y) { return (x < y) ? x : y; }
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_max(u32 x, u32 y) { return (x > y) ? x : y; }
+#define U32_NEXT_MULTIPLE(value, multiple_of) ((value) + (multiple_of) - ((value) % (multiple_of)))
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_round_next_multiple(u32 value, u32 multiple_of) { return value + multiple_of - (value % multiple_of); }
+
+#define U32_MAX_OF(x, y) (((x) > (y)) ? (x) : (y))
+#define COM_GET_STRIDE_IN_ARRAY(size, align) ((size) + ((align) - ((size) % (align))) % (align))
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 com_get_stride_in_array(u32 size, u32 align) { return size + (align - (size % align)) % align; }
