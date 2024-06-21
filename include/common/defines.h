@@ -139,7 +139,9 @@ typedef void* void_ptr_t;
  * Use REINTERPRET_CAST when you're sure the size of the non-pointer type of the target is less than or equal to that of source. */
 #ifdef GLOBAL_DEBUG
 #   define REINTERPRET_CAST(type, source) CAST_TO(type, __reinterpret_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
+#   define _REINTERPRET_CAST(type, source, source_size) CAST_TO(type, __reinterpret_cast(SIZEOF_NON_PTR_TYPE(type), source_size, source))
 #   define REINTERPRET_CONST_CAST(type, source) CAST_TO(type, __reinterpret_const_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
+#   define _REINTERPRET_CONST_CAST(type, source, source_size) CAST_TO(type, __reinterpret_const_cast(SIZEOF_NON_PTR_TYPE(type), source_size, source))
     COMMON_API const void* __reinterpret_const_cast(u32 sizeof_type, u32 sizeof_source, const void* source);
     COMMON_API void* __reinterpret_cast(u32 sizeof_type, u32 sizeof_source, void* source);
 #else
