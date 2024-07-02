@@ -80,7 +80,11 @@ typedef void* void_ptr_t;
 #define DESTRUCTOR DESTRUCTOR_FUNCTION
 #define HOT HOT_FUNCTION
 #define COLD COLD_FUNCTION
-#define AUTO __auto_type
+#ifdef __cplusplus
+#   define AUTO auto
+#else
+#   define AUTO __auto_type
+#endif
 
 #ifdef COMMON_STATIC_LIBRARY
 #	define COMMON_API
