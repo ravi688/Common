@@ -36,6 +36,18 @@ namespace com
 		return static_cast<EnumClassType>(intValue);
 	}
 
+	template<typename EnumClassType, typename IntegerType>
+	constexpr typename std::underlying_type<EnumClassType>::type CastIntToUnderlyingType(IntegerType intValue)
+	{
+		return static_cast<typename std::underlying_type<EnumClassType>::type>(intValue);
+	}
+
+	template<typename EnumClassType, typename IntegerType>
+	constexpr EnumClassType ForceIntToEnumClass(IntegerType intValue)
+	{
+		return IntToEnumClass<EnumClassType>(CastIntToUnderlyingType<EnumClassType, IntegerType>(intValue));
+	}
+
 	template<typename T>
 	class OptionalReference
 	{
