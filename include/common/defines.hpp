@@ -144,4 +144,17 @@ namespace com
 			second = std::move(pair.second);
 		}
 	};
+
+	template<typename Iterator, class UnaryPredicate>
+	bool erase_first_if(Iterator begin, Iterator end, UnaryPredicate predicate)
+	{
+		for(Iterator& it = begin; it != end; it++)
+			if(predicate(*it))
+			{
+				for(Iterator& _it = it; ++_it != end;)
+					*it++ = std::move(*_it);
+				return true;
+			}
+		return false;
+	}
 }
