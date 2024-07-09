@@ -42,3 +42,5 @@ COMMON_API u32 id_generator_get(id_generator_t* generator);
 COMMON_API void id_generator_return(id_generator_t* generator, u32 id);
 /* resets the counter and clears the unreserved list, thus, invalidates all the ids which were returned by id_generator_get() */
 COMMON_API void id_generator_reset(id_generator_t* generator, u32 begin);
+
+END_CPP_COMPATIBLE
