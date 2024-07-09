@@ -16,6 +16,8 @@ typedef struct com_allocation_callbacks_t
 	void (*deallocate)(void* user_data, void* ptr);
 } com_allocation_callbacks_t;
 
+BEGIN_CPP_COMPATIBLE
+
 COMMON_API com_allocation_callbacks_t com_allocation_callbacks_get_std();
 
 COMMON_API void* com_call_allocate_aligned(com_allocation_callbacks_t* callbacks, u32 size, u32 align);
@@ -34,3 +36,5 @@ COMMON_API void com_call_deallocate(com_allocation_callbacks_t* callbacks, void*
 COMMON_API buffer_t buf_create_with_callbacks(com_allocation_callbacks_t* callbacks, u32 element_size, u32 capacity, u32 offset);
 COMMON_API BUFFER* BUFcreate_with_callbacks(com_allocation_callbacks_t* callbacks, void* buffer, u32 element_size, u32 capacity, u32 offset);
 #define buf_new_with_callbacks(callbacks, type) buf_create_with_callbacks(callbacks, sizeof(type), 0, 0)
+
+END_CPP_COMPATIBLE
