@@ -4,6 +4,7 @@
 
 #include <type_traits>
 #include <utility>
+#include <iterator> /* for std::advance */
 
 #include <iostream>
 
@@ -156,5 +157,21 @@ namespace com
 				return true;
 			}
 		return false;
+	}
+
+	template<template<typename> typename STLContainerType, typename T, typename IndexType>
+	typename STLContainerType<T>::iterator GetIteratorFromIndex(STLContainerType<T>& stlContainer, IndexType index)
+	{
+		typename STLContainerType<T>::iterator it = stlContainer.begin();
+		std::advance(it, index);
+		return it;
+	}
+
+	template<template<typename> typename STLContainerType, typename T, typename IndexType>
+	typename STLContainerType<T>::const_iterator GetIteratorFromIndex(const STLContainerType<T>& stlContainer, IndexType index)
+	{
+		typename STLContainerType<T>::const_iterator it = stlContainer.begin();
+		std::advance(it, index);
+		return it;
 	}
 }
