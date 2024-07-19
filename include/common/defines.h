@@ -213,3 +213,5 @@ static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_round_next_multiple
 #define U32_MAX_OF(x, y) (((x) > (y)) ? (x) : (y))
 #define COM_GET_STRIDE_IN_ARRAY(size, align) U32_NEXT_MULTIPLE(size, align)
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 com_get_stride_in_array(u32 size, u32 align) { return u32_round_next_multiple(size, align); }
+
+#define COM_OPTIONAL(type) struct { bool has_value;  type value; }
