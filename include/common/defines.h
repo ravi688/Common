@@ -80,7 +80,11 @@ typedef void* void_ptr_t;
 #define DESTRUCTOR DESTRUCTOR_FUNCTION
 #define HOT HOT_FUNCTION
 #define COLD COLD_FUNCTION
-#define AUTO __auto_type
+#ifdef __cplusplus
+#   define AUTO auto
+#else
+#   define AUTO __auto_type
+#endif
 
 #ifdef COMMON_STATIC_LIBRARY
 #	define COMMON_API
@@ -139,7 +143,9 @@ typedef void* void_ptr_t;
  * Use REINTERPRET_CAST when you're sure the size of the non-pointer type of the target is less than or equal to that of source. */
 #ifdef GLOBAL_DEBUG
 #   define REINTERPRET_CAST(type, source) CAST_TO(type, __reinterpret_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
+#   define _REINTERPRET_CAST(type, source, source_size) CAST_TO(type, __reinterpret_cast(SIZEOF_NON_PTR_TYPE(type), source_size, source))
 #   define REINTERPRET_CONST_CAST(type, source) CAST_TO(type, __reinterpret_const_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
+#   define _REINTERPRET_CONST_CAST(type, source, source_size) CAST_TO(type, __reinterpret_const_cast(SIZEOF_NON_PTR_TYPE(type), source_size, source))
     COMMON_API const void* __reinterpret_const_cast(u32 sizeof_type, u32 sizeof_source, const void* source);
     COMMON_API void* __reinterpret_cast(u32 sizeof_type, u32 sizeof_source, void* source);
 #else
@@ -167,6 +173,7 @@ typedef void* void_ptr_t;
 #define DEG * DEG2RAD
 
 #define ALIGN_AS(alignment) __attribute__((aligned(alignment)))
+#define ALIGN_OF(type) __alignof(type)
 #define DERIVE_FROM(type) type __base
 #define BASE(ptr) (&((ptr)->__base))
 #define BIT16_PACK8(v1, v2) ((CAST_TO(u16, v1) << 8) | CAST_TO(u16, v2))
@@ -200,3 +207,11 @@ typedef void* void_ptr_t;
 
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_min(u32 x, u32 y) { return (x < y) ? x : y; }
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_max(u32 x, u32 y) { return (x > y) ? x : y; }
+#define U32_NEXT_MULTIPLE(value, multiple_of) ((value) + ((multiple_of) - ((value) % (multiple_of))) % multiple_of)
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_round_next_multiple(u32 value, u32 multiple_of) { return U32_NEXT_MULTIPLE(value, multiple_of); }
+
+#define U32_MAX_OF(x, y) (((x) > (y)) ? (x) : (y))
+#define COM_GET_STRIDE_IN_ARRAY(size, align) U32_NEXT_MULTIPLE(size, align)
+static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 com_get_stride_in_array(u32 size, u32 align) { return u32_round_next_multiple(size, align); }
+
+#define COM_OPTIONAL(type) struct { bool has_value;  type value; }
