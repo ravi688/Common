@@ -216,3 +216,7 @@ static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 u32_round_next_multiple
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 com_get_stride_in_array(u32 size, u32 align) { return u32_round_next_multiple(size, align); }
 
 #define COM_OPTIONAL(type) struct { bool has_value;  type value; }
+
+
+#define CENTIMETERS_PER_INCH 2.54f
+#define INCHES_PER_CENTIMETER (1.0f / CENTIMETERS_PER_INCH)
