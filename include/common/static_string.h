@@ -9,6 +9,8 @@
 #define __STDC_WANT_LIB_EXT1__ 1
 #include <string.h> /* string functions */
 
+BEGIN_CPP_COMPATIBLE
+
 #define COM_STATIC_STRING_N(SIZE) \
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE COM_STATIC_STRING_N_T(SIZE) static_string_##SIZE(const char* str) \
 { \
@@ -88,3 +90,5 @@ COM_STATIC_STRING_N_EXPAND(256);
  * static_string_512_cpy
  * static_string_512_cmp  */
 COM_STATIC_STRING_N_EXPAND(512);
+
+END_CPP_COMPATIBLE
