@@ -23,6 +23,23 @@
 #	define debug_log_fetal_error(...)
 #endif
 
+#ifdef COM_VERBOSE
+#	define debug_log_info_verbose(...) debug_log_info(__VA_ARGS__)
+#	define debug_log_warning_verbose(...) debug_log_warning(__VA_ARGS__)
+#	define debug_log_error_verbose(...) debug_log_error(__VA_ARGS__)
+#	define DEBUG_LOG_INFO_VERBOSE(...) DEBUG_LOG_INFO(__VA_ARGS__)
+#	define DEBUG_LOG_WARNING_VERBOSE(...) DEBUG_LOG_WARNING(__VA_ARGS__)
+#	define DEBUG_LOG_ERROR_VERBOSE(...) DEBUG_LOG_ERROR(__VA_ARGS__)
+#else
+#	define debug_log_info_verbose(...)
+#	define debug_log_warning_verbose(...)
+#	define debug_log_error_verbose(...)
+#	define DEBUG_LOG_INFO_VERBOSE(...)
+#	define DEBUG_LOG_WARNING_VERBOSE(...)
+#	define DEBUG_LOG_ERROR_VERBOSE(...)
+#endif
+
+
 BEGIN_CPP_COMPATIBLE
 
 #include <stdarg.h>
