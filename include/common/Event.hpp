@@ -1,3 +1,5 @@
+#pragma once
+
 #include <common/id_generator.h> // for generating unique ids for each subscription
 #include <common/debug.h> // for debug_log_error
 #include <common/assert.h> // for _com_assert
