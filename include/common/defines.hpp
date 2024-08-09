@@ -49,6 +49,12 @@ namespace com
 		return IntToEnumClass<EnumClassType>(CastIntToUnderlyingType<EnumClassType, IntegerType>(intValue));
 	}
 
+	template<typename EnumClassType>
+	constexpr bool EnumClassHasFlag(const EnumClassType bits, const EnumClassType flag) noexcept
+	{
+		return HAS_FLAG(EnumClassToInt<EnumClassType>(bits), EnumClassToInt<EnumClassType>(flag));
+	}
+
 	template<typename T>
 	class OptionalReference
 	{
@@ -174,4 +180,24 @@ namespace com
 		std::advance(it, index);
 		return it;
 	}
+}
+
+
+template<typename EnumClassType>
+constexpr EnumClassType operator&(const EnumClassType a, const EnumClassType b) noexcept
+{
+	return com::IntToEnumClass<EnumClassType, typename std::underlying_type<EnumClassType>::type>(com::EnumClassToInt<EnumClassType>(a) & com::EnumClassToInt<EnumClassType>(b));
+}
+
+template<typename EnumClassType>
+constexpr EnumClassType operator|(const EnumClassType a, const EnumClassType b) noexcept
+{
+	return com::IntToEnumClass<EnumClassType, typename std::underlying_type<EnumClassType>::type>(com::EnumClassToInt<EnumClassType>(a) | com::EnumClassToInt<EnumClassType>(b));
+}
+
+template<typename EnumClassType>
+constexpr EnumClassType operator|=(EnumClassType& a, const EnumClassType b) noexcept
+{
+	a = com::IntToEnumClass<EnumClassType, typename std::underlying_type<EnumClassType>::type>(com::EnumClassToInt<EnumClassType>(a) | com::EnumClassToInt<EnumClassType>(b));
+	return a;
 }
