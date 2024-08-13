@@ -44,6 +44,11 @@ SHARED_DEPENDENCIES =
 SHARED_DEPENDENCY_LIBS =
 SHARED_DEPENDENCIES_DIR = ./shared-dependencies
 
+
+ifeq ($(VERBOSE),1)
+	BUILD_DEFINES += -DCOM_VERBOSE
+endif
+
 # Windows
 # ifeq ($(PLATFORM),Windows)
 # 	EXTERNAL_LIBRARIES += -L${VK_SDK_PATH}/lib/ -lvulkan-1  -L./dependencies/VulkanRenderer/external-dependency-libs/win -lglfw3 -lfreetype.dll -lgdi32
