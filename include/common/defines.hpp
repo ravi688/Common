@@ -180,6 +180,36 @@ namespace com
 		std::advance(it, index);
 		return it;
 	}
+
+	template<typename T, typename FactorType = f32>
+	constexpr T Lerp(T a, T b, FactorType t) noexcept
+	{
+		return a * (static_cast<FactorType>(1) - t) + b * t;
+	}
+
+	// NOTE: this checks only for exclusive range
+	template<typename T>
+	constexpr bool LiesBetween(T value, T min, T max) noexcept
+	{
+		return (value > min) && (value < max);
+	}
+	template<typename T>
+	constexpr bool LiesBetweenInc(T value, T min, T max) noexcept
+	{
+		return (value >= min) && (value <= max);
+	}
+
+	template<typename T1, typename T2>
+	constexpr typename std::common_type<T1, T2>::type min(T1 v1, T2 v2) noexcept
+	{
+		return (v1 < v2) ? v1 : v2;
+	}
+
+	template<typename T1, typename T2>
+	constexpr typename std::common_type<T1, T2>::type max(T1 v1, T2 v2) noexcept
+	{
+		return (v1 > v2) ? v1 : v2;
+	}
 }
 
 
