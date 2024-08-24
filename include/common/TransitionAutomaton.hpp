@@ -1,8 +1,12 @@
+#pragma once
+
 #include <common/defines.hpp> // for com::Lerp template function
 
 #include <chrono> // for timing
 #include <initializer_list> // for std::initializer_list
 #include <unordered_map> // for std::unordered_map
+
+#include <common/assert.h>
 
 namespace com
 {
@@ -12,10 +16,29 @@ namespace com
 		typedef T (*type)(T start, T end, FactorType t);
 	};
 
-	template<typename T, typename GetLerpFuncProto<T>::type LerpFunc = Lerp<T>>
+	template<typename T>
+	struct GetEqualsApproxFuncProto
+	{
+		typedef bool (*type)(T lhs, T rhs);
+	};
+
+	template<typename T>
+	constexpr bool EqualsApprox(T lhs, T rhs) noexcept;
+
+	template<>
+	constexpr bool EqualsApprox<f32>(f32 lhs, f32 rhs) noexcept { return com::LiesBetweenInc(lhs, rhs - 0.00005f, rhs + 0.00005f); }
+	template<>
+	constexpr bool EqualsApprox<f64>(f64 lhs, f64 rhs) noexcept { return com::LiesBetweenInc(lhs, rhs - 0.000005, rhs + 0.000005); }
+
+	template<typename T, 	typename GetEqualsApproxFuncProto<T>::type EqualsApproxFunc = EqualsApprox<T>, 
+							typename GetLerpFuncProto<T>::type LerpFunc = Lerp<T>>
 	class TransitionAutomaton
 	{
-		std::unordered_map<u32, T> m_stateValue;
+	public:
+		typedef u32 StateType;
+
+	private:
+		std::unordered_map<StateType, T> m_stateValue;
 
 		bool m_isRunning;
 
@@ -30,7 +53,7 @@ namespace com
 		std::chrono::time_point<std::chrono::high_resolution_clock> m_prevTime;
 
 	public:
-		TransitionAutomaton(std::initializer_list<std::pair<const u32, T>> stateValuePairs) noexcept : m_stateValue(stateValuePairs),
+		TransitionAutomaton(std::initializer_list<std::pair<const StateType, T>> stateValuePairs) noexcept : m_stateValue(stateValuePairs),
 																											m_isRunning(false),
 																											m_transitionDelay(0.3f)
 		{
@@ -42,13 +65,13 @@ namespace com
 				m_destValue = m_currentValue;
 			}
 		}
-		bool isRunning() noexcept
+		bool isRunning() const noexcept
 		{
 			return m_isRunning;
 		}
 		void update() noexcept
 		{
-			if(m_currentValue.equalsApprox(m_destValue))
+			if(EqualsApproxFunc(m_currentValue, m_destValue))
 			{
 				m_currentValue = m_destValue;
 				m_isRunning = false;
@@ -63,20 +86,20 @@ namespace com
 
 		T getValue() const noexcept { return m_currentValue; }
 
-		void set(u32 state, T color) noexcept
+		void set(StateType state, T color) noexcept
 		{
 			m_stateValue[state] = color;
 		}
 
 		void setTransitionDelay(f32 transitionDelay) noexcept { m_transitionDelay = transitionDelay; }
-		void setDefault(u32 state) noexcept
+		void setDefault(StateType state) noexcept
 		{
 			auto it = m_stateValue.find(state);
 			_com_assert(it != m_stateValue.end());
 			m_currentValue = it->second;
 			m_prevValue = m_currentValue;
 		}
-		void transitionTo(u32 state) noexcept
+		void transitionTo(StateType state) noexcept
 		{
 			m_isRunning = true;
 			auto it = m_stateValue.find(state);
