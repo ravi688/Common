@@ -187,6 +187,12 @@ namespace com
 		return a * (static_cast<FactorType>(1) - t) + b * t;
 	}
 
+	template<typename FactorType, typename T>
+	constexpr FactorType InverseLerp(T value, T a, T b) noexcept
+	{
+		return (value - a) / static_cast<FactorType>(b - a);
+	}
+
 	// NOTE: this checks only for exclusive range
 	template<typename T>
 	constexpr bool LiesBetween(T value, T min, T max) noexcept
