@@ -5,8 +5,10 @@
 #include <chrono> // for timing
 #include <initializer_list> // for std::initializer_list
 #include <unordered_map> // for std::unordered_map
+#include <memory> // for std::unique_ptr
 
 #include <common/assert.h>
+#include <common/Event.hpp> // for com::Event
 
 namespace com
 {
@@ -36,9 +38,11 @@ namespace com
 	{
 	public:
 		typedef u32 StateType;
+		typedef com::Event<void> StateEvent;
 
 	private:
 		std::unordered_map<StateType, T> m_stateValue;
+		std::unordered_map<StateType, std::unique_ptr<StateEvent>> m_stateEvents;
 
 		bool m_isRunning;
 
@@ -49,6 +53,8 @@ namespace com
 		T m_currentValue;
 		// Final Color being chased during the course of transition.
 		T m_destValue;
+		StateType m_destState;
+		StateType m_currentState;
 
 		std::chrono::time_point<std::chrono::high_resolution_clock> m_prevTime;
 
@@ -63,6 +69,8 @@ namespace com
 				m_currentValue = stateValuePairs.begin()->second;
 				m_prevValue = m_currentValue;
 				m_destValue = m_currentValue;
+				m_currentState = stateValuePairs.begin()->first;
+				m_destState = m_currentState;
 			}
 		}
 		bool isRunning() const noexcept
@@ -74,7 +82,14 @@ namespace com
 			if(EqualsApproxFunc(m_currentValue, m_destValue))
 			{
 				m_currentValue = m_destValue;
+				m_currentState = m_destState;
 				m_isRunning = false;
+
+				// check if the current state (just achieved) has any events
+				auto it = m_stateEvents.find(m_currentState);
+				if(it != m_stateEvents.end())
+					// if yes, then publish it.
+					it->second->publish();
 			}
 			else
 			{
@@ -85,19 +100,23 @@ namespace com
 		}
 
 		T getValue() const noexcept { return m_currentValue; }
+		StateType getState() const noexcept { return m_currentState; }
 
-		void set(StateType state, T color) noexcept
+		void set(StateType state, T value) noexcept
 		{
-			m_stateValue[state] = color;
+			m_stateValue[state] = value;
 		}
 
 		void setTransitionDelay(f32 transitionDelay) noexcept { m_transitionDelay = transitionDelay; }
+		// This function supposed to be called just after instantiation of this class and only once.
 		void setDefault(StateType state) noexcept
 		{
 			auto it = m_stateValue.find(state);
 			_com_assert(it != m_stateValue.end());
 			m_currentValue = it->second;
 			m_prevValue = m_currentValue;
+			m_currentState = state;
+			m_destState = state;
 		}
 		void transitionTo(StateType state) noexcept
 		{
@@ -107,6 +126,20 @@ namespace com
 			m_destValue = it->second;
 			m_prevValue = m_currentValue;
 			m_prevTime = std::chrono::high_resolution_clock::now();
+			m_destState = state;
+		}
+
+		StateEvent& getEvent(StateType state) noexcept
+		{
+			auto it = m_stateEvents.find(state);
+			if(it == m_stateEvents.end())
+			{
+				StateEvent* event = new StateEvent();
+				std::unique_ptr<StateEvent> uPtr(event);
+				m_stateEvents.insert({ state, std::move(uPtr) });
+				return *event;
+			}
+			return *(it->second);
 		}
 	};
 }
