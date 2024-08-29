@@ -1,5 +1,7 @@
 #include <common/id_generator.h>
 
+#include <common/assert.h>
+
 COMMON_API id_generator_id_type_t id_generator_get(id_generator_t* generator)
 {
 	/* if the unreserved list can be created and there are some elements in it */
@@ -16,6 +18,7 @@ COMMON_API id_generator_id_type_t id_generator_get(id_generator_t* generator)
 
 COMMON_API void id_generator_return(id_generator_t* generator, id_generator_id_type_t id)
 {
+	_com_assert(id < generator->counter);
 	if(generator->unreserved == NULL)
 		generator->unreserved = BUFcreate_with_callbacks(generator->callbacks, NULL, sizeof(id_generator_id_type_t), 1, 0);
 	buf_push(generator->unreserved, &id);
