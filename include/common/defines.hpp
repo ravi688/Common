@@ -1,10 +1,12 @@
 #pragma once
 
 #include <common/defines.h>
+#include <common/assert.h> // for _com_assert
 
 #include <type_traits>
 #include <utility>
 #include <iterator> /* for std::advance */
+#include <unordered_map> // for std::unordered_map
 
 #include <iostream>
 
@@ -163,6 +165,14 @@ namespace com
 				return true;
 			}
 		return false;
+	}
+
+	template<typename TKey, typename TValue>
+	typename std::unordered_map<TKey, TValue>::iterator unordered_map_find(std::unordered_map<TKey, TValue>& map, const TKey& key) noexcept
+	{
+		auto it = map.find(key);
+		_com_assert(it != map.end());
+		return it;
 	}
 
 	template<template<typename> typename STLContainerType, typename T, typename IndexType>
