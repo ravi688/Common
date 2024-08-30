@@ -46,6 +46,16 @@ namespace com
 		Event(PublisherTypePtr publisher) noexcept : m_id_generator(id_generator_create(0, NULL)), m_publisher(publisher), m_isPublishing(false) { }
 		Event() noexcept : Event(NULL) { }
 
+		Event(Event&& event) noexcept : m_id_generator(event.m_id_generator),
+										m_publisher(event.m_publisher), 
+										m_handlers(std::move(event.m_handlers)),
+										m_unsubscribeRequests(std::move(event.m_unsubscribeRequests)),
+										m_isPublishing(event.m_isPublishing)
+		{
+			event.m_publisher = NULL;
+			event.m_isPublishing = false;
+		}
+
 		void setPublisher(PublisherTypePtr ptr) noexcept { m_publisher = ptr; }
 		PublisherTypePtr getPublisher() noexcept { return m_publisher; }
 
