@@ -89,8 +89,8 @@ $(DEPENDENCIES_DIR) $(SHARED_DEPENDENCIES_DIR):
 
 init: $(PROJECT_NAME).gv $(DEPENDENCIES_DIR) $(SHARED_DEPENDENCIES_DIR)
 	@echo [Log] $(PROJECT_NAME) init successfully!
-	$(MAKE) --directory=./dependencies/VulkanRenderer init
-	$(MAKE) --directory=./dependencies/VulkanRenderer/sutk init
+# 	$(MAKE) --directory=./dependencies/VulkanRenderer init
+# 	$(MAKE) --directory=./dependencies/VulkanRenderer/sutk init
 
 setup:
 	git submodule update --init
