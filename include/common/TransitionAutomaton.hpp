@@ -79,9 +79,8 @@ namespace com
 		}
 		void update() noexcept
 		{
-			if(EqualsApproxFunc(m_currentValue, m_destValue))
+			if(m_currentValue == m_destValue)
 			{
-				m_currentValue = m_destValue;
 				m_currentState = m_destState;
 				m_isRunning = false;
 
@@ -90,13 +89,16 @@ namespace com
 				if(it != m_stateEvents.end())
 					// if yes, then publish it.
 					it->second->publish();
+				return;
 			}
-			else
-			{
-				auto currTime = std::chrono::high_resolution_clock::now();
-				f32 timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(currTime - m_prevTime).count() * 0.001f;
-				m_currentValue = LerpFunc(m_prevValue, m_destValue, timeElapsed / m_transitionDelay);
-			}
+			auto currTime = std::chrono::high_resolution_clock::now();
+			f32 timeElapsed = std::chrono::duration_cast<std::chrono::microseconds>(currTime - m_prevTime).count() * 0.000001f;
+			m_currentValue = LerpFunc(m_prevValue, m_destValue, std::clamp(timeElapsed / m_transitionDelay, 0.0f, 1.0f));
+			// Apply correction to snap to the destination value,
+			// And let the user read the corrected value for the last time,
+			// And then only set m_isRunning to false (in the next iteration)
+			if(EqualsApproxFunc(m_currentValue, m_destValue))
+				m_currentValue = m_destValue;
 		}
 
 		T getValue() const noexcept { return m_currentValue; }
