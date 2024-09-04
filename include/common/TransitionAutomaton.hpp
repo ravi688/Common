@@ -113,6 +113,7 @@ namespace com
 		// This function supposed to be called just after instantiation of this class and only once.
 		void setDefault(StateType state) noexcept
 		{
+			m_isRunning = false;
 			auto it = m_stateValue.find(state);
 			_com_assert(it != m_stateValue.end());
 			m_currentValue = it->second;
