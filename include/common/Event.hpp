@@ -27,7 +27,7 @@ namespace com
 		typename std::unordered_map<SubscriptionID, std::pair<EventHandler, bool>>::iterator
 	 	getHandlerIt(SubscriptionID id)
 		{
-			_com_assert(id);
+			_com_assert(id != InvalidSubscriptionID);
 			auto it = m_handlers.find(id);
 			if(it == m_handlers.end())
 				debug_log_error("You're trying to access a subscription which you never subscribed to!");
@@ -36,7 +36,7 @@ namespace com
 
 		void unsubscribeImmediately(SubscriptionID id)
 		{
-			_com_assert(id);
+			_com_assert(id != InvalidSubscriptionID);
 			auto it = getHandlerIt(id);
 			m_handlers.erase(it);
 		}
@@ -64,6 +64,12 @@ namespace com
 			auto id = id_generator_get(&m_id_generator);
 			m_handlers.insert({ id, { handler, true } });
 			return id;
+		}
+
+		void clear() noexcept
+		{
+			id_generator_reset(&m_id_generator, 0);
+			m_handlers.clear();
 		}
 
 		void unsubscribe(SubscriptionID id) noexcept
