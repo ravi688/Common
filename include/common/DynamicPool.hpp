@@ -6,6 +6,7 @@
 #include <functional> // for std::function
 #include <utility> // for std::swap
 #include <vector> // for std::vector
+#include <algorithm> // for std::find
 
 namespace com
 {
@@ -24,7 +25,7 @@ namespace com
 		OnReturn m_onReturn;
 		OnRecycle m_onRecycle;
 
-		std::vector<T>::iterator getLastActive() noexcept;
+		typename std::vector<T>::iterator getLastActive() noexcept;
 
 	public:
 		DynamicPool(OnCreate onCreate, OnReturn onReturn, OnRecycle onRecycle, bool isReturn = false, std::size_t initialCount = 0) noexcept;
@@ -93,7 +94,7 @@ namespace com
 	}
 
 	template<typename T>
-	std::vector<T>::iterator DynamicPool<T>::getLastActive() noexcept
+	typename std::vector<T>::iterator DynamicPool<T>::getLastActive() noexcept
 	{
 		_com_assert(m_activeCount > 0);
 		return std::next(m_storage.begin(), m_activeCount - 1);
@@ -106,10 +107,10 @@ namespace com
 
 		// Check if such value was ever taken out of the pool
 		auto lastActive = getLastActive();
-		auto it = std::find(m_storage.begin(), lastActive);
+		auto it = std::find(m_storage.begin(), lastActive, value);
 		if(it == m_storage.end())
 		{
-			debug_log_error("No such value ever get from the pool, but you're still trying to return/put back into it");
+			debug_log_error("No such value ever gotten from the pool, but you're still trying to return/put back into it");
 			return;
 		}
 
@@ -125,8 +126,8 @@ namespace com
 		if(m_activeCount == 0)
 			return;
 
-		auto lastActive = getLastActive();
-		for(auto it = m_storage.begin(); it != lastActive; it++)
+		auto lastActiveEnd = std::next(getLastActive(), 1);
+		for(auto it = m_storage.begin(); it != lastActiveEnd; it++)
 			m_onReturn(*it);
 		m_activeCount = 0;
 	}
