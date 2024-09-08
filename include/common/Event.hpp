@@ -6,16 +6,28 @@
 
 #include <functional> // for std::function
 #include <unordered_map> // for std::unordered_map
+#include <type_traits> // for std::is_same_v
 
 namespace com
 {
+	struct no_publish_ptr_t { };
+
+	template<typename PublisherType, typename... Args>
+	struct EventHandlerProto
+	{
+		using type = typename std::conditional<std::is_same<PublisherType, no_publish_ptr_t>::value, 
+							std::function<void(Args...)>,
+							std::function<void(PublisherType*, Args...)>
+							>::type;
+	};
+
 	template<typename PublisherType, typename... Args>
 	class COMMON_API Event
 	{
 	public:
 		typedef PublisherType* PublisherTypePtr;
 		typedef id_generator_id_type_t SubscriptionID;
-		typedef std::function<void(PublisherTypePtr, Args...)> EventHandler;
+		typedef typename EventHandlerProto<PublisherType, Args...>::type EventHandler;
 		static constexpr id_generator_id_type_t InvalidSubscriptionID = ID_GENERATOR_ID_TYPE_MAX;
 	private:
 		id_generator_t m_id_generator;
@@ -43,9 +55,27 @@ namespace com
 
 	public:
 
-		Event(PublisherTypePtr publisher) noexcept : m_id_generator(id_generator_create(0, NULL)), m_publisher(publisher), m_isPublishing(false) { }
-		Event() noexcept : Event(NULL) { }
 
+		template<typename T = PublisherType>
+		requires(std::is_same_v<T, no_publish_ptr_t>)
+		Event() noexcept : m_id_generator(id_generator_create(0, NULL)), m_isPublishing(false) { }
+
+		template<typename T = PublisherType>
+		requires(!std::is_same_v<T, no_publish_ptr_t>)
+		Event(T* publisher) noexcept : m_id_generator(id_generator_create(0, NULL)), m_publisher(publisher), m_isPublishing(false) { }
+
+		template<typename T = PublisherType>
+		requires(std::is_same_v<T, no_publish_ptr_t>)
+		Event(Event&& event) noexcept : m_id_generator(event.m_id_generator),
+										m_handlers(std::move(event.m_handlers)),
+										m_unsubscribeRequests(std::move(event.m_unsubscribeRequests)),
+										m_isPublishing(event.m_isPublishing)
+		{
+			event.m_isPublishing = false;
+		}
+
+		template<typename T = PublisherType>
+		requires(!std::is_same_v<T, no_publish_ptr_t>)
 		Event(Event&& event) noexcept : m_id_generator(event.m_id_generator),
 										m_publisher(event.m_publisher), 
 										m_handlers(std::move(event.m_handlers)),
@@ -56,8 +86,13 @@ namespace com
 			event.m_isPublishing = false;
 		}
 
-		void setPublisher(PublisherTypePtr ptr) noexcept { m_publisher = ptr; }
-		PublisherTypePtr getPublisher() noexcept { return m_publisher; }
+		template<typename T = PublisherType>
+		requires(!std::is_same_v<T, no_publish_ptr_t>)
+		void setPublisher(T* ptr) noexcept { m_publisher = ptr; }
+
+		template<typename T = PublisherType>
+		requires(!std::is_same_v<T, no_publish_ptr_t>)
+		T* getPublisher() noexcept { return m_publisher; }
 
 		SubscriptionID subscribe(EventHandler handler) noexcept
 		{
@@ -94,7 +129,7 @@ namespace com
 			it->second.second = true;
 		}
 
-		void publish(Args... args) noexcept
+		void publish(Args... args) noexcept requires(!std::is_same_v<PublisherType, no_publish_ptr_t>)
 		{
 			m_isPublishing = true;
 			for(auto& pair : m_handlers)
@@ -111,5 +146,24 @@ namespace com
 				m_unsubscribeRequests.clear();
 			}
 		}
+
+		void publish(Args... args) noexcept requires(std::is_same_v<PublisherType, no_publish_ptr_t>)
+		{
+			m_isPublishing = true;
+			for(auto& pair : m_handlers)
+			{
+				// only invoke this handler if it is active
+				if(pair.second.second)
+					pair.second.first(args...);
+			}
+			m_isPublishing = false;
+			if(m_unsubscribeRequests.size() > 0)
+			{
+				for(auto id : m_unsubscribeRequests)
+					unsubscribeImmediately(id);
+				m_unsubscribeRequests.clear();
+			}
+		}
 	};
+
 }
