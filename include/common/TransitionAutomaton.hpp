@@ -38,7 +38,7 @@ namespace com
 	{
 	public:
 		typedef u32 StateType;
-		typedef com::Event<void> StateEvent;
+		typedef com::Event<com::no_publish_ptr_t> StateEvent;
 
 	private:
 		std::unordered_map<StateType, T> m_stateValue;
