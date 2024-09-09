@@ -7,6 +7,7 @@
 #include <utility>
 #include <iterator> /* for std::advance */
 #include <unordered_map> // for std::unordered_map
+#include <algorithm> // for std::find
 
 #include <iostream>
 
@@ -173,6 +174,26 @@ namespace com
 		auto it = map.find(key);
 		_com_assert(it != map.end());
 		return it;
+	}
+
+	template<typename ContainerType>
+	concept FindErasable = requires(ContainerType& container)
+	{
+		typename ContainerType::value_type;
+		container.begin();
+		container.end();
+	};
+
+	template<FindErasable ContainerType>
+	bool find_erase(ContainerType& container, typename ContainerType::value_type element) noexcept
+	{
+		auto it = std::find(container.begin(), container.end(), element);
+		if(it != container.end())
+		{
+			container.erase(it);
+			return true;
+		}
+		return false;
 	}
 
 	template<template<typename> typename STLContainerType, typename T, typename IndexType>
