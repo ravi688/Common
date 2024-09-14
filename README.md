@@ -1,5 +1,5 @@
 # Common utility library
-This repository contains the common being used across all my projects.
+This repository contains the reusabe functions, macros and constantes being used across all my projects.
 
 ## Platform Macros
 ### Header file: common/platform.h
