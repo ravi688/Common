@@ -8,7 +8,7 @@
 #include <iterator> /* for std::advance */
 #include <unordered_map> // for std::unordered_map
 #include <algorithm> // for std::find
-
+#include <filesystem> // for std::filesystem
 #include <iostream>
 
 #define _DBG_LINE_ std::cout << __FILE__ << ":" << __LINE__ << std::endl
@@ -250,6 +250,22 @@ namespace com
 
 	template<typename T, std::size_t N>
 	constexpr std::size_t array_size(const T (&arr)[N]) noexcept { return N; }
+
+	// Example:
+    // std::filesystem::path path = "myFolder/myAnotherFolder/value/";
+    // std::cout << path.relative_path() << std::endl;
+    // std::cout << path.relative_path().relative_path() << std::endl;
+    // std::cout << trim_front(path) << std::endl;
+    // std::cout << trim_front(trim_front(path)) << std::endl;
+    // std::cout << trim_front(trim_front(trim_front(path))) << std::endl;
+	//
+	//	Output:
+	// 	"myFolder/myAnotherFolder/value/"
+	// 	"myFolder/myAnotherFolder/value/"
+	// 	"myAnotherFolder/value/"
+	// 	"value/"
+	// 	""
+	std::filesystem::path trim_front(const std::filesystem::path& path) noexcept;
 }
 
 
