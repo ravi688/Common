@@ -247,6 +247,9 @@ namespace com
 	{
 		return (v1 > v2) ? v1 : v2;
 	}
+
+	template<typename T, std::size_t N>
+	constexpr std::size_t array_size(const T (&arr)[N]) noexcept { return N; }
 }
 
 
