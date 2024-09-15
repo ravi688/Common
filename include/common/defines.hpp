@@ -266,6 +266,16 @@ namespace com
 	// 	"value/"
 	// 	""
 	std::filesystem::path trim_front(const std::filesystem::path& path) noexcept;
+	// Example:
+	// std::filesystem::path path { "C:/4-Projects/value/myFolder" };
+    // std::cout << trim_back(path) << std::endl;
+    // std::filesystem::path path2 { "C:/5-Projects/myemptyfolder///" };
+    // std::cout << trim_back(path2) << std::endl;
+    // 
+    // Output:
+    //	"C:/4-Projects/value"
+	// 	"C:/5-Projects/myemptyfolder"
+	std::filesystem::path trim_back(const std::filesystem::path& path) noexcept;
 }
 
 
