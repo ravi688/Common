@@ -3,7 +3,7 @@
 #include <common/defines.h>
 #include <common/assert.h> // for _com_assert
 
-#include <type_traits>
+#include <type_traits> // for std::is_reference and std::is_pointer
 #include <utility>
 #include <iterator> /* for std::advance */
 #include <unordered_map> // for std::unordered_map
@@ -155,19 +155,6 @@ namespace com
 		}
 	};
 
-	template<typename Iterator, class UnaryPredicate>
-	bool erase_first_if(Iterator begin, Iterator end, UnaryPredicate predicate)
-	{
-		for(Iterator& it = begin; it != end; it++)
-			if(predicate(*it))
-			{
-				for(Iterator& _it = it; ++_it != end;)
-					*it++ = std::move(*_it);
-				return true;
-			}
-		return false;
-	}
-
 	template<typename TKey, typename TValue>
 	typename std::unordered_map<TKey, TValue>::iterator unordered_map_find(std::unordered_map<TKey, TValue>& map, const TKey& key) noexcept
 	{
@@ -188,6 +175,28 @@ namespace com
 	bool find_erase(ContainerType& container, typename ContainerType::value_type element) noexcept
 	{
 		auto it = std::find(container.begin(), container.end(), element);
+		if(it != container.end())
+		{
+			container.erase(it);
+			return true;
+		}
+		return false;
+	}
+
+	template<typename ContainerType>
+	concept AssociativeContainer = requires(ContainerType& container, 
+				typename ContainerType::key_type key,
+				typename ContainerType::iterator it)
+	{
+		typename ContainerType::key_type;
+		container.find(key);
+		container.erase(it);
+	};
+
+	template<AssociativeContainer ContainerType>
+	bool find_erase(ContainerType& container, typename ContainerType::key_type key) noexcept
+	{
+		auto it = container.find(key);
 		if(it != container.end())
 		{
 			container.erase(it);
@@ -276,6 +285,27 @@ namespace com
     //	"C:/4-Projects/value"
 	// 	"C:/5-Projects/myemptyfolder"
 	std::filesystem::path trim_back(const std::filesystem::path& path) noexcept;
+
+	template<typename T>
+	concept RefOrPtrType = requires
+	{
+		std::is_pointer_v<T> || std::is_reference_v<T>;
+	};
+
+	template<RefOrPtrType T, RefOrPtrType U>
+	static INLINE_IF_RELEASE_MODE T iknow_down_cast(U value) noexcept
+	{
+		#ifdef GLOBAL_DEBUG
+		T _value = dynamic_cast<T>(value);
+		if (std::is_pointer_v<T>)
+		{
+			_com_assert(_value != NULL);
+		}
+		return _value;
+		#else
+		return static_cast<T>(value);
+		#endif
+	}
 }
 
 
