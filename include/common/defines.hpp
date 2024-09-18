@@ -287,10 +287,7 @@ namespace com
 	std::filesystem::path trim_back(const std::filesystem::path& path) noexcept;
 
 	template<typename T>
-	concept RefOrPtrType = requires
-	{
-		std::is_pointer_v<T> || std::is_reference_v<T>;
-	};
+	concept RefOrPtrType = std::is_pointer_v<T> || std::is_reference_v<T>;
 
 	template<RefOrPtrType T, RefOrPtrType U>
 	static INLINE_IF_RELEASE_MODE T iknow_down_cast(U value) noexcept
@@ -305,6 +302,43 @@ namespace com
 		#else
 		return static_cast<T>(value);
 		#endif
+	}
+
+	template<typename T>
+	concept ValueType = !std::is_reference_v<T>;
+
+	template<ValueType T>
+	typename std::remove_const<T>::type cast_away_const(T&& value) noexcept
+	{
+		return const_cast<typename std::remove_const<T>::type>(std::forward<T&&>(value));
+	}
+
+	template<typename T>
+	concept RefType = std::is_reference_v<T>;
+
+	template<RefType T>
+	struct ref_remove_const
+	{
+		typedef 
+		typename std::conditional<
+		std::is_lvalue_reference<T>::value, 
+			typename std::add_lvalue_reference<
+				typename std::remove_const<
+					typename std::remove_reference<T>::type
+				>::type
+			>::type,
+			typename std::add_rvalue_reference<
+				typename std::remove_const<
+					typename std::remove_reference<T>::type
+				>::type
+			>::type
+		>::type type;
+	};
+
+	template<RefType T>
+	typename ref_remove_const<T>::type cast_away_const(T&& value) noexcept
+	{
+		return const_cast<typename ref_remove_const<T>::type>(std::forward<T&&>(value));
 	}
 }
 
