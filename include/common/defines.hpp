@@ -305,12 +305,38 @@ namespace com
 	}
 
 	template<typename T>
-	concept ValueType = !std::is_reference_v<T>;
+	concept ValueType = !std::is_reference_v<T> && !std::is_pointer_v<T>;
 
 	template<ValueType T>
 	typename std::remove_const<T>::type cast_away_const(T&& value) noexcept
 	{
 		return const_cast<typename std::remove_const<T>::type>(std::forward<T&&>(value));
+	}
+
+	template<typename T>
+	concept PtrType = std::is_pointer_v<T>;
+
+	template<PtrType T>
+	struct ptr_remove_const
+	{
+		typedef 
+		typename std::add_pointer<
+			typename std::remove_const<
+				typename std::remove_pointer<T>::type
+				>::type
+		>::type no_const_type;
+		typedef 
+		typename std::conditional<
+			std::is_const<T>::value,
+			typename std::add_const<no_const_type>::type,
+			no_const_type
+		>::type type;
+	};
+
+	template<PtrType T>
+	typename ptr_remove_const<T>::type cast_away_const(T&& value) noexcept
+	{
+		return const_cast<typename ptr_remove_const<T>::type>(std::forward<T&&>(value));
 	}
 
 	template<typename T>

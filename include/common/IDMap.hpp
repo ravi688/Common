@@ -6,6 +6,7 @@
 
 namespace com
 {
+	// TODO: We may also create SharedIDMap which would allow sharing of id_generator_it objects across multiple SharedIDMap objects
 	template<typename T>
 	class IDMap
 	{
