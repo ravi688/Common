@@ -54,6 +54,21 @@ typedef void* void_ptr_t;
 #define F64_MIN DBL_MIN
 #define F64_MAX DBL_MAX
 
+/* represents read only data, which may pontentially end up dangling if some code overwites 'bytes' or 'size'
+ * however, the referenced data is constant and can't be modified with this reference.  */
+typedef struct com_readonly_data_t
+{
+    const u8* bytes;
+    u32 size;
+} com_readonly_data_t;
+
+/* represents immutable data, no modifications are allowed. */
+typedef struct com_immutable_data_t
+{
+    const u8* const bytes;
+    const u32 size;
+} com_immutable_data_t;
+
 #define DEPRECATED_FUNCTION __attribute__((deprecated))
 #define REMOVED_FUNCTION __attribute__((unavailable))
 #define FORCE_INLINE_FUNCTION inline __attribute__((always_inline))
