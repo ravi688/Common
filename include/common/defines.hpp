@@ -205,6 +205,17 @@ namespace com
 		return false;
 	}
 
+	template<typename ContainerType>
+	concept MapContainer = AssociativeContainer<ContainerType> && requires { typename ContainerType::mapped_type; };
+
+	template<MapContainer ContainerType>
+	typename ContainerType::mapped_type& find_value(ContainerType& container, const typename ContainerType::key_type& key) noexcept
+	{
+		auto it = container.find(key);
+		_com_assert(it != container.end());
+		return it->second;
+	}
+
 	template<template<typename> typename STLContainerType, typename T, typename IndexType>
 	typename STLContainerType<T>::iterator GetIteratorFromIndex(STLContainerType<T>& stlContainer, IndexType index)
 	{
