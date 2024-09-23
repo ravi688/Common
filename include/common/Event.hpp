@@ -97,7 +97,7 @@ namespace com
 		SubscriptionID subscribe(EventHandler handler) noexcept
 		{
 			auto id = id_generator_get(&m_id_generator);
-			m_handlers.insert({ id, { handler, true } });
+			m_handlers.insert({ id, { std::move(handler), true } });
 			return id;
 		}
 
