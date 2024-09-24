@@ -183,18 +183,19 @@ namespace com
 		return false;
 	}
 
-	template<typename ContainerType>
-	concept AssociativeContainer = requires(ContainerType& container, 
-				typename ContainerType::key_type key,
-				typename ContainerType::iterator it)
+	template<typename T>
+	concept HasKeyType = requires { typename T::key_type; };
+
+	template<typename ContainerType, typename KeyType>
+	concept AssociativeContainer = HasKeyType<ContainerType> && requires(ContainerType& container, typename ContainerType::iterator it)
 	{
-		typename ContainerType::key_type;
-		container.find(key);
+		container.find(std::declval<KeyType>());
 		container.erase(it);
 	};
 
-	template<AssociativeContainer ContainerType>
-	bool find_erase(ContainerType& container, typename ContainerType::key_type key) noexcept
+	template<HasKeyType ContainerType, typename KeyType = typename ContainerType::key_type>
+	requires AssociativeContainer<ContainerType, KeyType>
+	bool find_erase(ContainerType& container, const KeyType& key) noexcept
 	{
 		auto it = container.find(key);
 		if(it != container.end())
@@ -205,11 +206,12 @@ namespace com
 		return false;
 	}
 
-	template<typename ContainerType>
-	concept MapContainer = AssociativeContainer<ContainerType> && requires { typename ContainerType::mapped_type; };
+	template<typename ContainerType, typename KeyType>
+	concept MapContainer = AssociativeContainer<ContainerType, KeyType> && requires { typename ContainerType::mapped_type; };
 
-	template<MapContainer ContainerType>
-	typename ContainerType::mapped_type& find_value(ContainerType& container, const typename ContainerType::key_type& key) noexcept
+	template<HasKeyType ContainerType, typename KeyType = typename ContainerType::key_type>
+	requires MapContainer<ContainerType, KeyType>
+	typename ContainerType::mapped_type& find_value(ContainerType& container, const KeyType& key) noexcept
 	{
 		auto it = container.find(key);
 		_com_assert(it != container.end());
