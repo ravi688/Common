@@ -2,6 +2,7 @@
 
 #include <common/defines.h>
 #include <common/assert.h> // for _com_assert
+#include <common/Concepts.hpp>
 
 #include <type_traits> // for std::is_reference and std::is_pointer
 #include <utility>
@@ -379,6 +380,45 @@ namespace com
 	{
 		return const_cast<typename ref_remove_const<T>::type>(std::forward<T&&>(value));
 	}
+
+	template<typename T>
+	struct TransparentHash
+	{
+		using is_transparent = void;
+
+		constexpr std::size_t operator()(const T& value) const noexcept
+		{
+			return std::hash<T> { } (value);
+		}
+	};
+
+	template<typename T>
+	struct TransparentEqualTo
+	{
+		using is_transparent = void;
+		constexpr bool operator()(const T& value1, const T& value2) const noexcept
+		{
+			return std::equal_to<T> { } (value1, value2);
+		}
+	};
+
+	template<typename T>
+	struct GetViewType
+	{
+		typedef T type;
+	};
+
+	template<>
+	struct GetViewType<std::string> { typedef std::string_view type; };
+
+	template<typename KeyType, typename ValueType, ViewType<KeyType> KeyViewType = typename GetViewType<KeyType>::type>
+	struct _unordered_map
+	{
+		typedef std::unordered_map<KeyType, ValueType, com::TransparentHash<KeyViewType>, com::TransparentEqualTo<KeyViewType>> type;
+	};
+
+	template<typename KeyType, typename ValueType, ViewType<KeyType> KeyViewType = typename GetViewType<KeyType>::type>
+	using unordered_map = typename _unordered_map<KeyType, ValueType, KeyViewType>::type;
 }
 
 
