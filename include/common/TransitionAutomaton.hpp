@@ -121,6 +121,22 @@ namespace com
 			m_currentState = state;
 			m_destState = state;
 		}
+		void setState(StateType state) noexcept
+		{
+			m_isRunning = false;
+			auto it = m_stateValue.find(state);
+			_com_assert(it != m_stateValue.end());
+			m_currentValue = it->second;
+			m_prevValue = m_currentValue;
+			m_currentState = state;
+			m_destState = state;
+
+			// check if the state has any events
+			auto it2 = m_stateEvents.find(state);
+			if(it2 != m_stateEvents.end())
+				// if yes, then publish it.
+				it2->second->publish();
+		}
 		void transitionTo(StateType state) noexcept
 		{
 			m_isRunning = true;
