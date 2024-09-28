@@ -10,6 +10,7 @@
 #include <unordered_map> // for std::unordered_map
 #include <algorithm> // for std::find
 #include <filesystem> // for std::filesystem
+#include <iterator> // for std::iterator_traits<>
 #include <iostream>
 
 #define _DBG_LINE_ std::cout << __FILE__ << ":" << __LINE__ << std::endl
@@ -419,6 +420,84 @@ namespace com
 
 	template<typename KeyType, typename ValueType, ViewType<KeyType> KeyViewType = typename GetViewType<KeyType>::type>
 	using unordered_map = typename _unordered_map<KeyType, ValueType, KeyViewType>::type;
+
+	template<typename T>
+	concept HasValueType = requires { typename T::value_type; };
+
+	template<typename T>
+	struct is_std_pair : std::false_type { };
+
+	template<typename T1, typename T2>
+	struct is_std_pair<std::pair<T1, T2>> : std::true_type { };
+
+	template<typename T>
+	concept IsStdPair = is_std_pair<T>::value;
+
+	template<typename T>
+	concept KeyValueIterator = HasValueType<T> && IsStdPair<typename T::value_type> && std::indirectly_readable<T>;
+
+	template<KeyValueIterator KVIterator>
+	class KeyIterator
+	{
+	public:
+		typedef typename std::iterator_traits<KVIterator>::value_type::first_type value_type;
+	private:
+		KVIterator m_it;
+	public:
+		KeyIterator(KVIterator it) noexcept : m_it(it) { }
+
+		KeyIterator& operator++() noexcept
+		{
+			++m_it;
+			return *this;
+		}
+		KeyIterator& operator--() noexcept
+		{
+			++m_it;
+			return *this;
+		}
+		KeyIterator& operator++(int) noexcept
+		{
+			++m_it;
+			return *this;
+		}
+		KeyIterator& operator--(int) noexcept
+		{
+			--m_it;
+			return *this;
+		}
+
+		value_type& operator*() noexcept
+		{
+			return m_it->first;
+		}
+
+		value_type& operator->() noexcept
+		{
+			return m_it->first;
+		}
+
+		bool operator==(const KeyIterator<KVIterator>& it) noexcept
+		{
+			return m_it == it.m_it;
+		}
+		bool operator!=(const KeyIterator<KVIterator>& it) noexcept
+		{
+			return m_it != it.m_it;
+		}
+	};
+
+	template<typename iterator>
+	class Iteratable
+	{
+	private:
+		iterator m_begin;
+		iterator m_end;
+	public:
+		Iteratable(iterator begin, iterator end) noexcept : m_begin(begin), m_end(end) { }
+		iterator begin() noexcept { return m_begin; }
+		iterator end() noexcept { return m_end; }
+	};
 }
 
 
