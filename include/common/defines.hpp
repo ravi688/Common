@@ -189,14 +189,14 @@ namespace com
 	concept HasKeyType = requires { typename T::key_type; };
 
 	template<typename ContainerType, typename KeyType>
-	concept AssociativeContainer = HasKeyType<ContainerType> && requires(ContainerType& container, typename ContainerType::iterator it)
+	concept FindEraseContainer = HasKeyType<ContainerType> && requires(ContainerType& container, typename ContainerType::iterator it)
 	{
 		container.find(std::declval<KeyType>());
 		container.erase(it);
 	};
 
 	template<HasKeyType ContainerType, typename KeyType = typename ContainerType::key_type>
-	requires AssociativeContainer<ContainerType, KeyType>
+	requires FindEraseContainer<ContainerType, KeyType>
 	bool find_erase(ContainerType& container, const KeyType& key) noexcept
 	{
 		auto it = container.find(key);
@@ -208,12 +208,25 @@ namespace com
 		return false;
 	}
 
+	template<typename T>
+	concept HasValueType = requires { typename T::value_type; };
+
 	template<typename ContainerType, typename KeyType>
-	concept MapContainer = AssociativeContainer<ContainerType, KeyType> && requires { typename ContainerType::mapped_type; };
+	concept FindContainer = HasKeyType<ContainerType> && HasValueType<ContainerType> && requires(ContainerType& container)
+	{ 
+		typename ContainerType::mapped_type; 
+		container.find(std::declval<KeyType>());
+		container.end();
+		{ container.find(std::declval<KeyType>()) != container.end() } -> std::same_as<bool>;
+	};
 
 	template<HasKeyType ContainerType, typename KeyType = typename ContainerType::key_type>
-	requires MapContainer<ContainerType, KeyType>
-	typename ContainerType::mapped_type& find_value(ContainerType& container, const KeyType& key) noexcept
+	requires FindContainer<ContainerType, KeyType>
+	typename std::conditional<
+				std::is_const<typename std::remove_reference<ContainerType>::type>::value,
+				const typename ContainerType::mapped_type&,
+				typename ContainerType::mapped_type&>::type
+	find_value(ContainerType& container, const KeyType& key) noexcept
 	{
 		auto it = container.find(key);
 		_com_assert(it != container.end());
@@ -422,9 +435,6 @@ namespace com
 	using unordered_map = typename _unordered_map<KeyType, ValueType, KeyViewType>::type;
 
 	template<typename T>
-	concept HasValueType = requires { typename T::value_type; };
-
-	template<typename T>
 	struct is_std_pair : std::false_type { };
 
 	template<typename T1, typename T2>
@@ -498,6 +508,12 @@ namespace com
 		iterator begin() noexcept { return m_begin; }
 		iterator end() noexcept { return m_end; }
 	};
+
+	template<typename Type>
+	constexpr Type* null_pointer() noexcept
+	{
+		return reinterpret_cast<Type*>(0);
+	}
 }
 
 
