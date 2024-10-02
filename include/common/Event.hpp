@@ -3,6 +3,7 @@
 #include <common/id_generator.h> // for generating unique ids for each subscription
 #include <common/debug.h> // for debug_log_error
 #include <common/assert.h> // for _com_assert
+#include <common/defines.hpp> // for com::KeyIteratable
 
 #include <functional> // for std::function
 #include <unordered_map> // for std::unordered_map
@@ -103,8 +104,17 @@ namespace com
 
 		void clear() noexcept
 		{
-			id_generator_reset(&m_id_generator, 0);
-			m_handlers.clear();
+			if(m_isPublishing)
+			{
+				com::KeyIteratable ids(m_handlers);
+				for(auto& id : ids)
+					unsubscribe(id);
+			}
+			else
+			{
+				id_generator_reset(&m_id_generator, 0);
+				m_handlers.clear();
+			}
 		}
 
 		void unsubscribe(SubscriptionID id) noexcept
