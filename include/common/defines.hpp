@@ -509,6 +509,22 @@ namespace com
 		iterator end() noexcept { return m_end; }
 	};
 
+	template<typename T>
+	concept HasBeginEndKeyValueIt = requires(T& t)
+	{
+		typename T::iterator;
+		{ t.begin() } -> KeyValueIterator;
+		{ t.end() } -> KeyValueIterator;
+	} && KeyValueIterator<typename T::iterator>;
+
+	template<HasBeginEndKeyValueIt T>
+	class KeyIteratable : public Iteratable<KeyIterator<typename T::iterator>>
+	{
+	public:
+		KeyIteratable(T& container) : Iteratable<KeyIterator<typename T::iterator>>(container.begin(), container.end()) { }
+		KeyIteratable(typename T::iterator begin, typename T::iterator end) : Iteratable<KeyIterator<typename T::iterator>>(KeyIterator { begin }, KeyIterator { end }) { }
+	};
+
 	template<typename Type>
 	constexpr Type* null_pointer() noexcept
 	{
