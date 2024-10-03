@@ -39,6 +39,9 @@ namespace com
 
 		std::size_t activeCount() const noexcept { return m_activeCount; }
 		std::size_t size() noexcept { return m_storage.size(); }
+
+		typename std::vector<T>::iterator begin() noexcept { return m_storage.begin(); }
+		typename std::vector<T>::iterator end() noexcept { return m_storage.end(); }
 	};
 
 
