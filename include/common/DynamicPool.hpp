@@ -36,6 +36,7 @@ namespace com
 		T get() noexcept;
 		void put(T value) noexcept;
 		void reclaim() noexcept;
+		void reserve(std::size_t count, bool isReturn = true) noexcept;
 
 		std::size_t activeCount() const noexcept { return m_activeCount; }
 		std::size_t size() noexcept { return m_storage.size(); }
@@ -133,5 +134,23 @@ namespace com
 		for(auto it = m_storage.begin(); it != lastActiveEnd; it++)
 			m_onReturn(*it);
 		m_activeCount = 0;
+	}
+
+	template<typename T>
+	void DynamicPool<T>::reserve(std::size_t count, bool isReturn) noexcept
+	{
+		// For now, we don't know what should happen if poolSize shrink is requested.
+		// I mean, right now we can't destroy SUTK::Container or SUTK::Renderable objects.
+		// Ideally, this should call m_onDestroy for every object being discarded during the size
+		// shrinking.
+		_com_assert(count >= m_storage.size());
+
+		auto diff = count - m_storage.size();
+		for(std::size_t i = 0; i < diff; ++i)
+		{
+			m_storage.push_back(m_onCreate());
+			if(isReturn)
+				m_onReturn(m_storage.back());
+		}
 	}
 }
