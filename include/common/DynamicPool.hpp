@@ -43,6 +43,12 @@ namespace com
 
 		typename std::vector<T>::iterator begin() noexcept { return m_storage.begin(); }
 		typename std::vector<T>::iterator end() noexcept { return m_storage.end(); }
+
+		Iteratable<typename std::vector<T>::iterator> getActives() noexcept
+		{
+			auto begin = m_storage.begin();
+			return { begin, std::next(begin, m_activeCount) };
+		}
 	};
 
 
