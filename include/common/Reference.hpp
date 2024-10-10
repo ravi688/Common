@@ -5,13 +5,14 @@
 namespace com
 {
 	template<typename T>
-	concept HandleType = std::constructible_from<T> && std::assignable_from<T&, T> && std::equality_comparable<T>;
+	concept cHandleType = std::constructible_from<T> && std::assignable_from<T&, T> && std::equality_comparable<T>;
 
-	template<HandleType T, T NullValue, typename... U>
+	template<cHandleType T, T NullValue, typename... U>
 	class Reference
 	{
 	public:
 		static constexpr T Null = NullValue;
+		typedef T HandleType;
 	protected:
 		T m_handle;
 	public:
@@ -37,9 +38,11 @@ namespace com
 
 		constexpr const T& getHandle() const noexcept { return m_handle; }
 
-		constexpr operator T&() noexcept { return m_handle; }
-		constexpr operator const T&() const noexcept { return m_handle; }
-		constexpr operator T() const noexcept { return m_handle; }
+
+		constexpr explicit operator T&() noexcept requires(!std::is_pointer<T>::value) { return m_handle; }
+		constexpr explicit operator const T&() const noexcept requires(!std::is_pointer<T>::value) { return m_handle; }
+		constexpr explicit operator T() const noexcept requires(!std::is_pointer<T>::value) { return m_handle; }
+		
 		constexpr operator bool() const noexcept { return m_handle != Null; }
 
 	};
