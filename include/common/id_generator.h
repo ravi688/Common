@@ -23,7 +23,8 @@ typedef struct id_generator_t
 BEGIN_CPP_COMPATIBLE
 
 /* creatse id_generator_t object
- * begin: no ids will be less than this, i.e. it will be starting value for 'counter' */
+ * begin: no ids will be less than this, i.e. it will be starting value for 'counter' \
+ * callbacks: the object must be valid throughout the life-time of id_generator_t object. */
 static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE id_generator_t id_generator_create(id_generator_id_type_t begin, com_allocation_callbacks_t* callbacks)
 {
 	id_generator_t generator = { };
