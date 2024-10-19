@@ -41,7 +41,7 @@ namespace com
 		{ \
 			return Reference::operator Reference::HandleType(); \
 		} \
-		operator bool() const noexcept \
+		explicit operator bool() const noexcept \
 		{ \
 			return Reference::operator bool(); \
 		}

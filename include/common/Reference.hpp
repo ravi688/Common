@@ -4,6 +4,7 @@
 
 namespace com
 {
+	// The cHandleType can't be 'bool'
 	template<typename T>
 	concept cHandleType = std::constructible_from<T> && std::assignable_from<T&, T> && std::equality_comparable<T> && !std::same_as<T, bool>;
 
@@ -63,7 +64,8 @@ namespace com
 		constexpr operator const T&() const noexcept requires(!std::is_pointer<T>::value) { return m_handle; }
 		constexpr operator T() const noexcept requires(!std::is_pointer<T>::value) { return m_handle; }
 		
-		constexpr operator bool() const noexcept { return m_handle != Null; }
+		// In non-old compilers, we can use 'explicit' keyword to only allow implicit evaluation to 'bool' in if context only.
+		constexpr explicit operator bool() const noexcept { return m_handle != Null; }
 
 	};
 }
