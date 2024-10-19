@@ -29,6 +29,14 @@ namespace com
 		{
 			return Bool(static_cast<bool>(*this) == static_cast<bool>(rhs));
 		}
+		constexpr Bool operator!=(const Bool& rhs) const noexcept
+		{
+			return Bool(static_cast<bool>(*this) != static_cast<bool>(rhs));
+		}
+		constexpr Bool operator^(const Bool& rhs) const noexcept
+		{
+			return Bool(static_cast<bool>(*this) ^ static_cast<bool>(rhs));
+		}
 
 		// Only allow automatic conversion in if(<Bool>) context
 		constexpr explicit operator bool() const noexcept { return (m_value == 0u) ? false : true; }
