@@ -17,6 +17,9 @@
 
 namespace com
 {
+	// Only used in Event.hpp and OrderedEvent.hpp
+	struct no_publish_ptr_t { };
+
 	template<typename T> T& null_reference() { return *reinterpret_cast<T*>(NULL); }
 
 	#pragma GCC diagnostic push
