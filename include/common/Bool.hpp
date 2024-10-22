@@ -41,4 +41,7 @@ namespace com
 		// Only allow automatic conversion in if(<Bool>) context
 		constexpr explicit operator bool() const noexcept { return (m_value == 0u) ? false : true; }
 	};
+
+	static constexpr Bool False = Bool::False();
+	static constexpr Bool True = Bool::True();
 }
