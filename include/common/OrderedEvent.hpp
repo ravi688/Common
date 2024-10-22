@@ -177,15 +177,24 @@ namespace com
 		void publish(Args... args) noexcept requires(!std::is_same_v<PublisherType, no_publish_ptr_t>)
 		{
 			m_isPublishing = true;
-			for(auto& pair : m_orderedMap)
+			for(auto it = m_orderedMap.begin(); it != m_orderedMap.end(); ++it)
 			{
+				auto& pair = *it;
 				// only invoke this handler if it is active
 				if(pair.second->isActive)
 				{
 					bool isStop = pair.second->handler(m_publisher, args...);
 					if(isStop)
+					{
+						++it;
+						while((it != m_orderedMap.end()) && (it->first == pair.first))
+						{
+							it->second->handler(m_publisher, args...);
+							++it;
+						}
 						break;
-				}
+					}
+				}				
 			}
 			m_isPublishing = false;
 			if(m_unsubscribeRequests.size() > 0)
@@ -199,15 +208,24 @@ namespace com
 		void publish(Args... args) noexcept requires(std::is_same_v<PublisherType, no_publish_ptr_t>)
 		{
 			m_isPublishing = true;
-			for(auto& pair : m_orderedMap)
+			for(auto it = m_orderedMap.begin(); it != m_orderedMap.end(); ++it)
 			{
+				auto& pair = *it;
 				// only invoke this handler if it is active
 				if(pair.second->isActive)
 				{
-					bool isStop = pair.second->handler(args...);
+					bool isStop = pair.second->handler(m_publisher, args...);
 					if(isStop)
+					{
+						++it;
+						while((it != m_orderedMap.end()) && (it->first == pair.first))
+						{
+							it->second->handler(m_publisher, args...);
+							++it;
+						}
 						break;
-				}
+					}
+				}				
 			}
 			m_isPublishing = false;
 			if(m_unsubscribeRequests.size() > 0)
