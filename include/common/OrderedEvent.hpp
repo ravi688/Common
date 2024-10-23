@@ -42,6 +42,8 @@ namespace com
 		std::unordered_map<SubscriptionID, EventHandlerData> m_handlers;
 		std::multimap<KeyType, EventHandlerData*, Compare> m_orderedMap;
 		std::vector<SubscriptionID> m_unsubscribeRequests;
+		SubscriptionID m_exclusiveAccessID;
+		EventHandlerData* m_exclusiveHandlerData;
 		bool m_isPublishing;
 
 		typename std::unordered_map<SubscriptionID, EventHandlerData>::iterator
@@ -81,11 +83,11 @@ namespace com
 
 		template<typename T = PublisherType>
 		requires(std::is_same_v<T, no_publish_ptr_t>)
-		OrderedEvent() noexcept : m_id_generator(id_generator_create(0, NULL)), m_isPublishing(false) { }
+		OrderedEvent() noexcept : m_id_generator(id_generator_create(0, NULL)), m_exclusiveAccessID(InvalidSubscriptionID), m_exclusiveHandlerData(com::null_pointer<EventHandlerData>()), m_isPublishing(false) { }
 
 		template<typename T = PublisherType>
 		requires(!std::is_same_v<T, no_publish_ptr_t>)
-		OrderedEvent(T* publisher) noexcept : m_id_generator(id_generator_create(0, NULL)), m_publisher(publisher), m_isPublishing(false) { }
+		OrderedEvent(T* publisher) noexcept : m_id_generator(id_generator_create(0, NULL)), m_exclusiveAccessID(InvalidSubscriptionID), m_exclusiveHandlerData(com::null_pointer<EventHandlerData>()), m_publisher(publisher), m_isPublishing(false) { }
 
 		template<typename T = PublisherType>
 		requires(std::is_same_v<T, no_publish_ptr_t>)
@@ -93,6 +95,8 @@ namespace com
 										m_handlers(std::move(event.m_handlers)),
 										m_orderedMap(std::move(event.m_orderedMap)),
 										m_unsubscribeRequests(std::move(event.m_unsubscribeRequests)),
+										m_exclusiveAccessID(InvalidSubscriptionID),
+										m_exclusiveHandlerData(com::null_pointer<EventHandlerData>()),
 										m_isPublishing(event.m_isPublishing)
 		{
 			event.m_isPublishing = false;
@@ -105,6 +109,8 @@ namespace com
 										m_handlers(std::move(event.m_handlers)),
 										m_orderedMap(std::move(event.m_orderedMap)),
 										m_unsubscribeRequests(std::move(event.m_unsubscribeRequests)),
+										m_exclusiveAccessID(InvalidSubscriptionID),
+										m_exclusiveHandlerData(com::null_pointer<EventHandlerData>()),
 										m_isPublishing(event.m_isPublishing)
 		{
 			event.m_publisher = NULL;
@@ -166,6 +172,30 @@ namespace com
 			it->second.isActive = true;
 		}
 
+		void grabExclusiveAccess(SubscriptionID id) noexcept
+		{
+			if(m_exclusiveAccessID != InvalidSubscriptionID)
+			{
+				debug_log_fetal_error("You're trying to grab exclusive access twice (without releasing it first), which is not possible");
+				return;
+			}
+			m_exclusiveAccessID = id;
+			m_exclusiveHandlerData = &getHandlerIt(id)->second;
+		}
+
+		void releaseExclusiveAccess(SubscriptionID id) noexcept
+		{
+			if(m_exclusiveAccessID != id)
+			{
+				debug_log_error("You released exclusive access with a different subscription id than what was used for the grabbing");
+				return;
+			}
+			m_exclusiveAccessID = InvalidSubscriptionID;
+			m_exclusiveHandlerData = com::null_pointer<EventHandlerData>();
+		}
+
+		SubscriptionID getExclusiveAccessID() const noexcept { return m_exclusiveAccessID; }
+
 		void updateKey(SubscriptionID id, const KeyType& newKey) noexcept
 		{
 			EventHandlerData& data = com::find_value(m_handlers, id);
@@ -177,24 +207,29 @@ namespace com
 		void publish(Args... args) noexcept requires(!std::is_same_v<PublisherType, no_publish_ptr_t>)
 		{
 			m_isPublishing = true;
-			for(auto it = m_orderedMap.begin(); it != m_orderedMap.end(); ++it)
+			if(m_exclusiveHandlerData)
+				m_exclusiveHandlerData->handler(m_publisher, args...);
+			else
 			{
-				auto& pair = *it;
-				// only invoke this handler if it is active
-				if(pair.second->isActive)
+				for(auto it = m_orderedMap.begin(); it != m_orderedMap.end(); ++it)
 				{
-					bool isStop = pair.second->handler(m_publisher, args...);
-					if(isStop)
+					auto& pair = *it;
+					// only invoke this handler if it is active
+					if(pair.second->isActive)
 					{
-						++it;
-						while((it != m_orderedMap.end()) && (it->first == pair.first))
+						bool isStop = pair.second->handler(m_publisher, args...);
+						if(isStop)
 						{
-							it->second->handler(m_publisher, args...);
 							++it;
+							while((it != m_orderedMap.end()) && (it->first == pair.first))
+							{
+								it->second->handler(m_publisher, args...);
+								++it;
+							}
+							break;
 						}
-						break;
-					}
-				}				
+					}				
+				}
 			}
 			m_isPublishing = false;
 			if(m_unsubscribeRequests.size() > 0)
@@ -208,24 +243,29 @@ namespace com
 		void publish(Args... args) noexcept requires(std::is_same_v<PublisherType, no_publish_ptr_t>)
 		{
 			m_isPublishing = true;
-			for(auto it = m_orderedMap.begin(); it != m_orderedMap.end(); ++it)
+			if(m_exclusiveHandlerData)
+				m_exclusiveHandlerData->handler(args...);
+			else
 			{
-				auto& pair = *it;
-				// only invoke this handler if it is active
-				if(pair.second->isActive)
+				for(auto it = m_orderedMap.begin(); it != m_orderedMap.end(); ++it)
 				{
-					bool isStop = pair.second->handler(m_publisher, args...);
-					if(isStop)
+					auto& pair = *it;
+					// only invoke this handler if it is active
+					if(pair.second->isActive)
 					{
-						++it;
-						while((it != m_orderedMap.end()) && (it->first == pair.first))
+						bool isStop = pair.second->handler(args...);
+						if(isStop)
 						{
-							it->second->handler(m_publisher, args...);
 							++it;
+							while((it != m_orderedMap.end()) && (it->first == pair.first))
+							{
+								it->second->handler(args...);
+								++it;
+							}
+							break;
 						}
-						break;
-					}
-				}				
+					}				
+				}
 			}
 			m_isPublishing = false;
 			if(m_unsubscribeRequests.size() > 0)
