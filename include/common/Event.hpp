@@ -24,6 +24,8 @@ namespace com
 	class COMMON_API Event
 	{
 	public:
+		// This is used to distinguise com::OrderedEvent type from com::Event when passed as template type parameter
+		static constexpr bool IsOrderedEventType = false;
 		typedef PublisherType* PublisherTypePtr;
 		typedef id_generator_id_type_t SubscriptionID;
 		typedef typename EventHandlerProto<PublisherType, Args...>::type EventHandler;
