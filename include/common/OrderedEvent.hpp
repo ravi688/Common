@@ -25,6 +25,8 @@ namespace com
 	class COMMON_API OrderedEvent
 	{
 	public:
+		// This is used to distinguise com::OrderedEvent type from com::Event when passed as template type parameter
+		static constexpr bool IsOrderedEventType = true;
 		typedef PublisherType* PublisherTypePtr;
 		typedef id_generator_id_type_t SubscriptionID;
 		typedef typename OrderedEventHandlerProto<PublisherType, Args...>::type EventHandler;
@@ -34,6 +36,7 @@ namespace com
 		{
 			EventHandler handler;
 			bool isActive;
+			bool isTempInActive;
 			KeyType key;
 		};
 	private:
@@ -87,7 +90,7 @@ namespace com
 
 		template<typename T = PublisherType>
 		requires(!std::is_same_v<T, no_publish_ptr_t>)
-		OrderedEvent(T* publisher) noexcept : m_id_generator(id_generator_create(0, NULL)), m_exclusiveAccessID(InvalidSubscriptionID), m_exclusiveHandlerData(com::null_pointer<EventHandlerData>()), m_publisher(publisher), m_isPublishing(false) { }
+		OrderedEvent(T* publisher) noexcept : m_id_generator(id_generator_create(0, NULL)), m_publisher(publisher), m_exclusiveAccessID(InvalidSubscriptionID), m_exclusiveHandlerData(com::null_pointer<EventHandlerData>()), m_isPublishing(false) { }
 
 		template<typename T = PublisherType>
 		requires(std::is_same_v<T, no_publish_ptr_t>)
@@ -128,7 +131,7 @@ namespace com
 		SubscriptionID subscribe(EventHandler handler, const KeyType& key) noexcept
 		{
 			auto id = id_generator_get(&m_id_generator);
-			m_handlers.insert({ id, { std::move(handler), true } });
+			m_handlers.insert({ id, { std::move(handler), true, false } });
 			EventHandlerData& data = com::find_value(m_handlers, id);
 			m_orderedMap.insert({ key, &data });
 			return id;
@@ -164,6 +167,12 @@ namespace com
 		{
 			auto it = getHandlerIt(id);
 			it->second.isActive = false;
+		}
+
+		void tempDeactivate(SubscriptionID id) noexcept
+		{
+			auto it = getHandlerIt(id);
+			it->second.isTempInActive = true;
 		}
 
 		void activate(SubscriptionID id) noexcept
@@ -215,7 +224,7 @@ namespace com
 				{
 					auto& pair = *it;
 					// only invoke this handler if it is active
-					if(pair.second->isActive)
+					if(!pair.second->isTempInActive && pair.second->isActive)
 					{
 						bool isStop = pair.second->handler(m_publisher, args...);
 						if(isStop)
@@ -223,12 +232,17 @@ namespace com
 							++it;
 							while((it != m_orderedMap.end()) && (it->first == pair.first))
 							{
-								it->second->handler(m_publisher, args...);
+								if(!pair.second->isTempInActive && it->second->isActive)
+									it->second->handler(m_publisher, args...);
+								else if(pair.second->isTempInActive)
+									pair.second->isTempInActive = false;
 								++it;
 							}
 							break;
 						}
-					}				
+					}
+					else if(pair.second->isTempInActive)
+						pair.second->isTempInActive = false;
 				}
 			}
 			m_isPublishing = false;
@@ -251,7 +265,7 @@ namespace com
 				{
 					auto& pair = *it;
 					// only invoke this handler if it is active
-					if(pair.second->isActive)
+					if(!pair.second->isTempInActive && pair.second->isActive)
 					{
 						bool isStop = pair.second->handler(args...);
 						if(isStop)
@@ -259,12 +273,17 @@ namespace com
 							++it;
 							while((it != m_orderedMap.end()) && (it->first == pair.first))
 							{
-								it->second->handler(args...);
+								if(!pair.second->isTempInActive && it->second->isActive)
+									it->second->handler(args...);
+								else if(pair.second->isTempInActive)
+									pair.second->isTempInActive = false;
 								++it;
 							}
 							break;
 						}
-					}				
+					}
+					else if(pair.second->isTempInActive)
+						pair.second->isTempInActive = false;			
 				}
 			}
 			m_isPublishing = false;
