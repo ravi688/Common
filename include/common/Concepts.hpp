@@ -9,4 +9,7 @@ namespace com
 
 	template<typename T, typename... U>
 	concept SameAsAny = (std::same_as<T, U> || ...);
+
+	template<typename T>
+	concept Number = std::floating_point<T> || std::integral<T>;
 }
