@@ -325,7 +325,7 @@ namespace com
 	{
 		#ifdef GLOBAL_DEBUG
 		T _value = dynamic_cast<T>(value);
-		if (std::is_pointer_v<T>)
+		if constexpr (std::is_pointer_v<T>)
 		{
 			_com_assert(_value != NULL);
 		}
