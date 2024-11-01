@@ -12,4 +12,10 @@ namespace com
 
 	template<typename T>
 	concept Number = std::floating_point<T> || std::integral<T>;
+
+	template<typename T, typename ValueType>
+	concept CompareFunction = requires ()
+	{
+		{ T { } (std::declval<ValueType>(), std::declval<ValueType>()) } -> std::same_as<bool>;
+	};
 }
