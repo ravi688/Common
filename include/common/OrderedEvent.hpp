@@ -90,9 +90,7 @@ namespace com
 		void updateKeyImmediately(SubscriptionID id, const KeyType& newKey) noexcept
 		{
 			EventHandlerData& data = com::find_value(m_handlers, id);
-			std::size_t count = m_orderedMap.size();
 			auto it = getOrderedMapIt(data);
-			_com_assert(it != m_orderedMap.end());
 			m_orderedMap.erase(it);
 			m_orderedMap.insert({ newKey, &data });
 		}
