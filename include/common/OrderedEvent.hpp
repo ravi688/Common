@@ -39,12 +39,18 @@ namespace com
 			bool isTempInActive;
 			KeyType key;
 		};
+		struct KeyUpdateRequest
+		{
+			SubscriptionID id;
+			KeyType newKey;
+		};
 	private:
 		id_generator_t m_id_generator;
 		PublisherTypePtr m_publisher;
 		std::unordered_map<SubscriptionID, EventHandlerData> m_handlers;
 		std::multimap<KeyType, EventHandlerData*, Compare> m_orderedMap;
 		std::vector<SubscriptionID> m_unsubscribeRequests;
+		std::vector<KeyUpdateRequest> m_keyUpdateRequests;
 		SubscriptionID m_exclusiveAccessID;
 		EventHandlerData* m_exclusiveHandlerData;
 		bool m_isPublishing;
@@ -79,6 +85,16 @@ namespace com
 			auto it2 = getOrderedMapIt(it->second);
 			m_orderedMap.erase(it2);
 			m_handlers.erase(it);
+		}
+
+		void updateKeyImmediately(SubscriptionID id, const KeyType& newKey) noexcept
+		{
+			EventHandlerData& data = com::find_value(m_handlers, id);
+			std::size_t count = m_orderedMap.size();
+			auto it = getOrderedMapIt(data);
+			_com_assert(it != m_orderedMap.end());
+			m_orderedMap.erase(it);
+			m_orderedMap.insert({ newKey, &data });
 		}
 
 	public:
@@ -131,7 +147,7 @@ namespace com
 		SubscriptionID subscribe(EventHandler handler, const KeyType& key) noexcept
 		{
 			auto id = id_generator_get(&m_id_generator);
-			m_handlers.insert({ id, { std::move(handler), true, false } });
+			m_handlers.insert({ id, { std::move(handler), true, false, key } });
 			EventHandlerData& data = com::find_value(m_handlers, id);
 			m_orderedMap.insert({ key, &data });
 			return id;
@@ -207,17 +223,24 @@ namespace com
 
 		void updateKey(SubscriptionID id, const KeyType& newKey) noexcept
 		{
-			EventHandlerData& data = com::find_value(m_handlers, id);
-			auto it = getOrderedMapIt(data);
-			m_orderedMap.erase(it);
-			m_orderedMap.insert({ newKey, &data });
+			if(m_isPublishing)
+			{
+				m_keyUpdateRequests.push_back({ id, newKey });
+				return;
+			}
+			updateKeyImmediately(id, newKey);
 		}
 
-		void publish(Args... args) noexcept requires(!std::is_same_v<PublisherType, no_publish_ptr_t>)
+		void publish(Args... args) noexcept
 		{
 			m_isPublishing = true;
 			if(m_exclusiveHandlerData)
-				m_exclusiveHandlerData->handler(m_publisher, args...);
+			{
+				if constexpr (std::is_same_v<PublisherType, no_publish_ptr_t>)
+					m_exclusiveHandlerData->handler(args...);
+				else
+					m_exclusiveHandlerData->handler(m_publisher, args...);
+			}
 			else
 			{
 				for(auto it = m_orderedMap.begin(); it != m_orderedMap.end(); ++it)
@@ -233,7 +256,12 @@ namespace com
 							while((it != m_orderedMap.end()) && (it->first == pair.first))
 							{
 								if(!pair.second->isTempInActive && it->second->isActive)
-									it->second->handler(m_publisher, args...);
+								{
+									if constexpr (std::is_same_v<PublisherType, no_publish_ptr_t>)
+										it->second->handler(args...);
+									else
+										it->second->handler(m_publisher, args...);
+								}
 								else if(pair.second->isTempInActive)
 									pair.second->isTempInActive = false;
 								++it;
@@ -252,46 +280,11 @@ namespace com
 					unsubscribeImmediately(id);
 				m_unsubscribeRequests.clear();
 			}
-		}
-
-		void publish(Args... args) noexcept requires(std::is_same_v<PublisherType, no_publish_ptr_t>)
-		{
-			m_isPublishing = true;
-			if(m_exclusiveHandlerData)
-				m_exclusiveHandlerData->handler(args...);
-			else
+			if(m_keyUpdateRequests.size() > 0)
 			{
-				for(auto it = m_orderedMap.begin(); it != m_orderedMap.end(); ++it)
-				{
-					auto& pair = *it;
-					// only invoke this handler if it is active
-					if(!pair.second->isTempInActive && pair.second->isActive)
-					{
-						bool isStop = pair.second->handler(args...);
-						if(isStop)
-						{
-							++it;
-							while((it != m_orderedMap.end()) && (it->first == pair.first))
-							{
-								if(!pair.second->isTempInActive && it->second->isActive)
-									it->second->handler(args...);
-								else if(pair.second->isTempInActive)
-									pair.second->isTempInActive = false;
-								++it;
-							}
-							break;
-						}
-					}
-					else if(pair.second->isTempInActive)
-						pair.second->isTempInActive = false;			
-				}
-			}
-			m_isPublishing = false;
-			if(m_unsubscribeRequests.size() > 0)
-			{
-				for(auto id : m_unsubscribeRequests)
-					unsubscribeImmediately(id);
-				m_unsubscribeRequests.clear();
+				for(auto request : m_keyUpdateRequests)
+					updateKeyImmediately(request.id, request.newKey);
+				m_keyUpdateRequests.clear();
 			}
 		}
 	};
