@@ -92,6 +92,7 @@ namespace com
 			EventHandlerData& data = com::find_value(m_handlers, id);
 			auto it = getOrderedMapIt(data);
 			m_orderedMap.erase(it);
+			data.key = newKey;
 			m_orderedMap.insert({ newKey, &data });
 		}
 
@@ -284,6 +285,24 @@ namespace com
 					updateKeyImmediately(request.id, request.newKey);
 				m_keyUpdateRequests.clear();
 			}
+		}
+
+		__attribute__((noinline))
+		void dump() const noexcept
+		{
+			std::cout << "Ordered Event (Dump): " << "\n";
+			for(auto& pair : m_handlers)
+				std::cout << pair.first << " -> " << pair.second.key << std::endl;
+			std::cout << "----\n";
+			for(auto& pair : m_orderedMap)
+			{
+				std::cout << pair.first << ": ";
+				for(auto& pair1 : m_handlers)
+					if(pair1.second.key == pair.first)
+						std::cout << pair1.first << " ";
+				std::cout << "\n";
+			}
+			std::cout << std::endl;
 		}
 	};
 
