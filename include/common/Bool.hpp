@@ -2,6 +2,8 @@
 
 #include <common/defines.hpp>
 
+#include <ostream> // for std::ostream
+
 namespace com
 {
 	class Bool
@@ -14,7 +16,7 @@ namespace com
 	public:
 		constexpr Bool() noexcept : m_value(0) { }
 		constexpr Bool(const Bool& _bool) noexcept : m_value(_bool.m_value) { }
-		constexpr explicit Bool(bool value) noexcept : m_value((value == 0) ? 0u : 1u) { }
+		constexpr explicit Bool(bool value) noexcept : m_value(value ? 1u : 0u) { }
 
 		constexpr Bool& operator=(Bool rhs) noexcept { m_value = rhs.m_value; return *this; }
 		constexpr Bool operator&&(const Bool& rhs) const noexcept
@@ -41,6 +43,8 @@ namespace com
 		// Only allow automatic conversion in if(<Bool>) context
 		constexpr explicit operator bool() const noexcept { return (m_value == 0u) ? false : true; }
 	};
+
+	std::ostream& operator <<(std::ostream& stream, com::Bool _bool) noexcept;
 
 	static constexpr Bool False = Bool::False();
 	static constexpr Bool True = Bool::True();
