@@ -135,6 +135,11 @@ namespace com
 			event.m_isPublishing = false;
 		}
 
+		~OrderedEvent() noexcept
+		{
+			id_generator_destroy(&m_id_generator);
+		}
+
 		template<typename T = PublisherType>
 		requires(!std::is_same_v<T, no_publish_ptr_t>)
 		void setPublisher(T* ptr) noexcept { m_publisher = ptr; }
