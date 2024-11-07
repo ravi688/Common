@@ -29,3 +29,10 @@ COMMON_API void id_generator_reset(id_generator_t* generator, id_generator_id_ty
 		buf_clear_fast(generator->unreserved);
 	generator->counter = begin;
 }
+
+COMMON_API id_generator_id_type_t id_generator_get_returned_count(id_generator_t* generator)
+{
+	if(generator->unreserved != NULL)
+		return buf_get_element_count(generator->unreserved);
+	return 0;
+}
