@@ -531,7 +531,8 @@ namespace com
 	template<typename Type>
 	constexpr Type* null_pointer() noexcept
 	{
-		return reinterpret_cast<Type*>(0);
+		// NOTE: reinterpert_cast<Type*>(0) leads to non-constant expression!
+		return static_cast<Type*>(0);
 	}
 
 	// This creates an lvalue reference in unevaluated contexts, similar to std::declval which does that for rvalue references.
