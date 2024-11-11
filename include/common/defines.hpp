@@ -321,6 +321,24 @@ namespace com
 	template<typename T>
 	concept RefOrPtrType = std::is_pointer_v<T> || std::is_reference_v<T>;
 
+
+	// <begin> Copied from https://stackoverflow.com/questions/45948835/stdis-base-of-and-virtual-base-class (second answer)
+	// First, a type trait to check whether a type can be static_casted to another    
+	template <typename From, typename To, typename = void>
+	struct can_static_cast: std::false_type{};
+	
+	template <typename From, typename To>
+	struct can_static_cast<From, To, std::void_t<decltype(static_cast<To>(std::declval<From>()))>>: std::true_type{};
+	
+	// Then, we apply the fact that a virtual base is first and foremost a base,
+	// that, however, cannot be static_casted to its derived class.
+	template <typename Base, typename Derived>
+	struct is_virtual_base_of: std::conjunction<
+	    std::is_base_of<Base, Derived>, 
+	    std::negation<can_static_cast<Base*, Derived*>>
+	>{};
+	// <end> TODO: switch to C++26, it has out of the box type trait : std::is_virtual_base_of
+
 	template<RefOrPtrType T, RefOrPtrType U>
 	static INLINE_IF_RELEASE_MODE T iknow_down_cast(U value) noexcept
 	{
@@ -332,7 +350,10 @@ namespace com
 		}
 		return _value;
 		#else
-		return static_cast<T>(value);
+		if constexpr (!is_virtual_base_of<U, T>::value)
+			return static_cast<T>(value);
+		else // Fallback to dynamic_cast<>
+			return dynamic_cast<T>(value);
 		#endif
 	}
 
