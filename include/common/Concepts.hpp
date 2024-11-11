@@ -1,5 +1,6 @@
 #pragma once
 
+#include <common/BaseDefines.hpp> // for com::decllval<>
 #include <concepts> // for std::is_convertible and std::is_constructible
 
 namespace com
@@ -18,4 +19,16 @@ namespace com
 	{
 		{ T { } (std::declval<ValueType>(), std::declval<ValueType>()) } -> std::same_as<bool>;
 	};
+
+	namespace concepts
+	{
+		template<typename T, typename ValueType>
+		concept UnaryVisitor = requires(T& instance)
+		{
+			{ instance (std::declval<ValueType>()) } -> std::same_as<void>;
+		} || requires(T& instance)
+		{
+			{ instance (com::decllval<ValueType>()) } -> std::same_as<void>;
+		};
+	}
 }
