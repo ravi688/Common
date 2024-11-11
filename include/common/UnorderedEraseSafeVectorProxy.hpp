@@ -23,6 +23,9 @@ namespace com
 		: m_data(initList),
 			m_curTraverseIndex(0),
 			m_isTraversing(com::False) { }
+		UnorderedEraseSafeVectorProxy() noexcept
+		: m_curTraverseIndex(0),
+			m_isTraversing(com::False) { }
 
 		void push_back(const T& value) noexcept
 		{
@@ -48,8 +51,8 @@ namespace com
 			return std::next(m_data.begin(), index);
 		}
 		
-		com::Bool isValidIterator(iterator it) noexcept { return it != m_data.end(); }
-		com::Bool isValidIterator(const_iterator it) const noexcept { return it != m_data.cend(); }
+		com::Bool isValidIterator(iterator it) noexcept { return com::Bool { it != m_data.end() }; }
+		com::Bool isValidIterator(const_iterator it) const noexcept { return com::Bool { it != m_data.cend() }; }
 
 		iterator find(const T& value) noexcept { return std::find(m_data.begin(), m_data.end(), value); }
 		const_iterator find(const T& value) const noexcept { return std::find(m_data.cbegin(), m_data.cend(), value); }
