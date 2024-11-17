@@ -11,6 +11,7 @@ namespace com
 	{
 	public:
 		typedef std::vector<T>::size_type size_type;
+		typedef std::vector<T>::value_type value_type;
 		typedef std::vector<T>::iterator iterator;
 		typedef std::vector<T>::const_iterator const_iterator;
 	private:
@@ -30,7 +31,7 @@ namespace com
 		void push_back(const T& value) noexcept
 		{
 			// For now we do not know what to do if push_back() is called while being traversed.
-			_com_assert(!m_isTraversing);
+			_com_assert(static_cast<bool>(!m_isTraversing));
 			m_data.push_back(value);
 		}
 		void pop_back() noexcept { m_data.pop_back(); }
@@ -44,6 +45,8 @@ namespace com
 		// As erase function takes non-constant iterator.
 		const_iterator begin() const noexcept { return m_data.begin(); }
 		const_iterator end() const noexcept { return m_data.end(); }
+		const_iterator cbegin() const noexcept { return begin(); }
+		const_iterator cend() const noexcept { return end(); }
 
 		iterator indexToIterator(size_type index) noexcept
 		{
@@ -57,7 +60,17 @@ namespace com
 		iterator find(const T& value) noexcept { return std::find(m_data.begin(), m_data.end(), value); }
 		const_iterator find(const T& value) const noexcept { return std::find(m_data.cbegin(), m_data.cend(), value); }
 		
+		// Since range based loop would use const_iterator (as we have only provided that),
+		// erase() can't be used inside a range-based loop - which is what we wanted!
+		// So one must have to 'traverse' function to really traverse the vector and potentially be able to erase elements during traversal
 		void erase(iterator pos) noexcept;
+		// Only allowed to be called in the visitor callback of 'traverse' function
+		// This erases the current element being traversed, and following this call no attempt should be made to access the reference to the current element
+		void eraseCurrent() noexcept
+		{
+			_com_assert(static_cast<bool>(m_isTraversing));
+			erase(indexToIterator(m_curTraverseIndex));
+		}
 		
 		template<com::concepts::UnaryVisitor<T> Visitor>
 		void traverse(Visitor visitor) noexcept;
