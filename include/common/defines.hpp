@@ -173,8 +173,8 @@ namespace com
 	concept FindErasable = requires(ContainerType& container)
 	{
 		typename ContainerType::value_type;
-		container.begin();
-		container.end();
+		{ container.begin() } -> std::same_as<typename ContainerType::iterator>;
+		{ container.end() } -> std::same_as<typename ContainerType::iterator>;
 	};
 
 	template<FindErasable ContainerType>
