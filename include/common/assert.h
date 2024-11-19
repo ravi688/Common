@@ -13,7 +13,11 @@
 #define COM_ASSERT_CALLED_ONCE(...) ASSERT_CALLED_ONCE(__VA_ARGS__)
 #define COM_ASSERT_NOT_IMPLEMENTED(...) ASSERT_NOT_IMPLEMENTED(__VA_ARGS__)
 
-#define DESCRIPTION(bool_value) (CAST_TO(u64, (bool_value)) | (1ULL << 16))
+#ifdef __cplusplus
+#	define DESCRIPTION(bool_value) (CAST_TO(u64, static_cast<bool>(bool_value)) | (1ULL << 16))
+#else
+#	define DESCRIPTION(bool_value) (CAST_TO(u64, (bool_value)) | (1ULL << 16))
+#endif
 
 #define COM_DESCRIPTION(...) DESCRIPTION(__VA_ARGS__)
 
