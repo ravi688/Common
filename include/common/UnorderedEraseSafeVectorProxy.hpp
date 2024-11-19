@@ -59,7 +59,8 @@ namespace com
 
 		iterator find(const T& value) noexcept { return std::find(m_data.begin(), m_data.end(), value); }
 		const_iterator find(const T& value) const noexcept { return std::find(m_data.cbegin(), m_data.cend(), value); }
-		
+		com::Bool contains(const T& value) const noexcept { return isValidIterator(find(value)); }
+
 		// Since range based loop would use const_iterator (as we have only provided that),
 		// erase() can't be used inside a range-based loop - which is what we wanted!
 		// So one must have to 'traverse' function to really traverse the vector and potentially be able to erase elements during traversal
@@ -70,6 +71,15 @@ namespace com
 		{
 			_com_assert(static_cast<bool>(m_isTraversing));
 			erase(indexToIterator(m_curTraverseIndex));
+		}
+
+		void find_erase(const T& value) noexcept
+		{
+			iterator it = find(value);
+			if(isValidIterator(it))
+				erase(it);
+			else // This should never happen
+				com_assert(COM_DESCRIPTION(false), "attempt to erase an element which doesn't really exist");
 		}
 		
 		template<com::concepts::UnaryVisitor<T> Visitor>
