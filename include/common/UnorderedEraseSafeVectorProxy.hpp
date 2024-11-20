@@ -30,8 +30,6 @@ namespace com
 
 		void push_back(const T& value) noexcept
 		{
-			// For now we do not know what to do if push_back() is called while being traversed.
-			_com_assert(static_cast<bool>(!m_isTraversing));
 			m_data.push_back(value);
 		}
 		void pop_back() noexcept { m_data.pop_back(); }
