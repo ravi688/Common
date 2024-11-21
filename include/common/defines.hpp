@@ -549,6 +549,22 @@ namespace com
 		KeyIteratable(T& container) : Iteratable<KeyIterator<typename T::iterator>>(container.begin(), container.end()) { }
 		KeyIteratable(typename T::iterator begin, typename T::iterator end) : Iteratable<KeyIterator<typename T::iterator>>(KeyIterator { begin }, KeyIterator { end }) { }
 	};
+
+	template<typename T>
+	class LinkedListNodeBase
+	{
+	protected:
+		T* m_next;
+		T* m_prev;
+	public:
+		LinkedListNodeBase() noexcept : m_next(com::null_pointer<T>()), m_prev(com::null_pointer<T>()) { }
+		T* getNext() noexcept { return m_next; }
+		const T* getNext() const noexcept { return m_next; }
+		void setNext(T* node) noexcept { m_next = node; }
+		T* getPrev() noexcept { return m_prev; }
+		const T* getPrev() const noexcept { return m_prev; }
+		void setPrev(T* node) noexcept { m_prev = node; }
+	};
 }
 
 
