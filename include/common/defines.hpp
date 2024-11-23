@@ -4,6 +4,7 @@
 #include <common/assert.h> // for _com_assert
 #include <common/BaseDefines.hpp>
 #include <common/Concepts.hpp>
+#include <bufferlib/buffer.h> // for buffer_t*, buf_get_ptr() and buf_get_element_count()
 
 #include <type_traits> // for std::is_reference and std::is_pointer
 #include <utility>
@@ -13,6 +14,7 @@
 #include <filesystem> // for std::filesystem
 #include <iterator> // for std::iterator_traits<>
 #include <iostream>
+#include <span> // for std::span<>
 
 #define _DBG_LINE_ std::cout << __FILE__ << ":" << __LINE__ << std::endl
 
@@ -565,6 +567,12 @@ namespace com
 		const T* getPrev() const noexcept { return m_prev; }
 		void setPrev(T* node) noexcept { m_prev = node; }
 	};
+
+	template<typename SpanElementType>
+	std::span<SpanElementType> GetSpanFromBuffer(buffer_t* buffer) noexcept
+	{
+		return { static_cast<SpanElementType*>(buf_get_ptr(buffer)), buf_get_element_count(buffer) };
+	}
 }
 
 
