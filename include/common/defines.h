@@ -104,9 +104,17 @@ typedef struct com_immutable_data_t
 #ifdef COMMON_STATIC_LIBRARY
 #	define COMMON_API
 #elif COMMON_DYNAMIC_LIBRARY
-#	define COMMON_API __declspec(dllimport)
+#	ifdef PLATFORM_LINUX
+#		define COMMON_API /* nothing */
+#	else
+#		define COMMON_API __declspec(dllimport)
+#	endif
 #elif BUILD_DYNAMIC_LIBRARY
-#	define COMMON_API __declspec(dllexport)
+#	ifdef PLATFORM_LINUX
+#		define COMMON_API __attribute__((__visibility__("default")))
+#	else
+#		define COMMON_API __declspec(dllexport)
+#	endif
 #else
 #	define COMMON_API
 #endif
