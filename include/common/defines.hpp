@@ -4,6 +4,7 @@
 #include <common/assert.h> // for _com_assert
 #include <common/BaseDefines.hpp>
 #include <common/Concepts.hpp>
+#include <common/Bool.hpp> // for com::Bool
 #include <bufferlib/buffer.h> // for buffer_t*, buf_get_ptr() and buf_get_element_count()
 
 #include <type_traits> // for std::is_reference and std::is_pointer
@@ -237,6 +238,21 @@ namespace com
 		auto it = container.find(key);
 		_com_assert(it != container.end());
 		return it->second;
+	}
+
+	template<HasKeyType ContainerType, typename KeyType = typename ContainerType::key_type>
+	requires FindContainer<ContainerType, KeyType>
+	OptionalReference<typename std::conditional<
+				std::is_const<typename std::remove_reference<ContainerType>::type>::value,
+				const typename ContainerType::mapped_type,
+				typename ContainerType::mapped_type>::type>
+	try_find_value(ContainerType& container, const KeyType& key) noexcept
+	{
+		auto it = container.find(key);
+		if(it != container.end())
+			return { it->second };
+		else
+			return { };
 	}
 
 	template<template<typename> typename STLContainerType, typename T, typename IndexType>
@@ -572,6 +588,21 @@ namespace com
 	std::span<SpanElementType> GetSpanFromBuffer(buffer_t* buffer) noexcept
 	{
 		return { static_cast<SpanElementType*>(buf_get_ptr(buffer)), buf_get_element_count(buffer) };
+	}
+
+	template<typename T>
+	static constexpr std::pair<T, T> GetMinMax(T a, T b) noexcept
+	{
+		if(a > b)
+			return { b, a };
+		else
+			return { a, b };
+	}
+
+	template<std::integral IntegerType>
+	static constexpr com::Bool IsOdd(IntegerType value) noexcept
+	{
+		return com::Bool { static_cast<bool>(value & 0x1) };
 	}
 }
 
