@@ -1,7 +1,6 @@
 #pragma once
 
-#include <common/defines.hpp>
-
+#include <common/defines.h> // for u8, WARNING: Do not include common/defines.hpp here because that header file itself depends on this header file.
 #include <ostream> // for std::ostream
 
 namespace com
