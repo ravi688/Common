@@ -85,6 +85,7 @@ typedef struct com_immutable_data_t
 #define CAN_BE_UNUSED_FUNCTION UNUSED_FUNCTION
 #define CAN_BE_UNUSED_VARIABLE UNUSED_VARIABLE
 #define WARN_UNUSED_RESULT_FUNCTION __attribute__((warn_unused_result))
+#define FALLTHROUGH __attribute__((fallthrough))
 #define INLINE_FUNCTION inline
 #define UNREACHABLE() __builtin_unreachable()
 

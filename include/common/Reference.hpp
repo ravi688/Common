@@ -46,24 +46,10 @@ namespace com
 		constexpr const T& getHandle() const noexcept { return m_handle; }
 
 
-		// Enable the following set of 3 (explicit) conversion operator overloads only if handle type is of pointer type
-		// That's because implicit conversion of pointer to bool is possible and automatic in C++, especially in 'if' evaluation context
-		// Which also leads to ambiguous resolution with 'operator bool()''
-		// Therefore, we are bette defining these functions as 'explicit'
-		// Otherwise, disable them.
-		constexpr explicit operator T&() noexcept requires(std::is_pointer<T>::value) { return m_handle; }
-		constexpr explicit operator const T&() const noexcept requires(std::is_pointer<T>::value) { return m_handle; }
-		constexpr explicit operator T() const noexcept requires(std::is_pointer<T>::value) { return m_handle; }
+		constexpr explicit operator T&() noexcept { return m_handle; }
+		constexpr explicit operator const T&() const noexcept { return m_handle; }
+		constexpr explicit operator T() const noexcept { return m_handle; }
 
-		// Enable the following set of 3 (implicit) conversion operator overloads only if handle type is not a pointer type
-		// That's because bool is automatically and implicitly converted to integer type in C++
-		// Therefore, if the destination type is an integral, so the handle type, and if no conversion operator found which convert
-		// to the integer type, C++ chooses the 'operator bool()' overload. Which leads to unexpected behaviour.
-		// Therefore, we define implicit conversion operators to the destination type so that C++ would priorities them first in the resolution.
-		constexpr operator T&() noexcept requires(!std::is_pointer<T>::value) { return m_handle; }
-		constexpr operator const T&() const noexcept requires(!std::is_pointer<T>::value) { return m_handle; }
-		constexpr operator T() const noexcept requires(!std::is_pointer<T>::value) { return m_handle; }
-		
 		// In non-old compilers, we can use 'explicit' keyword to only allow implicit evaluation to 'bool' in if context only.
 		constexpr explicit operator bool() const noexcept { return m_handle != Null; }
 
