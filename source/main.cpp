@@ -6,6 +6,10 @@
 
 #include <stdio.h> /* stdio.h */
 #include <common/static_string.h>
+#include <common/utility.h>
+
+#define TEST_NAME(name) std::cout << "Testing: " << name << std::endl
+#define CHECK(to_be_checked) if(!(to_be_checked)) std::cout << "Failed: " << #to_be_checked << std::endl
 
 static void static_string_test()
 {
@@ -27,7 +31,7 @@ static void static_string_test()
 
 static void UnorderedEraseSafeVectorProxyTest() noexcept
 {
-	std::cout << " -- Test for UnorderedEraseSafeVectorProxy<> " << std::endl;
+	TEST_NAME("UnorderedEraseSafeVectorProxy<>");
 	com::UnorderedEraseSafeVectorProxy<u32> values { { 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
 	std::cout << "UnorderedEraseSafeVectorProxy values: "; 
 	for(u32 value : values)
@@ -87,12 +91,55 @@ static void UnorderedEraseSafeVectorProxyTest() noexcept
 	std::cout << "Should Match (print after traverse): 2 8 4 9 6 7" << std::endl;
 }
 
+static void floatVerifyTest() noexcept
+{
+	TEST_NAME("Float verify test");
+	CHECK(com_verify_float_str("3.4f"));
+	CHECK(com_verify_float_str("3.4e+100f"));
+	CHECK(com_verify_float_str("3.4e-100f"));
+	CHECK(com_verify_float_str("3.444f"));
+	CHECK(com_verify_float_str("3.4e+100f"));
+	CHECK(com_verify_float_str("3434.434e-100f"));
+	CHECK(com_verify_float_str("+3.4f"));
+	CHECK(com_verify_float_str("+3.4e+100f"));
+	CHECK(com_verify_float_str("+3.4e-100f"));
+	CHECK(com_verify_float_str("+3.444f"));
+	CHECK(com_verify_float_str("+3.4e+100f"));
+	CHECK(com_verify_float_str("+3434.434e-100f"));
+	CHECK(com_verify_float_str("-3.4f"));
+	CHECK(com_verify_float_str("-3.4e+100f"));
+	CHECK(com_verify_float_str("-3.4e-100f"));
+	CHECK(com_verify_float_str("-3.444f"));
+	CHECK(com_verify_float_str("-3.4e+100f"));
+	CHECK(com_verify_float_str("-3434.434e-100f"));
+
+	CHECK(!com_verify_float_str("e3.4f"));
+	CHECK(!com_verify_float_str("f3.4e+100f"));
+	CHECK(!com_verify_float_str("3.f4e-100f"));
+	CHECK(!com_verify_float_str("3.#444f"));
+	CHECK(!com_verify_float_str("3$.4e+100f"));
+	CHECK(!com_verify_float_str("3 434.434e-100f"));
+	CHECK(!com_verify_float_str("++3.4f"));
+	CHECK(!com_verify_float_str("+-3.4e+100f"));
+	CHECK(!com_verify_float_str("+3.+4e-100f"));
+	CHECK(!com_verify_float_str("+3.er444f"));
+	CHECK(!com_verify_float_str("+3.f4e+100f"));
+	CHECK(!com_verify_float_str("+3_434.434e-100f"));
+	CHECK(!com_verify_float_str("--+3.4f"));
+	CHECK(!com_verify_float_str("-+3.+4e+100f"));
+	CHECK(!com_verify_float_str("-3.+4e-100f"));
+	CHECK(!com_verify_float_str("asdf-3.444f"));
+	CHECK(!com_verify_float_str("bvcc+3.4e+100f"));
+	CHECK(!com_verify_float_str("-3434.4f34e-100f"));
+}
+
 int main(int argc, char** argv)
 {
 	debug_log_info("Common Repository!");
 
 	static_string_test();
 	UnorderedEraseSafeVectorProxyTest();
+	floatVerifyTest();
 
 	return 0;
 }
