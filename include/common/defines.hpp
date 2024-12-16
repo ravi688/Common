@@ -240,6 +240,22 @@ namespace com
 		return it->second;
 	}
 
+	// Finds a value inside a container or returns a default (or) value passed as the third argument to this function
+	// Returns: Reference to either the found value or the 'orValue'
+	template<HasKeyType ContainerType, typename KeyType = typename ContainerType::key_type, typename ReturnValueType = 
+		typename std::conditional<
+				std::is_const<typename std::remove_reference<ContainerType>::type>::value,
+				const typename ContainerType::mapped_type,
+				typename ContainerType::mapped_type>::type>
+	requires FindContainer<ContainerType, KeyType>
+	ReturnValueType& find_value_or(ContainerType& container, const KeyType& key, ReturnValueType& orValue) noexcept
+	{
+		auto it = container.find(key);
+		if(it != container.end())
+			return it->second;
+		return orValue;
+	}
+
 	template<HasKeyType ContainerType, typename KeyType = typename ContainerType::key_type>
 	requires FindContainer<ContainerType, KeyType>
 	OptionalReference<typename std::conditional<
@@ -253,6 +269,44 @@ namespace com
 			return { it->second };
 		else
 			return { };
+	}
+
+	template<typename T>
+	concept HasMappedType = requires { typename T::mapped_type; };
+
+	template<typename T>
+	concept InsertFindMapContainer = HasKeyType<T> && HasValueType<T> && HasMappedType<T> &&
+	requires(T& cont)
+	{
+		{ cont.insert(typename T::value_type { com::decllval<typename T::key_type>(), std::declval<typename T::mapped_type>() }) };
+		{ try_find_value(cont, com::decllval<typename T::key_type>()) };
+	};
+
+	template<typename T>
+	struct GetViewType
+	{
+		typedef T type;
+	};
+
+	template<>
+	struct GetViewType<std::string> { typedef std::string_view type; };
+
+	// Works on std::unordered_map<> type containers which has insert() and find()
+	// If key value pair already exists then it only overwrites value of the already existing pair with the value passed as the third argument to this function
+	// Otherwise, it inserts a new key value pair
+	// Returns: com::True if new key value pair has been inserted, otherwise com::False
+	template<InsertFindMapContainer ContainerType, typename KeyType, typename MappedType = typename ContainerType::mapped_type>
+	requires(com::SameAsAny<KeyType, typename ContainerType::key_type, typename GetViewType<typename ContainerType::key_type>::type>)
+	com::Bool insert_or_set(ContainerType& container, const KeyType& key, MappedType value) noexcept
+	{
+		auto foundValue = try_find_value(container, key);
+		if(foundValue)
+		{
+			*foundValue = value;
+			return com::False;
+		}
+		container.insert({ key, std::move(value) });
+		return com::True;
 	}
 
 	template<template<typename> typename STLContainerType, typename T, typename IndexType>
@@ -458,15 +512,6 @@ namespace com
 			return std::equal_to<T> { } (value1, value2);
 		}
 	};
-
-	template<typename T>
-	struct GetViewType
-	{
-		typedef T type;
-	};
-
-	template<>
-	struct GetViewType<std::string> { typedef std::string_view type; };
 
 	template<typename KeyType, typename ValueType, ViewType<KeyType> KeyViewType = typename GetViewType<KeyType>::type>
 	struct _unordered_map
