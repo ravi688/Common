@@ -342,7 +342,7 @@ bin-clean:
 	@echo [Log] Binaries cleaned successfully!
 	$(MAKE) --directory=./../../shared-dependencies/BufferLib clean
 	$(MAKE) --directory=./../../dependencies/SafeMemory/shared-dependencies/CallTrace clean
-# 	$(MAKE) --directory=./dependencies/HPML clean
+	$(MAKE) --directory=./../../dependencies/MeshLib/dependencies/DiskManager clean
 # 	$(MAKE) --directory=../../shared-dependencies/HPML clean
 #  	$(MAKE) --directory=./dependencies/tgc clean
 #-------------------------------------------
