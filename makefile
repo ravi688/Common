@@ -341,7 +341,7 @@ bin-clean:
 	$(RM_DIR) $(TARGET_LIB_DIR)
 	@echo [Log] Binaries cleaned successfully!
 	$(MAKE) --directory=./dependencies/BufferLib clean
-# 	$(MAKE) --directory=./dependencies/HPML clean
+	$(MAKE) --directory=./dependencies/DiskManager clean
 # 	$(MAKE) --directory=../../shared-dependencies/HPML clean
 #  	$(MAKE) --directory=./dependencies/tgc clean
 #-------------------------------------------
