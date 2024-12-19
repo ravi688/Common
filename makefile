@@ -37,8 +37,8 @@ EXTERNAL_INCLUDES =
 EXTERNAL_LIBRARIES = 
 BUILD_DEFINES= 
 
-DEPENDENCIES = BufferLib BufferLib/dependencies/CallTrace
-DEPENDENCY_LIBS = BufferLib/lib/bufferlib.a BufferLib/dependencies/CallTrace/lib/calltrace.a
+DEPENDENCIES = BufferLib BufferLib/dependencies/CallTrace DiskManager
+DEPENDENCY_LIBS = BufferLib/lib/bufferlib.a BufferLib/dependencies/CallTrace/lib/calltrace.a DiskManager/lib/diskmanager.a
 DEPENDENCIES_DIR = ./dependencies
 SHARED_DEPENDENCIES =
 SHARED_DEPENDENCY_LIBS =
