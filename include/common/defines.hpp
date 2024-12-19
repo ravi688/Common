@@ -16,6 +16,7 @@
 #include <iterator> // for std::iterator_traits<>
 #include <iostream>
 #include <span> // for std::span<>
+#include <string_view> // for std::string_view
 
 #define _DBG_LINE_ std::cout << __FILE__ << ":" << __LINE__ << std::endl
 
@@ -648,6 +649,20 @@ namespace com
 	static constexpr com::Bool IsOdd(IntegerType value) noexcept
 	{
 		return com::Bool { static_cast<bool>(value & 0x1) };
+	}
+
+	template<typename T>
+	std::string_view span_to_string_view(std::span<T>& span) noexcept
+	{
+		static_assert(sizeof(T) == sizeof(char));
+		return std::string_view { reinterpret_cast<char*>(span.data()), span.size() };
+	}
+
+	template<typename T>
+	const std::string_view span_to_string_view(const std::span<T>& span) noexcept
+	{
+		static_assert(sizeof(T) == sizeof(char));
+		return std::string_view { reinterpret_cast<const char*>(span.data()), span.size() };
 	}
 }
 

@@ -1,3 +1,6 @@
 [submodule "dependencies/BufferLib"]
 	path = dependencies/BufferLib
 	url = https://github.com/ravi688/BufferLib.git
+[submodule "dependencies/DiskManager"]
+	path = dependencies/DiskManager
+	url = git@github.com:ravi688/DiskManager.git

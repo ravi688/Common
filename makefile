@@ -37,8 +37,8 @@ EXTERNAL_INCLUDES =
 EXTERNAL_LIBRARIES = 
 BUILD_DEFINES= 
 
-DEPENDENCIES = ../../../shared-dependencies/BufferLib ../../../dependencies/SafeMemory/shared-dependencies/CallTrace
-DEPENDENCY_LIBS = ../../../shared-dependencies/BufferLib/lib/bufferlib.a ../../../dependencies/SafeMemory/shared-dependencies/CallTrace/lib/calltrace.a
+DEPENDENCIES = ../../../shared-dependencies/BufferLib ../../../dependencies/SafeMemory/shared-dependencies/CallTrace ../../../dependencies/MeshLib/dependencies/DiskManager
+DEPENDENCY_LIBS = ../../../shared-dependencies/BufferLib/lib/bufferlib.a ../../../dependencies/SafeMemory/shared-dependencies/CallTrace/lib/calltrace.a ../../../dependencies/MeshLib/dependencies/DiskManager/lib/diskmanager.a
 DEPENDENCIES_DIR = ./dependencies
 SHARED_DEPENDENCIES =
 SHARED_DEPENDENCY_LIBS =
