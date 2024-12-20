@@ -655,7 +655,9 @@ namespace com
 	std::string_view span_to_string_view(std::span<T>& span) noexcept
 	{
 		static_assert(sizeof(T) == sizeof(char));
-		return std::string_view { reinterpret_cast<char*>(span.data()), span.size() };
+		if constexpr(std::is_const_v<T>)
+			return std::string_view { reinterpret_cast<const char*>(span.data()), span.size() };
+		else return std::string_view { reinterpret_cast<char*>(span.data()), span.size() };
 	}
 
 	template<typename T>
