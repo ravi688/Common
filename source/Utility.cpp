@@ -49,7 +49,7 @@ namespace com
 		if(m_isValid)
 		{
 			if(m_free)
-				m_free(m_data, m_freeUserData);
+				m_free(const_cast<void*>(m_data), m_freeUserData);
 			m_isValid = com::False;
 		}
 		else DEBUG_LOG_ERROR("You're trying to destroy an invalid FileLoadResult object");
