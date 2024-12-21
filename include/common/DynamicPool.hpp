@@ -11,10 +11,11 @@
 namespace com
 {
 	template<typename T>
-	class DynamicPool
+	class DynamicPool final
 	{
 	public:
 		typedef std::function<T()> OnCreate;
+		typedef std::function<void(T&)> OnDestroy;
 		typedef std::function<void(T&)> OnReturn;
 		typedef std::function<void(T&)> OnRecycle;
 
@@ -22,20 +23,27 @@ namespace com
 		std::vector<T> m_storage;
 		std::size_t m_activeCount;
 		OnCreate m_onCreate;
+		OnDestroy m_onDestroy;
 		OnReturn m_onReturn;
 		OnRecycle m_onRecycle;
 
 		typename std::vector<T>::iterator getLastActive() noexcept;
 
 	public:
-		DynamicPool(OnCreate onCreate, OnReturn onReturn, OnRecycle onRecycle, bool isReturn = false, std::size_t initialCount = 0) noexcept;
+		DynamicPool(OnCreate onCreate, OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle, bool isReturn = false, std::size_t initialCount = 0) noexcept;
 		DynamicPool(DynamicPool&& pool) noexcept;
+		~DynamicPool() noexcept;
 
 		DynamicPool& operator =(DynamicPool&& pool) noexcept;
 
 		T get() noexcept;
 		void put(T value) noexcept;
+		// Puts all the active objects back into the pool
+		// NOTE: this operation doesn't destroy the objects, it just cals OnReturn on every object
 		void reclaim() noexcept;
+		// Destroys all the objects
+		// NOTE: it only calls OnDestroy on every object
+		void clear() noexcept;
 		void reserve(std::size_t count, bool isReturn = true) noexcept;
 
 		std::size_t activeCount() const noexcept { return m_activeCount; }
@@ -53,9 +61,10 @@ namespace com
 
 
 	template<typename T>
-	DynamicPool<T>::DynamicPool(OnCreate onCreate, OnReturn onReturn, OnRecycle onRecycle, bool isReturn, std::size_t initialCount) noexcept : m_storage(initialCount), 
+	DynamicPool<T>::DynamicPool(OnCreate onCreate, OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle, bool isReturn, std::size_t initialCount) noexcept : m_storage(initialCount), 
 																																				m_activeCount(0),
 																																				m_onCreate(onCreate),
+																																				m_onDestroy(onDestroy),
 																																				m_onReturn(onReturn),
 																																				m_onRecycle(onRecycle)
 	{
@@ -70,11 +79,18 @@ namespace com
 	template<typename T>
 	DynamicPool<T>::DynamicPool(DynamicPool<T>&& pool) noexcept : m_storage(std::move(pool.m_storage)),
 																m_activeCount(pool.m_activeCount),
-																m_onCreate(m_onCreate),
-																m_onReturn(m_onReturn),
-																m_onRecycle(m_onRecycle)
+																m_onCreate(std::move(m_onCreate)),
+																m_onDestroy(std::move(m_onDestroy)),
+																m_onReturn(std::move(m_onReturn)),
+																m_onRecycle(std::move(m_onRecycle))
 	{
 
+	}
+
+	template<typename T>
+	DynamicPool<T>::~DynamicPool() noexcept
+	{
+		clear();
 	}
 
 	template<typename T>
@@ -83,6 +99,7 @@ namespace com
 		m_storage = std::move(pool);
 		m_activeCount = pool.m_activeCount;
 		m_onCreate = pool.m_onCreate;
+		m_onDestroy = pool.m_onDestroy;
 		m_onReturn = pool.m_onReturn;
 		m_onRecycle = pool.m_onRecycle;
 		return *this;
@@ -141,6 +158,18 @@ namespace com
 			m_onReturn(*it);
 		m_activeCount = 0;
 	}
+
+	template<typename T>
+	void DynamicPool<T>::clear() noexcept
+	{
+		if(m_activeCount == 0)
+			return;
+		for(auto it = m_storage.begin(); it != m_storage.end(); it++)
+			m_onDestroy(*it);
+		m_storage.clear();
+		m_activeCount = 0;
+	}
+
 
 	template<typename T>
 	void DynamicPool<T>::reserve(std::size_t count, bool isReturn) noexcept
