@@ -30,5 +30,12 @@ namespace com
 		{
 			{ instance (com::decllval<ValueType>()) } -> std::same_as<void>;
 		};
+
+		template<typename T>
+		concept LinkedListNode = requires(T& instance)
+		{
+			{ instance.getNext() } -> com::SameAsAny<T*, T&>;
+			{ instance.getPrev() } -> com::SameAsAny<T*, T&>;
+		};
 	}
 }
