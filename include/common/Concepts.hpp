@@ -37,5 +37,11 @@ namespace com
 			{ instance.getNext() } -> com::SameAsAny<T*, T&>;
 			{ instance.getPrev() } -> com::SameAsAny<T*, T&>;
 		};
+
+		template<typename T>
+		concept ForwardLinkedListNode = requires(T& instance)
+		{
+			{ instance.getNext() } -> com::SameAsAny<T*, T&>;
+		};
 	}
 }

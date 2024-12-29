@@ -666,6 +666,44 @@ namespace com
 		static_assert(sizeof(T) == sizeof(char));
 		return std::string_view { reinterpret_cast<const char*>(span.data()), span.size() };
 	}
+
+	// Fully Traverses a doubly-linked list starting from anywhere in the linked list
+	// node: pointer to a doubly LinkedListNode, it may be in the middle; can be null, in that case this function does nothing
+	// visitor: called for each node being visited
+	template<com::concepts::LinkedListNode T, com::concepts::UnaryVisitor<T*> VisitorType>
+	void TraverseLinkedListBiDirect(T* node, VisitorType visitor) noexcept
+	{
+		if(!node) return;
+		auto* left = node->getPrev();
+		while(left)
+		{
+			// NOTE: we need to pointer to the previous node before even calling 'visitor', that's because the visitor might delete the node object
+			// Therefore, dereferencing the deleted node won't be possible later
+			auto* nextLeft = left->getPrev();
+			visitor(left);
+			left = nextLeft;
+		}
+		while(node)
+		{
+			auto* nextRight = node->getNext();
+			visitor(node);
+			node = nextRight;
+		}
+	}
+	
+	// Fully traverses a forward-linked list starting from the head (root node)
+	// node: pointer to the head node; call be null, in that case this function does nothing
+	// visitor: called for each node being visisted
+	template<com::concepts::ForwardLinkedListNode T, com::concepts::UnaryVisitor<T*> VisitorType>
+	void TraverseLinkedList(T* node, VisitorType visitor) noexcept
+	{
+		while(node)
+		{
+			auto* nextNode = node->getNext();
+			visitor(node);
+			node = nextNode;
+		}
+	}
 }
 
 
