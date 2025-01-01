@@ -108,6 +108,12 @@ namespace com
 		{
 			m_stateValue[state] = value;
 		}
+		T get(StateType state) const noexcept
+		{
+			auto value = com::try_find_value(m_stateValue, state);
+			_com_assert(value.has_value());
+			return value.value();
+		}
 
 		void setTransitionDelay(f32 transitionDelay) noexcept { m_transitionDelay = transitionDelay; }
 		// This function supposed to be called just after instantiation of this class and only once.
