@@ -12,6 +12,9 @@
 
 namespace com
 {
+	// Event Handler type generator class based on template arguments pass in.
+	// If PublisherType is com::no_publish_ptr_t then the first argument passed to the handler isn't pointer to some publisher type
+	// If PublisherType is of some other type then the first argument passed to the handler is pointer to some publisher type
 	template<typename PublisherType, typename... Args>
 	struct OrderedEventHandlerProto
 	{
@@ -21,6 +24,12 @@ namespace com
 							>::type;
 	};
 
+	// Event object which imposes order among the subscriptions (so among their corresponding handlers).
+	// Each subscription has as a key which need not to be unique, the keys are comparable with one another,
+	// All the subscriptions are stored in increasingly sorted order compared with 'Compare'.
+	// Upon calling publish() the handler of the subscription with smallest key will be invoked first.
+	// Handlers with larger keys can stop invocation of the handlers with smaller keys, and it should be noted
+	// that all handlers with equal keys will always be invoked if any of them is invoked even if it returns 'false' to stop the rest.
 	template<typename PublisherType, typename KeyType, class Compare = std::less<KeyType>, typename... Args>
 	class COMMON_API OrderedEvent
 	{
@@ -103,6 +112,8 @@ namespace com
 		requires(std::is_same_v<T, no_publish_ptr_t>)
 		OrderedEvent() noexcept : m_id_generator(id_generator_create(0, NULL)), m_exclusiveAccessID(InvalidSubscriptionID), m_exclusiveHandlerData(com::null_pointer<EventHandlerData>()), m_isPublishing(false) { }
 
+		// This constructor will be enabled only if the first template argument in com::OrderedEvent<> is not of type com::no_publisher_ptr_t
+		// The pointer passed in here will be passed as the first argument while invoking the handlers
 		template<typename T = PublisherType>
 		requires(!std::is_same_v<T, no_publish_ptr_t>)
 		OrderedEvent(T* publisher) noexcept : m_id_generator(id_generator_create(0, NULL)), m_publisher(publisher), m_exclusiveAccessID(InvalidSubscriptionID), m_exclusiveHandlerData(com::null_pointer<EventHandlerData>()), m_isPublishing(false) { }
@@ -140,14 +151,30 @@ namespace com
 			id_generator_destroy(&m_id_generator);
 		}
 
+		// Description: Returns the number of subscriptions to this event
+		// Params: None
+		// Returns: an integer (unsigned)
+		COM_NO_DISCARD auto size() const noexcept { return m_handlers.size(); }
+
+		// It overwrites the pointer to be passed as the first argument while invoking the handlers
+		// NOTE: This method won't be available if com::OrderedEvent<> has been created with com::no_publish_ptr_t as the first template argument
 		template<typename T = PublisherType>
 		requires(!std::is_same_v<T, no_publish_ptr_t>)
 		void setPublisher(T* ptr) noexcept { m_publisher = ptr; }
 
+		// Returns the pointer to be passed as the first argument while invoking the handlers
+		// NOTE: This method won't be available if com::OrderedEvent<> has been created with com::no_publish_ptr_t as the first template argument
 		template<typename T = PublisherType>
 		requires(!std::is_same_v<T, no_publish_ptr_t>)
 		T* getPublisher() noexcept { return m_publisher; }
 
+		// Description: Subscribes to this event
+		// Params:
+		//	handler: Callable of signature bool(Args...), this will be invoked when publish() is called and no other handler stops it
+		//	key: Key for this subscription, smallest key means the handler associated with will be called first when the event is published
+		// Returns: A locally unique ID of type SubscriptionID
+		// NOTE: The returned id is only unique in the key-space of only one instance of type com::OrderedEvent<>
+		//		The keys must not be inter-mixed with multiple instances of com::OrderedEvent<> ! 
 		SubscriptionID subscribe(EventHandler handler, const KeyType& key) noexcept
 		{
 			auto id = id_generator_get(&m_id_generator);
@@ -157,6 +184,9 @@ namespace com
 			return id;
 		}
 
+		// Description: clears (unsubscribes) all the subscriptions, after call to this function size() would return zero
+		// Params: None
+		// Returns: None
 		void clear() noexcept
 		{
 			if(m_isPublishing)
@@ -173,6 +203,11 @@ namespace com
 			}
 		}
 
+		// Description: unsubscribes an already subscribed handler/subscription from this Event
+		// Params:
+		//	id: Subscription id returned by subscribe(), it must be a valid id
+		// Returns: None
+		// NOTE: If id is InvalidSubscriptionID then assertion failure occurs, otherwise the behaviour is undefined
 		void unsubscribe(SubscriptionID id) noexcept
 		{
 			if(m_isPublishing)
@@ -183,24 +218,49 @@ namespace com
 			unsubscribeImmediately(id);
 		}
 
+		// Description: deactivates a subscription/handler which causes the handler invocation
+		// 				for this subscription to be ignored when the event is published.
+		// Params:
+		//	id: Subscription id returned by subscribe(), it must ba valid id
+		// Returns: None
+		// NOTE: If id is InvalidSubscription then assertion failure occurs, otherwise the behaviour is undefined
 		void deactivate(SubscriptionID id) noexcept
 		{
 			auto it = getHandlerIt(id);
 			it->second.isActive = false;
 		}
 
+		// Description: temporarily marks a subscription/handler deactive which causes the handler invocation
+		//				for this subscription to be ignored for only one call to publish(), after that it becomes active
+		//				hence the name tempDeactivate.
+		// Params:
+		//	id: Subscription id returned by subscribe(), it must ba valid id
+		// Returns: None
+		// NOTE: If id is InvalidSubscription then assertion failure occurs, otherwise the behaviour is undefined
 		void tempDeactivate(SubscriptionID id) noexcept
 		{
 			auto it = getHandlerIt(id);
 			it->second.isTempInActive = true;
 		}
 
+		// Description: activates a subscription/handler which was possibly deactivately by calling deactivate(),
+		//				activating a subscription causes it to be invoked whenever publish() is called on the Event.
+		// Params:
+		//	id: Subscription id returned by subscribe(), it must ba valid id
+		// Returns: None
+		// NOTE: If id is InvalidSubscription then assertion failure occurs, otherwise the behaviour is undefined
 		void activate(SubscriptionID id) noexcept
 		{
 			auto it = getHandlerIt(id);
 			it->second.isActive = true;
 		}
 
+		// Description: Grants exclusive access to only one subscription/handler, that means if publish() is called on the Event,
+		//				then only one subscription/handler, which has been granted exclusive access, will be invoked.
+		// Params:
+		//	id: Subscription id returned by subscribe(), it must be a valid id
+		// Returns: None
+		// NOTE: Grabbing exclusive access multiple times without releasing, by calling releaseExclusiveAccess(), results in fetal error.
 		void grabExclusiveAccess(SubscriptionID id) noexcept
 		{
 			if(m_exclusiveAccessID != InvalidSubscriptionID)
@@ -212,19 +272,33 @@ namespace com
 			m_exclusiveHandlerData = &getHandlerIt(id)->second;
 		}
 
+		// Description: Releases exclusive access granted on a subscription
+		// Params:
+		//	id: Subscription id returned by subscribe(), it must be a valid id and same id as the one passed in grabExclusiveAccess()
+		// Returns: None
+		// NOTE: If mismatch in the subscription id happens between grabExclusiveAccess() and releaseExclusiveAccess() then fetal error occurs.
 		void releaseExclusiveAccess(SubscriptionID id) noexcept
 		{
 			if(m_exclusiveAccessID != id)
 			{
-				debug_log_error("You released exclusive access with a different subscription id than what was used for the grabbing");
+				debug_log_fetal_error("You released exclusive access with a different subscription id than what was used for the grabbing");
 				return;
 			}
 			m_exclusiveAccessID = InvalidSubscriptionID;
 			m_exclusiveHandlerData = com::null_pointer<EventHandlerData>();
 		}
 
-		SubscriptionID getExclusiveAccessID() const noexcept { return m_exclusiveAccessID; }
+		// Description: Returns id of the subscription/handler which has exclusive access currently otherwise InvalidSubscriptionID
+		// Params: None
+		// Returns: SubscripionID which may be InvalidSubscriptionID
+		COM_NO_DISCARD SubscriptionID getExclusiveAccessID() const noexcept { return m_exclusiveAccessID; }
 
+		// Description: Updates key of a subscription which also causes re-ordering internally
+		// Params:
+		//	id: Subscription id returned by subscribe(), it must be a valid id
+		//	newKey: value of the new key
+		// Returns: None
+		// NOTE: if id is not a valid subscription id then the behaviour is undefined
 		void updateKey(SubscriptionID id, const KeyType& newKey) noexcept
 		{
 			if(m_isPublishing)
@@ -235,6 +309,11 @@ namespace com
 			updateKeyImmediately(id, newKey);
 		}
 
+		// Description: Publishes this event which causes all the subscriptions to be notified (their handlers are invoked)
+		//				in a sorted order. If any handler has been granted exclusive access then only that handler will be invoked.
+		// Params:
+		//	args: variable number of arguments which will forwarded/passed to each handler invocation
+		// Returns: None
 		void publish(Args... args) noexcept
 		{
 			m_isPublishing = true;
@@ -253,7 +332,11 @@ namespace com
 					// only invoke this handler if it is active
 					if(!pair.second->isTempInActive && pair.second->isActive)
 					{
-						bool isStop = pair.second->handler(m_publisher, args...);
+						bool isStop = false;
+						if constexpr (std::is_same_v<PublisherType, no_publish_ptr_t>)
+							isStop = pair.second->handler(args...);
+						else
+							isStop = pair.second->handler(m_publisher, args...);
 						if(isStop)
 						{
 							++it;

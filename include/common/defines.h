@@ -98,8 +98,10 @@ typedef struct com_immutable_data_t
 #define COLD COLD_FUNCTION
 #ifdef __cplusplus
 #   define AUTO auto
+#   define COM_NO_DISCARD [[nodiscard]]
 #else
 #   define AUTO __auto_type
+#   define COM_NO_DISCARD /* TODO: Find equivalent for C language */
 #endif
 
 #ifdef COMMON_STATIC_LIBRARY
