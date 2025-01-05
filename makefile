@@ -40,7 +40,7 @@ MAIN_SOURCE_LANG = cpp
 #The sources which needs to be included when building primary executable
 MAIN_SOURCES=source/main.cpp
 #The sources which needs to be included when building test executasble
-TEST_SOURCES=source/test.cpp
+TEST_SOURCES=$(wildcard source/tests/*.cpp)
 EXTERNAL_INCLUDES =
 EXTERNAL_LIBRARIES = $(shell pkg-config catch2-with-main --libs)
 BUILD_DEFINES=
