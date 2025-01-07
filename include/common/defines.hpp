@@ -704,6 +704,71 @@ namespace com
 			node = nextNode;
 		}
 	}
+
+	template<com::concepts::LinkedListNodeSetters T>
+	void RemoveLinkedListNode(T* node, com::Bool isSetNull = com::True) noexcept
+	{
+		if(node->getPrev())
+			node->getPrev()->setNext(node->getNext());
+		if(node->getNext())
+			node->getNext()->setPrev(node->getPrev());
+		if(isSetNull)
+		{
+			node->setNext(com::null_pointer<T>());
+			node->setPrev(com::null_pointer<T>());
+		}
+	}
+
+	template<com::concepts::LinkedListNodeSetters T>
+	void InsertLinkedListNodeAfter(T* node, T* after) noexcept
+	{
+		if(auto afterNext = after->getNext())
+		{
+			afterNext->setPrev(node);
+			node->setNext(afterNext);
+		}
+		node->setPrev(after);	
+		after->setNext(node);
+	}
+
+	template<com::concepts::LinkedListNodeSetters T>
+	void InsertLinkedListNodeBefore(T* node, T* before) noexcept
+	{
+		if(auto beforePrev = before->getPrev())
+		{
+			beforePrev->setNext(node);
+			node->setPrev(beforePrev);
+		}
+		node->setNext(before);
+		before->setPrev(node);
+	}
+
+	template<com::concepts::BackwardLinkedListNode T>
+	u32 GetLinkedListNodeIndex(const T* node) noexcept
+	{
+		u32 index = 0;
+		node = node->getPrev();
+		while(node)
+		{
+			++index;
+			node = node->getPrev();
+		}
+		return index;
+	}
+
+	template<com::concepts::BackwardLinkedListNode T>
+	T* GetLinkedListRoot(T* node) noexcept
+	{
+		while(node && node->getPrev())
+			node = node->getPrev();
+		return node;
+	}
+
+	template<typename T>
+	constexpr com::Bool is_nullptr(T* ptr) noexcept
+	{
+		return com::Bool { ptr == com::null_pointer<T>() };
+	}
 }
 
 
