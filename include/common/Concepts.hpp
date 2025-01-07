@@ -39,9 +39,22 @@ namespace com
 		};
 
 		template<typename T>
+		concept LinkedListNodeSetters = LinkedListNode<T> && requires(T& instance)
+		{
+			instance.setNext(std::declval<typename std::add_pointer<T>::type>());
+			instance.setPrev(std::declval<typename std::add_pointer<T>::type>());
+		};
+
+		template<typename T>
 		concept ForwardLinkedListNode = requires(T& instance)
 		{
 			{ instance.getNext() } -> com::SameAsAny<T*, T&>;
+		};
+
+		template<typename T>
+		concept BackwardLinkedListNode = requires(T& instance)
+		{
+			{ instance.getPrev() } -> com::SameAsAny<T*, T&>;
 		};
 	}
 }
