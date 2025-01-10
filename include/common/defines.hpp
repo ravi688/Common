@@ -62,10 +62,11 @@ namespace com
 		return IntToEnumClass<EnumClassType>(CastIntToUnderlyingType<EnumClassType, IntegerType>(intValue));
 	}
 
-	template<typename EnumClassType>
-	constexpr bool EnumClassHasFlag(const EnumClassType bits, const EnumClassType flag) noexcept
+	template<typename EnumClassType1, typename EnumClassType2>
+	constexpr bool EnumClassHasFlag(const EnumClassType1 bits, const EnumClassType2 flag) noexcept
 	{
-		return HAS_FLAG(EnumClassToInt<EnumClassType>(bits), EnumClassToInt<EnumClassType>(flag));
+		static_assert(sizeof(EnumClassType1) >= sizeof(EnumClassType2));
+		return HAS_FLAG(EnumClassToInt<EnumClassType1>(bits), EnumClassToInt<EnumClassType2>(flag));
 	}
 
 	template<typename T>
