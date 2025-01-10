@@ -99,9 +99,13 @@ typedef struct com_immutable_data_t
 #ifdef __cplusplus
 #   define AUTO auto
 #   define COM_NO_DISCARD [[nodiscard]]
+#   define COM_DEPRECATED [[deprecated]]
+#   define COM_DEPRECATED_STR(str) [[deprecated(str)]]
 #else
 #   define AUTO __auto_type
 #   define COM_NO_DISCARD /* TODO: Find equivalent for C language */
+#   define COM_DEPRECATED DEPRECATED
+#   define COM_DEPRECATED_STR(str) COM_DEPRECATED 
 #endif
 
 #ifdef COMMON_STATIC_LIBRARY
