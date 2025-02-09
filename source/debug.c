@@ -65,7 +65,7 @@ COMMON_API void debug_log_break(const char* description, u32 line, const char* f
 	debug_break();
 }
 
-#ifdef GLOBAL_DEBUG
+#ifdef COMMON_DEBUG
 COMMON_API void* __static_cast(u32 sizeof_type, u32 sizeof_source, void* source)
 {
 	com_assert(DESCRIPTION(sizeof_type == sizeof_source), "Invalid static_cast. You might run into reading corrupted data.");
@@ -83,4 +83,4 @@ COMMON_API const void* __reinterpret_const_cast(u32 sizeof_type, u32 sizeof_sour
 	com_assert(DESCRIPTION(sizeof_type <= sizeof_source), "Invalid reinterpret_cast. You might run into reading corrupted data.");
 	return source;
 }
-#endif /* GLOBAL_DEBUG */
+#endif /* COMMON_DEBUG */

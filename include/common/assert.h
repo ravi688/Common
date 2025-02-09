@@ -51,7 +51,7 @@
 #define _COM_ASSERT(...) _ASSERT(__VA_ARGS__)
 #define _COM_ASSERT_WRN(...) ASSERT_WRN(__VA_ARGS__)
 
-#ifdef GLOBAL_DEBUG
+#ifdef COMMON_DEBUG
 #	define com_assert(...) ASSERT(__VA_ARGS__)
 #	define com_assert_wrn(...) ASSERT_WRN(__VA_ARGS__)
 #	define com_assert_called_once(...) ASSERT_CALLED_ONCE(__VA_ARGS__)

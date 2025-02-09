@@ -416,7 +416,7 @@ namespace com
 	template<RefOrPtrType T, RefOrPtrType U>
 	static INLINE_IF_RELEASE_MODE T iknow_down_cast(U value) noexcept
 	{
-		#ifdef GLOBAL_DEBUG
+		#ifdef COMMON_DEBUG
 		T _value = dynamic_cast<T>(value);
 		if constexpr (std::is_pointer_v<T>)
 		{

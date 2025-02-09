@@ -9,7 +9,7 @@
 #define DEBUG_LOG_ERROR_EXIT(...) __debug_log_exit("[Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
 #define DEBUG_LOG_FETAL_ERROR(...) debug_log_break("[Fetal Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
 
-#ifdef GLOBAL_DEBUG
+#ifdef COMMON_DEBUG
 #	define debug_log_info(...) DEBUG_LOG_INFO(__VA_ARGS__)
 #	define debug_log_warning(...) DEBUG_LOG_WARNING(__VA_ARGS__)
 #	define debug_log_error(...) DEBUG_LOG_ERROR(__VA_ARGS__)

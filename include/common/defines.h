@@ -8,6 +8,12 @@
 #include <float.h>
 #include <stddef.h> // NULL
 #include <common/platform.h>
+#include <common/api_defines.h>
+
+#if !defined(COMMON_RELEASE) && !defined(COMMON_DEBUG)
+#   warning "None of COMMON_RELEASE && COMMON_DEBUG is defined; using COMMON_DEBUG"
+#   define COMMON_DEBUG
+#endif
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -108,24 +114,6 @@ typedef struct com_immutable_data_t
 #   define COM_DEPRECATED_STR(str) COM_DEPRECATED 
 #endif
 
-#ifdef COMMON_STATIC_LIBRARY
-#	define COMMON_API
-#elif COMMON_DYNAMIC_LIBRARY
-#	ifdef PLATFORM_LINUX
-#		define COMMON_API /* nothing */
-#	else
-#		define COMMON_API __declspec(dllimport)
-#	endif
-#elif BUILD_DYNAMIC_LIBRARY
-#	ifdef PLATFORM_LINUX
-#		define COMMON_API __attribute__((__visibility__("default")))
-#	else
-#		define COMMON_API __declspec(dllexport)
-#	endif
-#else
-#	define COMMON_API
-#endif
-
 #ifdef __cplusplus
 #	define BEGIN_CPP_COMPATIBLE extern "C" {
 #	define END_CPP_COMPATIBLE }
@@ -134,11 +122,11 @@ typedef struct com_immutable_data_t
 #	define END_CPP_COMPATIBLE
 #endif
 
-#ifdef GLOBAL_DEBUG
+#ifdef COMMON_DEBUG
 #	define DEBUG_BLOCK(x) x
 #else
 #	define DEBUG_BLOCK(x)
-#endif /*GLOBAL_DEBUG*/
+#endif /*COMMON_DEBUG*/
 
 #define DREF_TO(type, ptr) (*(type*)(ptr))
 #define DREF(ptr) (*(ptr))
@@ -161,17 +149,17 @@ typedef struct com_immutable_data_t
 /* STATIC_CAST: casts one type of pointer to another where the corresponding non-pointer types have the same size.
  * Use STATIC_CAST when you're sure both the pointers point to same sized objects
  * If the size mistmatched, it throws an error at runtime. */
-#ifdef GLOBAL_DEBUG
+#ifdef COMMON_DEBUG
 #   define STATIC_CAST(type, source) CAST_TO(type, __static_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
     COMMON_API void* __static_cast(u32 sizeof_type, u32 sizeof_source, void* source);
 #else
 #   define STATIC_CAST(target, source) CAST_TO(target, source)
-#endif /* GLOBAL_DEBUG */
+#endif /* COMMON_DEBUG */
 
 /* REINTERPRET_CAST: casts on type of pointer to another where the corresponding non-pointer types may not have the
                      same size. However the size of the non-pointer type of the target must be less than or equal to that of source.
  * Use REINTERPRET_CAST when you're sure the size of the non-pointer type of the target is less than or equal to that of source. */
-#ifdef GLOBAL_DEBUG
+#ifdef COMMON_DEBUG
 #   define REINTERPRET_CAST(type, source) CAST_TO(type, __reinterpret_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
 #   define _REINTERPRET_CAST(type, source, source_size) CAST_TO(type, __reinterpret_cast(SIZEOF_NON_PTR_TYPE(type), source_size, source))
 #   define REINTERPRET_CONST_CAST(type, source) CAST_TO(type, __reinterpret_const_cast(SIZEOF_NON_PTR_TYPE(type), sizeof(DREF(source)), source))
@@ -181,7 +169,7 @@ typedef struct com_immutable_data_t
 #else
 #   define REINTERPRET_CAST(type, source) CAST_TO(type, source)
 #   define REINTERPRET_CONST_CAST(type, source) CAST_TO(type, source)
-#endif /* GLOBAL_DEBUG */
+#endif /* COMMON_DEBUG */
 
 #define __COM_OUT__ *
 #define __COM_IN__ const *
@@ -227,7 +215,7 @@ typedef struct com_immutable_data_t
 #endif
 
 #ifndef INLINE_IF_RELEASE_MODE
-#   if !defined(GLOBAL_DEBUG) && !defined(DEBUG)
+#   if !defined(COMMON_DEBUG)
 #       define INLINE_IF_RELEASE_MODE FORCE_INLINE
 #   else
 #       define INLINE_IF_RELEASE_MODE
