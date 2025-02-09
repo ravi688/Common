@@ -1,0 +1,60 @@
+{
+    "project_name" : "Common",
+    "canonical_name" : "common",
+    "description" : "A C++ utility library",
+    "dependencies" : [ "calltrace", "bufferlib", "diskmanager" ],
+    "release_defines": [ "-DCOMMON_RELEASE" ],
+    "debug_defines": [ "-DCOMMON_DEBUG" ],
+    "install_header_dirs" : [ "include/common" ],
+    "include_dirs" : [ "include" ],
+    "targets" :
+    [
+        {
+            "name" : "common_static",
+            "is_static_library" : true,
+            "description" : "Static Library for Common",
+            "build_defines" : [ "-DCOMMON_BUILD_STATIC_LIBRARY" ],
+            "use_defines" : [ "-DCOMMON_USE_STATIC_LIBRARY" ]
+        }, 
+        {
+            "name" : "common_shared",
+            "is_shared_library" : true,
+            "description" : "Shared Library for Common",
+            "build_defines" : [ "-DCOMMON_BUILD_SHARED_LIBRARY" ],
+            "use_defines" : [ "-DCOMMON_USE_SHARED_LIBRARY" ]
+        },
+        {
+            "name" : "main_test",
+            "is_executable" : true,
+            "dependencies" : ["catch2-with-main"],
+            "sources" : [ 
+                "source/tests/test.cpp",
+                "source/tests/OrderedEvent.cpp" 
+            ]
+        },
+        {
+            "name" : "main",
+            "is_executable" : true,
+            "sources" : [
+                "source/main.cpp"
+            ]
+        }
+    ],
+    "sources" :
+    [
+        "source/Bool.cpp",
+        "source/Formatters.cpp",
+        "source/Utility.cpp",
+        "source/allocation_callbacks.c",
+        "source/binary_reader.c",
+        "source/binary_writer.c",
+        "source/debug.c",
+        "source/debug.cpp",
+        "source/defines.cpp",
+        "source/id_generator.c",
+        "source/iterator.c",
+        "source/static_string.c",
+        "source/string.c",
+        "source/utility.c"
+    ]
+}
