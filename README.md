@@ -1,6 +1,21 @@
 # Common utility library
 This repository contains the reusabe functions, macros and constantes being used across all my projects.
 
+## Building and Installing
+```
+$ meson setup build
+$ meson compile -C build
+$ meson install -C build
+```
+## Building and Running unit tess
+```
+$ meson wrap install catch2
+$ meson setup build
+$ meson compile -C build main_test main
+$ ./build/main_test
+$ ./build/main 
+```
+
 ## Platform Macros
 ### Header file: common/platform.h
 * `PLATFORM_WINDOWS` is defined when compiling in Windows Environment (OS)
