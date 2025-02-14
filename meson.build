@@ -50,44 +50,52 @@ project('Common', 'c', 'cpp',
   ]
 )
 
+# Variables
+
+
+# Defines
+defines_bm_internal__ = [
+
+]
+
 # Release Build Defines
-release_defines = [
+release_defines_bm_internal__ = [
 '-DCOMMON_RELEASE'
 ] 
 
 # Debug Build Defines
-debug_defines = [
+debug_defines_bm_internal__ = [
 '-DCOMMON_DEBUG'
 ]
 
 # Source files (common to all targets)
-sources = files(
+sources_bm_internal__ = files(
 'source/Bool.cpp', 'source/Formatters.cpp', 'source/Utility.cpp', 'source/allocation_callbacks.c', 'source/binary_reader.c', 'source/binary_writer.c', 'source/debug.c', 'source/debug.cpp', 'source/defines.cpp', 'source/id_generator.c', 'source/iterator.c', 'source/static_string.c', 'source/string.c', 'source/utility.c'
 )
 
 # Include directories
-inc = include_directories(
+inc_bm_internal__ = include_directories(
 'include'
 )
 
 # Library Install Directory
-lib_install_dir = get_option('libdir')/'common'
+lib_install_dir_bm_internal__ = get_option('libdir')/'common'
 
 # Dependencies
-dependencies = [
+dependencies_bm_internal__ = [
 dependency('calltrace'),
 dependency('bufferlib'),
 dependency('diskmanager')
 ]
 
 # Linker Arguments
-windows_link_args = [ 
+windows_link_args_bm_internal__ = [ 
 
 ]
-linux_link_args = [
+linux_link_args_bm_internal__ = [
 
 ]
-darwin_link_args = [
+darwin_link_args_bm_internal__ = [
 
 ]
 
@@ -98,201 +106,212 @@ darwin_link_args = [
 add_project_arguments('-m64', language : 'c')
 add_project_arguments('-m64', language : 'cpp')
 # Linker configuration
-link_args = []
-os_name = host_machine.system()
-if os_name == 'windows'
-  link_args += windows_link_args
-elif os_name == 'linux'
-  link_args += linux_link_args
-elif os_name == 'darwin'
-  link_args += darwin_link_args
+link_args_bm_internal__ = []
+os_name_bm_internal__ = host_machine.system()
+if os_name_bm_internal__ == 'windows'
+  link_args_bm_internal__ += windows_link_args_bm_internal__
+elif os_name_bm_internal__ == 'linux'
+  link_args_bm_internal__ += linux_link_args_bm_internal__
+elif os_name_bm_internal__ == 'darwin'
+  link_args_bm_internal__ += darwin_link_args_bm_internal__
 endif
-add_project_link_arguments('-m64', link_args, language : 'c')
-add_project_link_arguments('-m64', link_args, language : 'cpp')
+add_project_link_arguments('-m64', link_args_bm_internal__, language : 'c')
+add_project_link_arguments('-m64', link_args_bm_internal__, language : 'cpp')
 
 # Build type specific defines
-build_mode_defines = []
+build_mode_defines_bm_internal__ = defines_bm_internal__
 if get_option('buildtype') == 'release'
-  add_project_arguments(release_defines, language : 'c')
-  add_project_arguments(release_defines, language : 'cpp')
-  build_mode_defines += release_defines
+  add_project_arguments(release_defines_bm_internal__, language : 'c')
+  add_project_arguments(release_defines_bm_internal__, language : 'cpp')
+  build_mode_defines_bm_internal__ += release_defines_bm_internal__
 else
-  add_project_arguments(debug_defines, language : 'c')
-  add_project_arguments(debug_defines, language : 'cpp')
-  build_mode_defines += debug_defines
+  add_project_arguments(debug_defines_bm_internal__, language : 'c')
+  add_project_arguments(debug_defines_bm_internal__, language : 'cpp')
+  build_mode_defines_bm_internal__ += debug_defines_bm_internal__
 endif
 
 # pkg-config package installation
-python = find_program('python')
 # Try PKG_CONFIG_PATH first, typicallly it succeeds on MINGW64 (MSYS2)
-result = run_command(python, '-c', 'import os; print(os.environ["PKG_CONFIG_PATH"])', check : false)
-pkgconfig_install_path = ''
-if result.returncode() == 0
-  str = result.stdout()
+python_pkg_config_path_result_bm_internal__ = run_command(find_program('python'), '-c', 'import os; print(os.environ["PKG_CONFIG_PATH"])', check : false)
+pkgconfig_install_path_bm_internal__ = ''
+if python_pkg_config_path_result_bm_internal__.returncode() == 0
+  str = python_pkg_config_path_result_bm_internal__.stdout()
   # Unix
   if str.startswith('/')
-    pkgconfig_install_path = str.replace(';', ':').split(':')[0]
+    pkgconfig_install_path_bm_internal__ = str.replace(';', ':').split(':')[0]
   # Windows
   else
-    pkgconfig_install_path = str.split(';')[0]
+    pkgconfig_install_path_bm_internal__ = str.split(';')[0]
   endif
 endif
-if pkgconfig_install_path == ''
+if pkgconfig_install_path_bm_internal__ == ''
   # Otherwise use pkg-config to query its lookup directories
   message('PKG_CONFIG_PATH seems to be empty, trying another method')
-  result = run_command('pkg-config', '--variable', 'pc_path', 'pkg-config', check : false)
-  if result.returncode() == 0
-    str = result.stdout()
+  python_pkg_config_path_result_bm_internal__ = run_command('pkg-config', '--variable', 'pc_path', 'pkg-config', check : false)
+  if python_pkg_config_path_result_bm_internal__.returncode() == 0
+    str = python_pkg_config_path_result_bm_internal__.stdout()
     if str.startswith('/')
-      pkgconfig_install_path = str.replace(';', ':').split(':')[0]
+      pkgconfig_install_path_bm_internal__ = str.replace(';', ':').split(':')[0]
     else
-      pkgconfig_install_path = str.split(';')[0]
+      pkgconfig_install_path_bm_internal__ = str.split(';')[0]
     endif
   # Finally if the above attempts fail, use 'libdir' value
   else
-    pkgconfig_install_path = get_option('libdir')
+    pkgconfig_install_path_bm_internal__ = get_option('libdir')
   endif
 endif
-message('pkg config path: ' + pkgconfig_install_path)
+message('pkg config path: ' + pkgconfig_install_path_bm_internal__)
 
 #-------------------------------------------------------------------------------
 #--------------------------------BUILD TARGETS----------------------------------
 pkgmod = import('pkgconfig')
 
 # -------------- Target: common_static ------------------
-common_static_sources = [
+common_static_sources_bm_internal__ = [
 
 ]
-common_static_dependencies = [
+common_static_include_dirs_bm_internal__ = [
 
 ]
-common_static_link_args = {
+common_static_dependencies_bm_internal__ = [
+
+]
+common_static_link_args_bm_internal__ = {
 'windows' : [],
 'linux' : [],
 'darwin' : []
 }
-common_static_build_defines = [
+common_static_build_defines_bm_internal__ = [
 '-DCOMMON_BUILD_STATIC_LIBRARY'
 ]
-common_static_use_defines = [
+common_static_use_defines_bm_internal__ = [
 '-DCOMMON_USE_STATIC_LIBRARY'
 ]
 common_static = static_library('common_static',
-	common_static_sources + sources,
-	dependencies: dependencies + common_static_dependencies,
-	include_directories: inc,
+	common_static_sources_bm_internal__ + sources_bm_internal__,
+	dependencies: dependencies_bm_internal__ + common_static_dependencies_bm_internal__,
+	include_directories: [inc_bm_internal__, common_static_include_dirs_bm_internal__],
 	install: true,
-	install_dir: lib_install_dir,
-	c_args: common_static_build_defines + common_static_use_defines,
-	cpp_args: common_static_build_defines + common_static_use_defines, 
-	link_args: common_static_link_args[host_machine.system()],
+	install_dir: lib_install_dir_bm_internal__,
+	c_args: common_static_build_defines_bm_internal__,
+	cpp_args: common_static_build_defines_bm_internal__, 
+	link_args: common_static_link_args_bm_internal__[host_machine.system()],
 	gnu_symbol_visibility: 'hidden'
 )
 common_static_dep = declare_dependency(
 	link_with: common_static,
-	include_directories: inc,
-	compile_args: common_static_use_defines + build_mode_defines
+	include_directories: [inc_bm_internal__, common_static_include_dirs_bm_internal__],
+	compile_args: common_static_use_defines_bm_internal__ + build_mode_defines_bm_internal__
 )
 pkgmod.generate(common_static,
 	name: 'Common',
 	description: 'Static Library for Common',
 	filebase: 'common_static',
-	install_dir: pkgconfig_install_path,
-	extra_cflags: common_static_use_defines + build_mode_defines
+	install_dir: pkgconfig_install_path_bm_internal__,
+	extra_cflags: common_static_use_defines_bm_internal__ + build_mode_defines_bm_internal__
 )
 
 # -------------- Target: common_shared ------------------
-common_shared_sources = [
+common_shared_sources_bm_internal__ = [
 
 ]
-common_shared_dependencies = [
+common_shared_include_dirs_bm_internal__ = [
 
 ]
-common_shared_link_args = {
+common_shared_dependencies_bm_internal__ = [
+
+]
+common_shared_link_args_bm_internal__ = {
 'windows' : [],
 'linux' : [],
 'darwin' : []
 }
-common_shared_build_defines = [
+common_shared_build_defines_bm_internal__ = [
 '-DCOMMON_BUILD_SHARED_LIBRARY'
 ]
-common_shared_use_defines = [
+common_shared_use_defines_bm_internal__ = [
 '-DCOMMON_USE_SHARED_LIBRARY'
 ]
 common_shared = shared_library('common_shared',
-	common_shared_sources + sources,
-	dependencies: dependencies + common_shared_dependencies,
-	include_directories: inc,
+	common_shared_sources_bm_internal__ + sources_bm_internal__,
+	dependencies: dependencies_bm_internal__ + common_shared_dependencies_bm_internal__,
+	include_directories: [inc_bm_internal__, common_shared_include_dirs_bm_internal__],
 	install: true,
-	install_dir: lib_install_dir,
-	c_args: common_shared_build_defines + common_shared_use_defines,
-	cpp_args: common_shared_build_defines + common_shared_use_defines, 
-	link_args: common_shared_link_args[host_machine.system()],
+	install_dir: lib_install_dir_bm_internal__,
+	c_args: common_shared_build_defines_bm_internal__,
+	cpp_args: common_shared_build_defines_bm_internal__, 
+	link_args: common_shared_link_args_bm_internal__[host_machine.system()],
 	gnu_symbol_visibility: 'hidden'
 )
 common_shared_dep = declare_dependency(
 	link_with: common_shared,
-	include_directories: inc,
-	compile_args: common_shared_use_defines + build_mode_defines
+	include_directories: [inc_bm_internal__, common_shared_include_dirs_bm_internal__],
+	compile_args: common_shared_use_defines_bm_internal__ + build_mode_defines_bm_internal__
 )
 pkgmod.generate(common_shared,
 	name: 'Common',
 	description: 'Shared Library for Common',
 	filebase: 'common_shared',
-	install_dir: pkgconfig_install_path,
-	extra_cflags: common_shared_use_defines + build_mode_defines
+	install_dir: pkgconfig_install_path_bm_internal__,
+	extra_cflags: common_shared_use_defines_bm_internal__ + build_mode_defines_bm_internal__
 )
 
 # -------------- Target: main_test ------------------
-main_test_sources = [
+main_test_sources_bm_internal__ = [
 'source/tests/test.cpp',
 'source/tests/OrderedEvent.cpp'
 ]
-main_test_dependencies = [
+main_test_include_dirs_bm_internal__ = [
+
+]
+main_test_dependencies_bm_internal__ = [
 dependency('catch2-with-main')
 ]
-main_test_link_args = {
+main_test_link_args_bm_internal__ = {
 'windows' : [],
 'linux' : [],
 'darwin' : []
 }
-main_test_defines = [
+main_test_defines_bm_internal__ = [
 
 ]
 main_test = executable('main_test',
-	main_test_sources + sources,
-	dependencies: dependencies + main_test_dependencies,
-	include_directories: inc,
+	main_test_sources_bm_internal__ + sources_bm_internal__,
+	dependencies: dependencies_bm_internal__ + main_test_dependencies_bm_internal__,
+	include_directories: [inc_bm_internal__, main_test_include_dirs_bm_internal__],
 	install: false,
-	c_args: main_test_defines,
-	cpp_args: main_test_defines, 
-	link_args: main_test_link_args[host_machine.system()],
+	c_args: main_test_defines_bm_internal__,
+	cpp_args: main_test_defines_bm_internal__, 
+	link_args: main_test_link_args_bm_internal__[host_machine.system()],
 	gnu_symbol_visibility: 'hidden'
 )
 
 # -------------- Target: main ------------------
-main_sources = [
+main_sources_bm_internal__ = [
 'source/main.cpp'
 ]
-main_dependencies = [
+main_include_dirs_bm_internal__ = [
 
 ]
-main_link_args = {
+main_dependencies_bm_internal__ = [
+
+]
+main_link_args_bm_internal__ = {
 'windows' : [],
 'linux' : [],
 'darwin' : []
 }
-main_defines = [
+main_defines_bm_internal__ = [
 
 ]
 main = executable('main',
-	main_sources + sources,
-	dependencies: dependencies + main_dependencies,
-	include_directories: inc,
+	main_sources_bm_internal__ + sources_bm_internal__,
+	dependencies: dependencies_bm_internal__ + main_dependencies_bm_internal__,
+	include_directories: [inc_bm_internal__, main_include_dirs_bm_internal__],
 	install: false,
-	c_args: main_defines,
-	cpp_args: main_defines, 
-	link_args: main_link_args[host_machine.system()],
+	c_args: main_defines_bm_internal__,
+	cpp_args: main_defines_bm_internal__, 
+	link_args: main_link_args_bm_internal__[host_machine.system()],
 	gnu_symbol_visibility: 'hidden'
 )
 
