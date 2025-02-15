@@ -83,7 +83,6 @@ lib_install_dir_bm_internal__ = get_option('libdir')/'common'
 
 # Dependencies
 dependencies_bm_internal__ = [
-dependency('calltrace'),
 dependency('bufferlib'),
 dependency('diskmanager')
 ]

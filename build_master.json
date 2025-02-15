@@ -2,7 +2,7 @@
     "project_name" : "Common",
     "canonical_name" : "common",
     "description" : "A C++ utility library",
-    "dependencies" : [ "calltrace", "bufferlib", "diskmanager" ],
+    "dependencies" : [ "bufferlib", "diskmanager" ],
     "release_defines": [ "-DCOMMON_RELEASE" ],
     "debug_defines": [ "-DCOMMON_DEBUG" ],
     "install_header_dirs" : [ "include/common" ],
