@@ -22,6 +22,8 @@
 
 namespace com
 {
+	using size_t = com_size_t;
+
 	// Only used in Event.hpp and OrderedEvent.hpp
 	struct no_publish_ptr_t { };
 
