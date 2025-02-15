@@ -27,14 +27,19 @@ COMMON_API void* com_call_reallocate_aligned(com_allocation_callbacks_t* callbac
 CAN_BE_UNUSED_FUNCTION static INLINE_IF_RELEASE_MODE void* com_memzero_forward(void* ptr, u32 size) { memset(ptr, 0, size); return ptr; }
 #define com_allocate_obj(callbacks, type) com_call_allocate_obj(callbacks, type)
 #define com_call_allocate_obj(callbacks, type) CAST_TO(type*, com_call_allocate(callbacks, sizeof(type)))
+#define com_allocate(callbacks, size) com_call_allocate(callbacks, size)
+#define com_allocate_aligned(callbacks, size, align) com_call_allocate_aligned(callbacks, size, align)
 CAN_BE_UNUSED_FUNCTION static INLINE_IF_RELEASE_MODE void* com_call_allocate(com_allocation_callbacks_t* callbacks, u32 size){ return com_call_allocate_aligned(callbacks, size, U32_MAX); }
 CAN_BE_UNUSED_FUNCTION static INLINE_IF_RELEASE_MODE void* com_call_reallocate(com_allocation_callbacks_t* callbacks, void* old_ptr, u32 size) { return  com_call_reallocate_aligned(callbacks, old_ptr, size, U32_MAX); }
 #define com_deallocate(callbacks, ptr) com_call_deallocate(callbacks, ptr)
 COMMON_API void com_call_deallocate(com_allocation_callbacks_t* callbacks, void* ptr);
 
 #include <bufferlib/buffer.h>
+// NOTE: param 'callbacks' is allowed to be NULL, in which case com_allocation_callbacks_get_std() will be used
 COMMON_API buffer_t buf_create_with_callbacks(com_allocation_callbacks_t* callbacks, u32 element_size, u32 capacity, u32 offset);
+// NOTE: param 'callbacks' is allowed to be NULL, in which case com_allocation_callbacks_get_std() will be used
 COMMON_API BUFFER* BUFcreate_with_callbacks(com_allocation_callbacks_t* callbacks, void* buffer, u32 element_size, u32 capacity, u32 offset);
+// NOTE: param 'callbacks' is allowed to be NULL, in which case com_allocation_callbacks_get_std() will be used
 #define buf_new_with_callbacks(callbacks, type) buf_create_with_callbacks(callbacks, sizeof(type), 0, 0)
 
 END_CPP_COMPATIBLE

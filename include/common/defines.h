@@ -41,6 +41,14 @@ typedef f32* f32_ptr_t;
 typedef f64* f64_ptr_t;
 typedef void* void_ptr_t;
 
+/* com_size_t: Portable across C/C++ both */
+#ifdef __cplusplus
+    #include <cstddef>
+    typedef std::size_t com_size_t;
+#else
+    typedef u64 com_size_t;
+#endif
+
 #define U8_MAX UINT8_MAX
 #define U16_MAX UINT16_MAX
 #define U32_MAX UINT32_MAX
@@ -134,6 +142,7 @@ typedef struct com_immutable_data_t
 #define DEREF_TO DREF_TO
 #define CAST_TO(to, s) ((to)(s))
 #define REINTERPRET_TO(to, s) (*(to*)(&(s)))
+#define DREF_VOID_PTR(ptr) CAST_TO(void*, DREF_TO(u8*, (void**)(ptr)))
 
 #define SIZEOF_ARRAY(array) (sizeof(array) / sizeof((array)[0]))
 
@@ -238,3 +247,6 @@ static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 com_get_stride_in_array
 
 #define CENTIMETERS_PER_INCH 2.54f
 #define INCHES_PER_CENTIMETER (1.0f / CENTIMETERS_PER_INCH)
+
+// Use for Repeating a block and we don't care about the induction variable
+#define COM_REPEAT(n) for(com::size_t __i##__LINE__ = 0; __i##__LINE__ < (n); ++__i##__LINE__)

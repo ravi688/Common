@@ -70,7 +70,7 @@ debug_defines_bm_internal__ = [
 
 # Source files (common to all targets)
 sources_bm_internal__ = files(
-'source/Bool.cpp', 'source/Formatters.cpp', 'source/Utility.cpp', 'source/allocation_callbacks.c', 'source/binary_reader.c', 'source/binary_writer.c', 'source/debug.c', 'source/debug.cpp', 'source/defines.cpp', 'source/id_generator.c', 'source/iterator.c', 'source/static_string.c', 'source/string.c', 'source/utility.c'
+'source/Bool.cpp', 'source/Formatters.cpp', 'source/Utility.cpp', 'source/allocation_callbacks.c', 'source/binary_reader.c', 'source/binary_writer.c', 'source/debug.c', 'source/debug.cpp', 'source/defines.cpp', 'source/id_generator.c', 'source/iterator.c', 'source/static_string.c', 'source/string.c', 'source/utility.c', 'source/hash_table.c', 'source/hash_function.c', 'source/comparer.c', 'source/multi_buffer.c'
 )
 
 # Include directories
@@ -119,15 +119,15 @@ add_project_link_arguments('-m64', link_args_bm_internal__, language : 'c')
 add_project_link_arguments('-m64', link_args_bm_internal__, language : 'cpp')
 
 # Build type specific defines
-build_mode_defines_bm_internal__ = defines_bm_internal__
+project_build_mode_defines_bm_internal__ = defines_bm_internal__
 if get_option('buildtype') == 'release'
   add_project_arguments(release_defines_bm_internal__, language : 'c')
   add_project_arguments(release_defines_bm_internal__, language : 'cpp')
-  build_mode_defines_bm_internal__ += release_defines_bm_internal__
+  project_build_mode_defines_bm_internal__ += release_defines_bm_internal__
 else
   add_project_arguments(debug_defines_bm_internal__, language : 'c')
   add_project_arguments(debug_defines_bm_internal__, language : 'cpp')
-  build_mode_defines_bm_internal__ += debug_defines_bm_internal__
+  project_build_mode_defines_bm_internal__ += debug_defines_bm_internal__
 endif
 
 # pkg-config package installation
@@ -193,22 +193,22 @@ common_static = static_library('common_static',
 	include_directories: [inc_bm_internal__, common_static_include_dirs_bm_internal__],
 	install: true,
 	install_dir: lib_install_dir_bm_internal__,
-	c_args: common_static_build_defines_bm_internal__,
-	cpp_args: common_static_build_defines_bm_internal__, 
+	c_args: common_static_build_defines_bm_internal__ + project_build_mode_defines_bm_internal__,
+	cpp_args: common_static_build_defines_bm_internal__ + project_build_mode_defines_bm_internal__, 
 	link_args: common_static_link_args_bm_internal__[host_machine.system()],
 	gnu_symbol_visibility: 'hidden'
 )
 common_static_dep = declare_dependency(
 	link_with: common_static,
 	include_directories: [inc_bm_internal__, common_static_include_dirs_bm_internal__],
-	compile_args: common_static_use_defines_bm_internal__ + build_mode_defines_bm_internal__
+	compile_args: common_static_use_defines_bm_internal__ + project_build_mode_defines_bm_internal__
 )
 pkgmod.generate(common_static,
 	name: 'Common',
 	description: 'Static Library for Common',
 	filebase: 'common_static',
 	install_dir: pkgconfig_install_path_bm_internal__,
-	extra_cflags: common_static_use_defines_bm_internal__ + build_mode_defines_bm_internal__
+	extra_cflags: common_static_use_defines_bm_internal__ + project_build_mode_defines_bm_internal__
 )
 
 # -------------- Target: common_shared ------------------
@@ -238,28 +238,30 @@ common_shared = shared_library('common_shared',
 	include_directories: [inc_bm_internal__, common_shared_include_dirs_bm_internal__],
 	install: true,
 	install_dir: lib_install_dir_bm_internal__,
-	c_args: common_shared_build_defines_bm_internal__,
-	cpp_args: common_shared_build_defines_bm_internal__, 
+	c_args: common_shared_build_defines_bm_internal__ + project_build_mode_defines_bm_internal__,
+	cpp_args: common_shared_build_defines_bm_internal__ + project_build_mode_defines_bm_internal__, 
 	link_args: common_shared_link_args_bm_internal__[host_machine.system()],
 	gnu_symbol_visibility: 'hidden'
 )
 common_shared_dep = declare_dependency(
 	link_with: common_shared,
 	include_directories: [inc_bm_internal__, common_shared_include_dirs_bm_internal__],
-	compile_args: common_shared_use_defines_bm_internal__ + build_mode_defines_bm_internal__
+	compile_args: common_shared_use_defines_bm_internal__ + project_build_mode_defines_bm_internal__
 )
 pkgmod.generate(common_shared,
 	name: 'Common',
 	description: 'Shared Library for Common',
 	filebase: 'common_shared',
 	install_dir: pkgconfig_install_path_bm_internal__,
-	extra_cflags: common_shared_use_defines_bm_internal__ + build_mode_defines_bm_internal__
+	extra_cflags: common_shared_use_defines_bm_internal__ + project_build_mode_defines_bm_internal__
 )
 
 # -------------- Target: main_test ------------------
 main_test_sources_bm_internal__ = [
 'source/tests/test.cpp',
-'source/tests/OrderedEvent.cpp'
+'source/tests/OrderedEvent.cpp',
+'source/tests/HashTableTest.cpp',
+'source/tests/MultiBufferTest.cpp'
 ]
 main_test_include_dirs_bm_internal__ = [
 
@@ -280,8 +282,8 @@ main_test = executable('main_test',
 	dependencies: dependencies_bm_internal__ + main_test_dependencies_bm_internal__,
 	include_directories: [inc_bm_internal__, main_test_include_dirs_bm_internal__],
 	install: false,
-	c_args: main_test_defines_bm_internal__,
-	cpp_args: main_test_defines_bm_internal__, 
+	c_args: main_test_defines_bm_internal__ + project_build_mode_defines_bm_internal__,
+	cpp_args: main_test_defines_bm_internal__ + project_build_mode_defines_bm_internal__, 
 	link_args: main_test_link_args_bm_internal__[host_machine.system()],
 	gnu_symbol_visibility: 'hidden'
 )
@@ -309,8 +311,8 @@ main = executable('main',
 	dependencies: dependencies_bm_internal__ + main_dependencies_bm_internal__,
 	include_directories: [inc_bm_internal__, main_include_dirs_bm_internal__],
 	install: false,
-	c_args: main_defines_bm_internal__,
-	cpp_args: main_defines_bm_internal__, 
+	c_args: main_defines_bm_internal__ + project_build_mode_defines_bm_internal__,
+	cpp_args: main_defines_bm_internal__ + project_build_mode_defines_bm_internal__, 
 	link_args: main_link_args_bm_internal__[host_machine.system()],
 	gnu_symbol_visibility: 'hidden'
 )
@@ -320,4 +322,5 @@ main = executable('main',
 #--------------------------------Header Intallation----------------------------------
 # Header installation
 install_subdir('include/common', install_dir : get_option('includedir'))
+
 
