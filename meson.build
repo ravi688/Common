@@ -70,7 +70,7 @@ debug_defines_bm_internal__ = [
 
 # Source files (common to all targets)
 sources_bm_internal__ = files(
-'source/Bool.cpp', 'source/Formatters.cpp', 'source/Utility.cpp', 'source/allocation_callbacks.c', 'source/binary_reader.c', 'source/binary_writer.c', 'source/debug.c', 'source/debug.cpp', 'source/defines.cpp', 'source/id_generator.c', 'source/iterator.c', 'source/static_string.c', 'source/string.c', 'source/utility.c', 'source/hash_table.c', 'source/hash_function.c', 'source/comparer.c', 'source/multi_buffer.c'
+'source/Bool.cpp', 'source/Formatters.cpp', 'source/Utility.cpp', 'source/allocation_callbacks.c', 'source/binary_reader.c', 'source/binary_writer.c', 'source/debug.c', 'source/debug.cpp', 'source/defines.cpp', 'source/id_generator.c', 'source/iterator.c', 'source/static_string.c', 'source/string.c', 'source/utility.c', 'source/hash_table.c', 'source/hash_function.c', 'source/comparer.c', 'source/multi_buffer.c', 'source/dictionary.c'
 )
 
 # Include directories

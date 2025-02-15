@@ -9,121 +9,122 @@
 #include <common/platform.h>
 #include <common/defines.h>
 #include <common/debug.h>
+#include <common/assert.h>
 #include <memory.h>
-#	include <stdlib.h>
-#	include <malloc.h> // malloc_usable_size for linux, and _msize for windows
+#include <stdlib.h>
+#include <malloc.h> // malloc_usable_size for linux, and _msize for windows
 
-#	ifdef PLATFORM_WINDOWS
-#		ifndef malloc_usable_size
-#			define malloc_usable_size(ptr) _msize(ptr)
-#		endif /* if not defined malloc_usable_size */
-#	endif /* PLATFORM_WINDOWS */
+#ifdef PLATFORM_WINDOWS
+#	ifndef malloc_usable_size
+#		define malloc_usable_size(ptr) _msize(ptr)
+#	endif /* if not defined malloc_usable_size */
+#endif /* PLATFORM_WINDOWS */
 
-#	ifdef PLATFORM_LINUX
-#		ifndef _aligned_malloc
-			/* NOTE: size and alignment are swapped with each other on the right */
-#			define _aligned_malloc(size, alignment) aligned_alloc(alignment, size)
-#		endif /* _aligned_malloc */
-#		ifndef _aligned_free
-#			define _aligned_free(...) free(__VA_ARGS__)
-#		endif /* _aligned_free */
-#		ifndef _aligned_realloc
-#			include <memory.h>  // memcpy
-#			define _aligned_realloc(...) aligned_realloc(__VA_ARGS__)
-			static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE bool is_aligned(void* ptr, size_t align) { return (CAST_TO(u64, ptr) % align) == 0; }
-			static CAN_BE_UNUSED_FUNCTION void* aligned_realloc(void* old_ptr, size_t size, size_t align)
+#ifdef PLATFORM_LINUX
+#	ifndef _aligned_malloc
+		/* NOTE: size and alignment are swapped with each other on the right */
+#		define _aligned_malloc(size, alignment) aligned_alloc(alignment, size)
+#	endif /* _aligned_malloc */
+#	ifndef _aligned_free
+#		define _aligned_free(...) free(__VA_ARGS__)
+#	endif /* _aligned_free */
+#	ifndef _aligned_realloc
+#		include <memory.h>  // memcpy
+#		define _aligned_realloc(...) aligned_realloc(__VA_ARGS__)
+		static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE bool is_aligned(void* ptr, size_t align) { return (CAST_TO(u64, ptr) % align) == 0; }
+		static CAN_BE_UNUSED_FUNCTION void* aligned_realloc(void* old_ptr, size_t size, size_t align)
+		{
+			void* ptr = realloc(old_ptr, size);
+			if(!is_aligned(ptr, align))
 			{
-				void* ptr = realloc(old_ptr, size);
-				if(!is_aligned(ptr, align))
-				{
-					size_t old_size = malloc_usable_size(old_ptr);
-					ptr = _aligned_malloc(size, align);
-					if(old_ptr != NULL)
-						memcpy(ptr, old_ptr, size < old_size ? size : old_size);
-					_aligned_free(old_ptr);
-				}
-				return ptr;
+				size_t old_size = malloc_usable_size(old_ptr);
+				ptr = _aligned_malloc(size, align);
+				if(old_ptr != NULL)
+					memcpy(ptr, old_ptr, size < old_size ? size : old_size);
+				_aligned_free(old_ptr);
 			}
-#		endif
-#	endif /* PLATFORM_LINUX */
+			return ptr;
+		}
+#	endif
+#endif /* PLATFORM_LINUX */
 
-	/* malloc */
-	#ifdef GLOBAL_DEBUG
-		static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* _std_malloc(size_t size) { _com_assert(size != 0); return malloc(size); }
-	#else /* GLOBAL_RELEASE */
-	#	define _std_malloc(size) malloc(size)
-	#endif /* GLOBAL_DEBUG */
+/* malloc */
+#ifdef GLOBAL_DEBUG
+	static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* _std_malloc(size_t size) { _com_assert(size != 0); return malloc(size); }
+#else /* GLOBAL_RELEASE */
+#	define _std_malloc(size) malloc(size)
+#endif /* GLOBAL_DEBUG */
 
-	/* realloc */
-	#ifdef GLOBAL_DEBUG
-		static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* _std_realloc(void* old_ptr, size_t size) { _debug_assert_wrn__(size != 0); return realloc(old_ptr, size); }
-	#else /* GLOBAL_RELEASE */
-	#	define _std_realloc(old_ptr, size) realloc(old_ptr, size)
-	#endif /* GLOBAL_DEBUG */
+/* realloc */
+#ifdef GLOBAL_DEBUG
+	static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* _std_realloc(void* old_ptr, size_t size) { _com_assert_wrn(size != 0); return realloc(old_ptr, size); }
+#else /* GLOBAL_RELEASE */
+#	define _std_realloc(old_ptr, size) realloc(old_ptr, size)
+#endif /* GLOBAL_DEBUG */
 
-	/* free */
-	#ifdef GLOBAL_DEBUG
-		static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void _std_free(void* ptr){ _com_assert(ptr != NULL); free(ptr); }
-	#else /* GLOBAL_RELEASE */
-	#	define _std_free(ptr) free(ptr)
-	#endif /* GLOBAL_DEBUG */
+/* free */
+#ifdef GLOBAL_DEBUG
+	static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void _std_free(void* ptr){ _com_assert(ptr != NULL); free(ptr); }
+#else /* GLOBAL_RELEASE */
+#	define _std_free(ptr) free(ptr)
+#endif /* GLOBAL_DEBUG */
 
-	/* aligned_malloc */
-	#ifdef GLOBAL_DEBUG
-		static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* _std_aligned_malloc(size_t size, size_t align) { _com_assert(align != 0); return _aligned_malloc(size, align); }
-	#else /* GLOBAL_RELEASE */
-	#	define _std_aligned_malloc(size, align) _aligned_malloc(size, align)
-	#endif /* GLOBAL_DEBUG */
+/* aligned_malloc */
+#ifdef GLOBAL_DEBUG
+	static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* _std_aligned_malloc(size_t size, size_t align) { _com_assert(align != 0); return _aligned_malloc(size, align); }
+#else /* GLOBAL_RELEASE */
+#	define _std_aligned_malloc(size, align) _aligned_malloc(size, align)
+#endif /* GLOBAL_DEBUG */
 
-	/* aligned_realloc */
-	#ifdef GLOBAL_DEBUG
-		static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* _std_aligned_realloc(void* old_ptr, size_t size, size_t align) { _com_assert(align != 0); return _aligned_realloc(old_ptr, size, align); }
-	#else /* GLOBAL_RELEASE */
-	#	define _std_aligned_realloc(old_ptr, size, align) _aligned_realloc(old_ptr, size, align)
-	#endif /* GLOBAL_DEBUG */
+/* aligned_realloc */
+#ifdef GLOBAL_DEBUG
+	static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* _std_aligned_realloc(void* old_ptr, size_t size, size_t align) { _com_assert(align != 0); return _aligned_realloc(old_ptr, size, align); }
+#else /* GLOBAL_RELEASE */
+#	define _std_aligned_realloc(old_ptr, size, align) _aligned_realloc(old_ptr, size, align)
+#endif /* GLOBAL_DEBUG */
 
-	/* aligned_free */
-	#ifdef GLOBAL_DEBUG
-		static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void _std_aligned_free(void* ptr) { _com_assert(ptr != NULL); _aligned_free(ptr); }
-	#else /* GLOBAL_RELEASE */
-	#	define _std_aligned_free(ptr) _aligned_free(ptr)
-	#endif /* GLOBAL_DEBUG */
+/* aligned_free */
+#ifdef GLOBAL_DEBUG
+	static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void _std_aligned_free(void* ptr) { _com_assert(ptr != NULL); _aligned_free(ptr); }
+#else /* GLOBAL_RELEASE */
+#	define _std_aligned_free(ptr) _aligned_free(ptr)
+#endif /* GLOBAL_DEBUG */
 
-	/* alloca */
-	#ifdef GLOBAL_DEBUG
-		static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* __std_alloca_forward(void* ptr, size_t size) { _com_assert(size != 0); return ptr; }
-		#define _std_alloca(size) __std_alloca_forward(alloca(size), size)
-	#else /* GLOBAL_RELEASE */
-	#	define _std_alloca(size) alloca(size)
-	#endif /* GLOBAL_DEBUG */
+/* alloca */
+#ifdef GLOBAL_DEBUG
+	static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* __std_alloca_forward(void* ptr, size_t size) { _com_assert(size != 0); return ptr; }
+	#define _std_alloca(size) __std_alloca_forward(alloca(size), size)
+#else /* GLOBAL_RELEASE */
+#	define _std_alloca(size) alloca(size)
+#endif /* GLOBAL_DEBUG */
 
-	#ifdef GLOBAL_DEBUG
-		static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 _std_malloc_usable_size(void* ptr) { _com_assert(ptr != NULL); return malloc_usable_size(ptr); }
-	#else /* GLOBAL_RELEASE */
-	#	define _std_malloc_usable_size(ptr) CAST_TO(u32, malloc_usable_size(ptr))
-	#endif /* GLOBAL_DEBUG */
+#ifdef GLOBAL_DEBUG
+	static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE u32 _std_malloc_usable_size(void* ptr) { _com_assert(ptr != NULL); return malloc_usable_size(ptr); }
+#else /* GLOBAL_RELEASE */
+#	define _std_malloc_usable_size(ptr) CAST_TO(u32, malloc_usable_size(ptr))
+#endif /* GLOBAL_DEBUG */
 
-#	define alloc_init(x)
-#	define alloc_terminate()
-#   define add_alloc(basePtr, size) basePtr
-#	define heap_alloc(size) _std_malloc(size)
-#   define heap_realloc(old_ptr, size) _std_realloc(old_ptr, size)
-#   define heap_aligned_alloc(size, align) _std_aligned_malloc(size, align)
-#   define heap_aligned_realloc(old_ptr, size, align) _std_aligned_realloc(old_ptr, size, align)
-#	define stack_alloc(size) _std_alloca(size)
-#	define stack_free(basePtr) 
-#	define heap_free(basePtr) _std_free(basePtr)
-#   define heap_aligned_free(basePtr) _std_aligned_free(basePtr)
-#   define heap_silent_free(basePtr) _std_free(basePtr)
-#   define heap_silent_aligned_free(basePtr) _std_aligned_free(basePtr)
-#	define heap_sizeof(type) sizeof(type)
-#	define heap_usable_size(basePtr) _std_malloc_usable_size(basePtr)
-#   define get_element(type, validPtr, index) (validPtr)[index]
-#   define get_element_ptr(type, validPtr, index) (&(validPtr)[index])
-#   define MEM_CHECK(ptr)
-#   define var(type, id) type id
-#   define val(id) id
-#   define ptr(id) &id
+#define alloc_init(x)
+#define alloc_terminate()
+#define add_alloc(basePtr, size) basePtr
+#define heap_alloc(size) _std_malloc(size)
+#define heap_realloc(old_ptr, size) _std_realloc(old_ptr, size)
+#define heap_aligned_alloc(size, align) _std_aligned_malloc(size, align)
+#define heap_aligned_realloc(old_ptr, size, align) _std_aligned_realloc(old_ptr, size, align)
+#define stack_alloc(size) _std_alloca(size)
+#define stack_free(basePtr) 
+#define heap_free(basePtr) _std_free(basePtr)
+#define heap_aligned_free(basePtr) _std_aligned_free(basePtr)
+#define heap_silent_free(basePtr) _std_free(basePtr)
+#define heap_silent_aligned_free(basePtr) _std_aligned_free(basePtr)
+#define heap_sizeof(type) sizeof(type)
+#define heap_usable_size(basePtr) _std_malloc_usable_size(basePtr)
+#define get_element(type, validPtr, index) (validPtr)[index]
+#define get_element_ptr(type, validPtr, index) (&(validPtr)[index])
+#define MEM_CHECK(ptr)
+#define var(type, id) type id
+#define val(id) id
+#define ptr(id) &id
 
 #define stack_new(type) ((type*)stack_alloc(sizeof(type)))
 #define stack_newv(type, count) ((type*)stack_alloc(sizeof(type) * (count)))
@@ -191,6 +192,6 @@ static CAN_BE_UNUSED_FUNCTION INLINE_IF_RELEASE_MODE void* __memzero(void* const
 /* vector version of memzero */
 #define unsafe_memzerov(ptr, type, count) _debug_memset(ptr, 0, sizeof(type) * (count))
 
-#   define __safe_memset(ptr, value, size) _debug_memset(ptr, value, size)
-#   define safe_memzero(ptr, type) memzero(ptr, type)
-#   define safe_memzerov(ptr, type, count) memzerov(ptr, type, count)
+#define __safe_memset(ptr, value, size) _debug_memset(ptr, value, size)
+#define safe_memzero(ptr, type) memzero(ptr, type)
+#define safe_memzerov(ptr, type, count) memzerov(ptr, type, count)

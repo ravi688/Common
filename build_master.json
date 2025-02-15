@@ -61,6 +61,7 @@
         "source/hash_table.c",
         "source/hash_function.c",
         "source/comparer.c",
-        "source/multi_buffer.c"
+        "source/multi_buffer.c",
+        "source/dictionary.c"
     ]
 }
