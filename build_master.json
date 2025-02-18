@@ -31,7 +31,9 @@
                 "source/tests/test.cpp",
                 "source/tests/OrderedEvent.cpp",
                 "source/tests/HashTableTest.cpp",
-                "source/tests/MultiBufferTest.cpp"
+                "source/tests/MultiBufferTest.cpp",
+                "source/tests/TypeTraits.cpp",
+                "source/tests/ToUpper.cpp"
             ]
         },
         {

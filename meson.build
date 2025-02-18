@@ -260,7 +260,9 @@ main_test_sources_bm_internal__ = [
 'source/tests/test.cpp',
 'source/tests/OrderedEvent.cpp',
 'source/tests/HashTableTest.cpp',
-'source/tests/MultiBufferTest.cpp'
+'source/tests/MultiBufferTest.cpp',
+'source/tests/TypeTraits.cpp',
+'source/tests/ToUpper.cpp'
 ]
 main_test_include_dirs_bm_internal__ = [
 
