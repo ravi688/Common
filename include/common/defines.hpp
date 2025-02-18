@@ -11,7 +11,7 @@
 #include <utility>
 #include <iterator> /* for std::advance */
 #include <unordered_map> // for std::unordered_map
-#include <algorithm> // for std::find
+#include <algorithm> // for std::find and std::transform
 #include <filesystem> // for std::filesystem
 #include <iterator> // for std::iterator_traits<>
 #include <iostream>
@@ -772,6 +772,65 @@ namespace com
 	{
 		return com::Bool { ptr == com::null_pointer<T>() };
 	}
+
+	// Removes pointer and reference traits of a type
+	template<typename T>
+	struct remove_pointer_and_reference
+	{
+		using type = typename std::remove_reference<typename std::remove_pointer<T>::type>::type;
+	};
+
+	// Tells if a type refers to a const "value"
+	// NOTE: It returns false for reference to non-const types, unlike std::is_const<>, which returns true
+	template<typename T>
+	struct is_refers_to_const_value
+	{
+		static constexpr bool value = std::is_const<typename remove_pointer_and_reference<T>::type>::value;
+	};
+
+	// Checks if two types are identical if cv-qualification is ignored
+	template<typename T1, typename T2>
+	struct is_same_nocv
+	{
+		static constexpr bool value = std::is_same<typename std::remove_cv<T1>::type, typename std::remove_cv<T2>::type>::value;
+	};
+
+	// ------------------------- to_upper() ------------------------------------------------------
+	// Converts each character in a string (std::string or std::string_view) to upper case equivalent
+	// WARN: It does modifies the original data if passed as std::string.
+	// NOTE:
+	//	1. If passed std::string_view or const std::string then it returns std::string (a copy and transformed object)
+	// 	2. If passed (non-const) std::string then it returns reference to it, that means it doesn't creates any new std::string object.
+	template<typename T, 
+			bool isConstData = 
+			is_same_nocv<typename std::remove_reference<T>::type, 
+							std::string_view>::value
+			|| is_refers_to_const_value<T>::value>
+	static typename std::conditional<isConstData, std::string, T&>::type to_upper(T& str)
+	{
+		auto toupper = [](T::value_type c){ return std::toupper(static_cast<char>(c)); };
+		if constexpr(isConstData)
+		{
+			std::string strCopy { str };
+			std::transform(str.begin(), str.end(), strCopy.begin(), toupper);
+			return strCopy;
+		}
+		else
+		{
+			std::transform(str.begin(), str.end(), str.begin(), toupper);
+			return str;
+		}
+	}
+	template<typename T>
+	static decltype(auto) to_upper(T&& str)
+	{
+		return to_upper<const T>(str);
+	}
+	static decltype(auto) to_upper(const char* str)
+	{
+		return to_upper(std::string_view { str });
+	}
+	// ---------------------------------------------------------------------------------------
 }
 
 
