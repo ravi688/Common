@@ -8,6 +8,8 @@
 #include <common/static_string.h>
 #include <common/utility.h>
 
+#include <common/third_party/termcolor.hpp>
+
 #define TEST_NAME(name) std::cout << "Testing: " << name << std::endl
 #define CHECK(to_be_checked) if(!(to_be_checked)) std::cout << "Failed: " << #to_be_checked << std::endl
 
@@ -133,6 +135,13 @@ static void floatVerifyTest() noexcept
 	CHECK(!com_verify_float_str("-3434.4f34e-100f"));
 }
 
+static void termcolorTest()
+{
+	std::cout << "-----This is termcolor test-----\n";
+	std::cout << termcolor::red << "This is red text" << termcolor::reset << std::endl;
+	std::cout << termcolor::green << "This is green text" << termcolor::reset << std::endl;
+}
+
 int main(int argc, char** argv)
 {
 	debug_log_info("Common Repository!");
@@ -140,6 +149,7 @@ int main(int argc, char** argv)
 	static_string_test();
 	UnorderedEraseSafeVectorProxyTest();
 	floatVerifyTest();
+	termcolorTest();
 
 	return 0;
 }
