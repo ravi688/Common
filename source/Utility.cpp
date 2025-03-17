@@ -1,6 +1,6 @@
 #include <common/Utility.hpp>
 #include <disk_manager/file_reader.h> // for load_text_from_file() and load_binary_from_file()
-#include <bufferlib/buffer.h> // for buf_* functions
+#include <bufferlib/buffer.hpp> // for buf_* functions and buflib::GetSpanFromBuffer<>
 #include <cstring>
 #include <utility>
 
@@ -16,7 +16,7 @@ namespace com
 			return { };
 		auto freeCallback = buf_get_free_callback(fileData);
 		auto freeUserData = buf_get_malloc_callback_user_data(fileData);
-		std::span<std::byte> span = com::GetSpanFromBuffer<std::byte>(fileData);
+		std::span<std::byte> span = buflib::GetSpanFromBuffer<std::byte>(fileData);
 		buf_free_except_data(fileData);
 		return { span, freeCallback, freeUserData };
 	}
@@ -31,7 +31,7 @@ namespace com
 			return { };
 		auto freeCallback = buf_get_free_callback(fileData);
 		auto freeUserData = buf_get_malloc_callback_user_data(fileData);
-		std::span<char> span = com::GetSpanFromBuffer<char>(fileData);
+		std::span<char> span = buflib::GetSpanFromBuffer<char>(fileData);
 		buf_free_except_data(fileData);
 		return { span, freeCallback, freeUserData };
 	}
