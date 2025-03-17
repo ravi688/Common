@@ -5,7 +5,6 @@
 #include <common/BaseDefines.hpp>
 #include <common/Concepts.hpp>
 #include <common/Bool.hpp> // for com::Bool
-#include <bufferlib/buffer.h> // for buffer_t*, buf_get_ptr() and buf_get_element_count()
 
 #include <type_traits> // for std::is_reference and std::is_pointer
 #include <utility>
@@ -632,12 +631,6 @@ namespace com
 		const T* getPrev() const noexcept { return m_prev; }
 		void setPrev(T* node) noexcept { m_prev = node; }
 	};
-
-	template<typename SpanElementType>
-	std::span<SpanElementType> GetSpanFromBuffer(buffer_t* buffer) noexcept
-	{
-		return { static_cast<SpanElementType*>(buf_get_ptr(buffer)), buf_get_element_count(buffer) };
-	}
 
 	template<typename T>
 	static constexpr std::pair<T, T> GetMinMax(T a, T b) noexcept
