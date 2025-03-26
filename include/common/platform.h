@@ -21,14 +21,14 @@
 #	error "GNU compiler is expected"
 #endif /* __GNUC__ */
 
-#if defined(__MINGW32__) || defined(__MINGW64__) || defined(__CYGWIN__) || defined(_WIN32) || defined(_WIN64)
+#if defined(__MINGW32__) || defined(__MINGW64__) || defined(__CYGWIN__) || defined(_WIN32) || defined(__WIN32__) || defined(_WIN64)
 #	define PLATFORM_WINDOWS
 #	if defined(_WIN32) || defined(__MINGW32__)
 #		define PLATFORM_WINDOWS_32_BIT
 #	else
 #		define PLATFORM_WINDOWS_64_BIT
 #	endif
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__linux)
 #	define PLATFORM_LINUX
 #	if defined(__x86_64__) || defined(__ppc64__)
 #		define PLATFORM_LINUX_64_BIT
