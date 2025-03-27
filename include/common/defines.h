@@ -101,7 +101,15 @@ typedef struct com_immutable_data_t
 #define WARN_UNUSED_RESULT_FUNCTION __attribute__((warn_unused_result))
 #define FALLTHROUGH __attribute__((fallthrough))
 #define INLINE_FUNCTION inline
-#define UNREACHABLE() __builtin_unreachable()
+#if defined(__cplusplus) && __cplusplus >= 202302L
+#       include <utility>
+#       define UNREACHABLE() std::unreachable()
+#elif defined(COMPILER_CLANG) || defined(COMPILER_MINGW) || defined(COMPILER_GCC)
+#       define UNREACHABLE() __builtin_unreachable()
+#else
+#       include <cstdlib>
+#       define UNREACHABLE() abort()
+#endif
 
 #define DEPRECATED DEPRECATED_FUNCTION
 #define INLINE INLINE_FUNCTION
