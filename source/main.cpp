@@ -3,12 +3,15 @@
 #include <common/assert.h>
 #include <common/UnorderedEraseSafeVectorProxy.hpp>
 #include <iostream>
+#include <algorithm> // for std::copy()
 
 #include <stdio.h> /* stdio.h */
 #include <common/static_string.h>
 #include <common/utility.h>
+#include <common/CmdArgs.hpp>
 
 #include <common/third_party/termcolor.hpp>
+
 
 #define TEST_NAME(name) std::cout << "Testing: " << name << std::endl
 #define CHECK(to_be_checked) if(!(to_be_checked)) std::cout << "Failed: " << #to_be_checked << std::endl
@@ -142,14 +145,20 @@ static void termcolorTest()
 	std::cout << termcolor::green << "This is green text" << termcolor::reset << std::endl;
 }
 
-int main(int argc, char** argv)
+int main(int argc, const char* argv[])
 {
+	com::CmdArgs::init(argc, argv);
+	std::cout << "Cmd Args count: " << com::CmdArgs::getArgCount() << "\n";
+	std::cout << "Cmd Args: "; std::copy(com::CmdArgs::getArgs(), com::CmdArgs::getArgs() + com::CmdArgs::getArgCount(),  std::ostream_iterator<const char*>(std::cout, " "));
+	std::cout << std::endl;
+
 	debug_log_info("Common Repository!");
 
 	static_string_test();
 	UnorderedEraseSafeVectorProxyTest();
 	floatVerifyTest();
 	termcolorTest();
+
 
 	return 0;
 }
