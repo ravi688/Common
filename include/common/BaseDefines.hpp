@@ -12,10 +12,7 @@ namespace com
 	}
 
 	// This creates an lvalue reference in unevaluated contexts, similar to std::declval which does that for rvalue references.
+	// NOTE: This won't work in evaluated contexts.
 	template<typename T>
-	typename std::add_lvalue_reference<T>::type decllval() noexcept
-	{
-		static_assert(false, "com::decllval not allowed in evaluated contexts");
-		return *null_pointer<T>();
-	}
+	typename std::add_lvalue_reference<T>::type decllval() noexcept;
 }
