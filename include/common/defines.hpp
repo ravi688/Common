@@ -28,15 +28,12 @@ namespace com
 
 	template<typename T> T& null_reference() { return *reinterpret_cast<T*>(NULL); }
 
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wreturn-local-addr"
-		template<typename T>
-		T& garbage_reference()
-		{
-			char bytes[sizeof(T)];
-			return *reinterpret_cast<T*>(bytes);
-		}
-	#pragma GCC diagnostic pop
+	template<typename T>
+	T& garbage_reference()
+	{
+		static typename std::aligned_storage<sizeof(T), alignof(T)>::type storage;
+		return *reinterpret_cast<T*>(&storage);
+	}
 
 	template<typename EnumClassType>
 	constexpr typename std::underlying_type<EnumClassType>::type EnumClassToInt(EnumClassType value)
