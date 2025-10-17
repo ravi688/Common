@@ -5,19 +5,19 @@
 namespace com
 {
 	template<com::concepts::Lockable T>
-	class UnlockOnDestruct
+	class UnlockOnScopeExit
 	{
 	private:
 		T& m_value;
 	
 	public:
-		UnlockOnDestruct(T& value, bool acquireLock = true) : m_value(value)
+		UnlockOnScopeExit(T& value, bool acquireLock = true) : m_value(value)
 		{
 			if(acquireLock)
 				m_value.lock();
 		}
 	
-		~UnlockOnDestruct()
+		~UnlockOnScopeExit()
 		{
 			m_value.unlock();
 		}
@@ -28,7 +28,7 @@ namespace com
 	};
 
 	template<com::concepts::Lockable T>
-	UnlockOnDestruct<T> GetLocked(T& t)
+	UnlockOnScopeExit<T> GetLocked(T& t)
 	{
 		return { t };
 	}

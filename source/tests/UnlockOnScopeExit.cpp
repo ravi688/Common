@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <common/UnlockOnDestruct.hpp>
+#include <common/UnlockOnScopeExit.hpp>
 
 class DummyLockable
 {
@@ -16,19 +16,19 @@ public:
 
 class DummyNotLockable { };
 
-TEST_CASE( "UnlockOnDestruct", "[UnlockOnDestruct]" ) {
+TEST_CASE( "UnlockOnScopeExit", "[UnlockOnScopeExit]" ) {
 
     REQUIRE( com::concepts::Lockable<DummyLockable> == true );
     REQUIRE( com::concepts::Lockable<DummyNotLockable> == false );
     DummyLockable lockable;
     {
-        com::UnlockOnDestruct<DummyLockable> unlocker(lockable);
+        com::UnlockOnScopeExit<DummyLockable> unlocker(lockable);
         REQUIRE(unlocker->isLocked() == true);
     }
     REQUIRE(lockable.isLocked() == false);
     {
         lockable.lock();
-        com::UnlockOnDestruct<DummyLockable> unlocker(lockable, /* acquireLock = */ false);
+        com::UnlockOnScopeExit<DummyLockable> unlocker(lockable, /* acquireLock = */ false);
     }
     REQUIRE(lockable.isLocked() == false);
 }

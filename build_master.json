@@ -34,7 +34,7 @@
                 "source/tests/MultiBufferTest.cpp",
                 "source/tests/TypeTraits.cpp",
                 "source/tests/ToUpper.cpp",
-                "source/tests/UnlockOnDestruct.cpp"
+                "source/tests/UnlockOnScopeExit.cpp"
             ]
         },
         {

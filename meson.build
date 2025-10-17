@@ -298,7 +298,7 @@ main_test_sources_bm_internal__ = [
 'source/tests/MultiBufferTest.cpp',
 'source/tests/TypeTraits.cpp',
 'source/tests/ToUpper.cpp',
-'source/tests/UnlockOnDestruct.cpp'
+'source/tests/UnlockOnScopeExit.cpp'
 ]
 main_test_include_dirs_bm_internal__ = [
 
