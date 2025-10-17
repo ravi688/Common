@@ -33,7 +33,8 @@
                 "source/tests/HashTableTest.cpp",
                 "source/tests/MultiBufferTest.cpp",
                 "source/tests/TypeTraits.cpp",
-                "source/tests/ToUpper.cpp"
+                "source/tests/ToUpper.cpp",
+                "source/tests/UnlockOnDestruct.cpp"
             ]
         },
         {

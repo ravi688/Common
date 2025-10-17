@@ -1,7 +1,7 @@
 #pragma once
 
 #include <common/BaseDefines.hpp> // for com::decllval<>
-#include <concepts> // for std::is_convertible and std::is_constructible
+#include <concepts> // for std::is_convertible and std::is_constructible, and std::same_as<>
 
 namespace com
 {
@@ -55,6 +55,13 @@ namespace com
 		concept BackwardLinkedListNode = requires(T& instance)
 		{
 			{ instance.getPrev() } -> com::SameAsAny<T*, T&>;
+		};
+
+		template<typename T>
+		concept Lockable = requires(T& t)
+		{
+			{ t.lock() } -> std::same_as<void>;
+			{ t.unlock() } -> std::same_as<void>;
 		};
 	}
 }
