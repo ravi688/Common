@@ -1,5 +1,6 @@
 #pragma once
 
+#include <common/defines.h> // for u8
 #include <common/BaseDefines.hpp> // for com::decllval<>
 #include <concepts> // for std::is_convertible and std::is_constructible, and std::same_as<>
 
@@ -62,6 +63,13 @@ namespace com
 		{
 			{ t.lock() } -> std::same_as<void>;
 			{ t.unlock() } -> std::same_as<void>;
+		};
+
+		template<typename Container>
+		concept BufferLike = requires(Container& t)
+		{
+			{ t.size() } -> std::unsigned_integral;
+			{ t.data() } -> SameAsAny<char*, u8*, void*, const char*, const u8*, const void*>;
 		};
 	}
 }

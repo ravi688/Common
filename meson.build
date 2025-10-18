@@ -299,7 +299,8 @@ main_test_sources_bm_internal__ = [
 'source/tests/TypeTraits.cpp',
 'source/tests/ToUpper.cpp',
 'source/tests/UnlockOnScopeExit.cpp',
-'source/tests/IDGenerator.cpp'
+'source/tests/IDGenerator.cpp',
+'source/tests/BitCastBuffer.cpp'
 ]
 main_test_include_dirs_bm_internal__ = [
 
