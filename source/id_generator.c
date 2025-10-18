@@ -16,6 +16,15 @@ COMMON_API id_generator_id_type_t id_generator_get(id_generator_t* generator)
 	return generator->counter++;
 }
 
+COMMON_API bool id_generator_is_returnable(id_generator_t* generator, id_generator_id_type_t id)
+{
+	_com_assert(sizeof(id_generator_id_type_t) == sizeof(u32));
+	if((id < generator->counter) && (!generator->unreserved || (buf_find_index_of(generator->unreserved, &id, buf_u32_comparer) == BUF_INVALID_INDEX)))
+		return true;
+	else
+		return false;	
+}
+
 COMMON_API void id_generator_return(id_generator_t* generator, id_generator_id_type_t id)
 {
 	_com_assert(id < generator->counter);
