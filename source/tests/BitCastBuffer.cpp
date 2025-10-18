@@ -32,6 +32,14 @@ public:
     s32 size() const { return 0; }
 };
 
+enum class TestEnum : u8
+{
+    EnumValue1,
+    EnumValue2,
+    EnumValue3,
+    EnumValue4,
+};
+
 TEST_CASE( "BitCastBuffer", "[BitCastBuffer]" ) {
 
     REQUIRE( com::concepts::BufferLike<std::string> == true );
@@ -55,6 +63,11 @@ TEST_CASE( "BitCastBuffer", "[BitCastBuffer]" ) {
     auto* valuePtr = reinterpret_cast<char*>(&value);
     REQUIRE( com::BitCastBuffer<u32>(std::string { valuePtr, valuePtr + sizeof(value) }).has_value() == true );
     REQUIRE( com::BitCastBuffer<u32>(std::string { valuePtr, valuePtr + sizeof(value) }).value() == value );
+
+    TestEnum enumValue = TestEnum::EnumValue3;
+    auto* valuePtr2 = reinterpret_cast<char*>(&enumValue);
+    REQUIRE( com::BitCastBuffer<TestEnum>(std::string { valuePtr2, valuePtr2 + sizeof(enumValue) }).has_value() == true );
+    REQUIRE( com::BitCastBuffer<TestEnum>(std::string { valuePtr2, valuePtr2 + sizeof(enumValue) }).value() == enumValue );
 
 }
 

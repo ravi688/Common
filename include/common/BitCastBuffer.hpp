@@ -29,6 +29,7 @@ namespace com
 	{
 		if constexpr (std::is_enum<T>::value)
 			return BitCastBufferToEnum<T, BufferType>(buffer);
-		return __bitcast_buffer<T, BufferType>(buffer, sizeof(T));
+		else
+			return __bitcast_buffer<T, BufferType>(buffer, sizeof(T));
 	}
 }
