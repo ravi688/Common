@@ -25,11 +25,28 @@ namespace com
 	}
 
 	template<typename T, com::concepts::BufferLike BufferType>
+	std::optional<T> __bitcast_buffer_relaxed(const BufferType& buffer, std::unsigned_integral auto targetSize)
+	{
+		if(buffer.size() < targetSize)
+			return { };
+		auto obj = __bitcast_buffer_unsafe<T, BufferType>(buffer, targetSize);
+		return { std::move(obj) };
+	}
+
+	template<typename T, com::concepts::BufferLike BufferType>
 	std::optional<T> BitCastBufferToEnum(const BufferType& buffer)
 	{
 		static_assert(std::is_enum<T>::value);
 		constexpr auto size = sizeof(typename std::underlying_type<T>::type);
 		return __bitcast_buffer<T, BufferType>(buffer, size);	
+	}
+
+	template<typename T, com::concepts::BufferLike BufferType>
+	std::optional<T> BitCastBufferToEnumRelaxed(const BufferType& buffer)
+	{
+		static_assert(std::is_enum<T>::value);
+		constexpr auto size = sizeof(typename std::underlying_type<T>::type);
+		return __bitcast_buffer_relaxed<T, BufferType>(buffer, size);	
 	}
 
 	template<typename T>
@@ -40,6 +57,16 @@ namespace com
 			return BitCastBufferToEnum<T, BufferType>(buffer);
 		else
 			return __bitcast_buffer<T, BufferType>(buffer, sizeof(T));
+	}
+
+	template<typename T>
+	std::optional<T> BitCastBufferRelaxed(const com::concepts::BufferLike auto& buffer)
+	{
+		using BufferType = typename std::remove_const<typename std::remove_reference<decltype(buffer)>::type>::type;
+		if constexpr (std::is_enum<T>::value)
+			return BitCastBufferToEnumRelaxed<T, BufferType>(buffer);
+		else
+			return __bitcast_buffer_relaxed<T, BufferType>(buffer, sizeof(T));
 	}
 
 	template<typename T1, typename T2, typename... Args>
