@@ -40,6 +40,24 @@ enum class TestEnum : u8
     EnumValue4,
 };
 
+#pragma pack(push, 1)
+struct PackedDataBuffer
+{
+    u32 value1 = 45;
+    u8 value2 = 43;
+    u16 value3 = 87;
+    u8 value4 = 56;
+
+    bool operator==(const PackedDataBuffer& buf) const noexcept
+    {
+        return buf.value1 == value1 && buf.value2 == value2 && buf.value3 == value3 && buf.value4 == value4;    
+    }
+
+    const u8* data() const { return reinterpret_cast<const u8*>(this); }
+    std::size_t size() const { return sizeof(PackedDataBuffer); }
+};
+#pragma pack(pop)
+
 TEST_CASE( "BitCastBuffer", "[BitCastBuffer]" ) {
 
     REQUIRE( com::concepts::BufferLike<std::string> == true );
@@ -69,5 +87,9 @@ TEST_CASE( "BitCastBuffer", "[BitCastBuffer]" ) {
     REQUIRE( com::BitCastBuffer<TestEnum>(std::string { valuePtr2, valuePtr2 + sizeof(enumValue) }).has_value() == true );
     REQUIRE( com::BitCastBuffer<TestEnum>(std::string { valuePtr2, valuePtr2 + sizeof(enumValue) }).value() == enumValue );
 
+    auto packedResult = com::BitCastBufferPacked<u32, u8, u16, u8>(PackedDataBuffer { });
+    REQUIRE( packedResult.has_value() == true );
+    auto [value1, value2, value3, value4] = *packedResult;
+    REQUIRE( PackedDataBuffer { value1, value2, value3, value4 } == PackedDataBuffer { } );
 }
 
