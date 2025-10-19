@@ -5,6 +5,7 @@
 #include <common/BaseDefines.hpp>
 #include <common/Concepts.hpp>
 #include <common/Bool.hpp> // for com::Bool
+#include <common/NullableRef.hpp>
 
 #include <type_traits> // for std::is_reference and std::is_pointer
 #include <utility>
@@ -27,13 +28,6 @@ namespace com
 	struct no_publish_ptr_t { };
 
 	template<typename T> T& null_reference() { return *reinterpret_cast<T*>(NULL); }
-
-	template<typename T>
-	T& garbage_reference()
-	{
-		static typename std::aligned_storage<sizeof(T), alignof(T)>::type storage;
-		return *reinterpret_cast<T*>(&storage);
-	}
 
 	template<typename EnumClassType>
 	constexpr typename std::underlying_type<EnumClassType>::type EnumClassToInt(EnumClassType value)
@@ -66,28 +60,6 @@ namespace com
 		static_assert(sizeof(EnumClassType1) >= sizeof(EnumClassType2));
 		return HAS_FLAG(EnumClassToInt<EnumClassType1>(bits), EnumClassToInt<EnumClassType2>(flag));
 	}
-
-	template<typename T>
-	class OptionalReference
-	{
-	private:
-		T& m_value;
-		bool m_hasValue;
-	
-	public:
-		OptionalReference() : m_value(garbage_reference<T>()), m_hasValue(false) { }
-		OptionalReference(T& value) : m_value(value), m_hasValue(true) { }
-		
-		OptionalReference(OptionalReference& ref) : m_value(ref.m_value), m_hasValue(ref.m_hasValue) { }
-		OptionalReference& operator=(T& value) { m_value = value; m_hasValue = true; return *this; }
-	
-		T& value() noexcept { return m_value; }
-		operator bool() const noexcept { return m_hasValue; }
-		bool hasValue() const noexcept { return m_hasValue; }
-		bool has_value() const noexcept { return hasValue(); }
-		T& operator*() noexcept { return m_value; }
-		T* operator->() noexcept { return &m_value; }
-	};
 
 	template<typename T>
 	class Optional
