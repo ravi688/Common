@@ -96,5 +96,8 @@ TEST_CASE( "BitCastBuffer", "[BitCastBuffer]" ) {
     REQUIRE( com::BitCastBuffer<u32>(PackedDataBuffer { }).has_value() == false );
     REQUIRE( com::BitCastBufferRelaxed<u32>(PackedDataBuffer { }).has_value() == true);
     REQUIRE( com::BitCastBufferRelaxed<u32>(PackedDataBuffer { }).value() == PackedDataBuffer { }.value1);
+
+    REQUIRE( com::BitCastBufferPacked<u32, u8>(PackedDataBuffer { }).has_value() == false );
+    REQUIRE( com::BitCastBufferPackedRelaxed<u32, u8>(PackedDataBuffer { }).has_value() == true );
 }
 

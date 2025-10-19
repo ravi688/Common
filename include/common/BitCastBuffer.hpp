@@ -4,6 +4,7 @@
 #include <cstring> // for std::memcpy()
 #include <type_traits> // for std::is_enum<> and std::underlying_type<>
 #include <utility> // for std::tuple<>
+#include <functional> // for std::less_than<> and std::not_equal_to<>
 
 namespace com
 {
@@ -69,11 +70,11 @@ namespace com
 			return __bitcast_buffer_relaxed<T, BufferType>(buffer, sizeof(T));
 	}
 
-	template<typename T1, typename T2, typename... Args>
-	std::optional<std::tuple<T1, T2, Args...>> BitCastBufferPacked(const com::concepts::BufferLike auto& buffer)
+	template<typename T, typename... Args>
+	std::optional<std::tuple<T, Args...>> __BitCastBufferPacked(const com::concepts::BufferLike auto& buffer, auto compareFunction)
 	{
-		constexpr auto totalSize = sizeof(T1) + sizeof(T2) + (sizeof(Args) + ...);
-		if(buffer.size() != totalSize)
+		constexpr auto totalSize = sizeof(T) + (sizeof(Args) + ...);
+		if(compareFunction(buffer.size(), totalSize))
 			return { };
 
 		using BufferType = typename std::remove_const<typename std::remove_reference<decltype(buffer)>::type>::type;
@@ -86,13 +87,24 @@ namespace com
     	    return old;
     	};
 
-		std::tuple<T1, T2, Args...> tupleRes
+		std::tuple<T, Args...> tupleRes
 		{
-			 __bitcast_buffer_unsafe<T1, BufferType>(buffer, sizeof(T1), next_offset(sizeof(T1))),
-			 __bitcast_buffer_unsafe<T2, BufferType>(buffer, sizeof(T2), next_offset(sizeof(T2))),
+			 __bitcast_buffer_unsafe<T, BufferType>(buffer, sizeof(T), next_offset(sizeof(T))),
 			 __bitcast_buffer_unsafe<Args, BufferType>(buffer, sizeof(Args), next_offset(sizeof(Args)))...
 		};
 
 		return { tupleRes };
+	}
+
+	template<typename T, typename... Args>
+	std::optional<std::tuple<T, Args...>> BitCastBufferPacked(const com::concepts::BufferLike auto& buffer)
+	{
+		return __BitCastBufferPacked<T, Args...>(buffer, std::not_equal_to<std::size_t>());
+	}
+
+	template<typename T, typename... Args>
+	std::optional<std::tuple<T, Args...>> BitCastBufferPackedRelaxed(const com::concepts::BufferLike auto& buffer)
+	{
+		return __BitCastBufferPacked<T, Args...>(buffer, std::less<std::size_t>());
 	}
 }
