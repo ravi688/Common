@@ -41,7 +41,7 @@ jobs:
           # if you use a theme or plugins, install them too, e.g.:
           # pip install mkdocs-material mkdocs-awesome-pages-plugin
       - name: Build MkDocs site
-        run: mkdocs build --clean --site-dir ./docs/site
+        run: mkdocs build --clean --site-dir ./docs
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
