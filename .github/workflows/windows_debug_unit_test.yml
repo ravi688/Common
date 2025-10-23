@@ -1,0 +1,29 @@
+name: Windows Debug Mode Unit Test
+on: [push, pull_request]
+
+jobs:
+  mingw64-debug-test:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: git mingw-w64-x86_64-gcc
+      - name: Build environment setup
+        run: |
+          git clone https://github.com/ravi688/BuildMaster.git
+          (cd BuildMaster && ./install_build_master.sh)
+
+      - name: Build
+        run: |
+          build_master meson setup debug_build --buildtype=debug
+          build_master meson compile -C debug_build
+
+      - name: Run unit tests
+        run: |
+          ./unit-test.sh debug_build
