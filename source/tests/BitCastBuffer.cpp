@@ -75,7 +75,7 @@ TEST_CASE( "BitCastBuffer", "[BitCastBuffer]" ) {
     REQUIRE( com::BitCastBuffer<u8>(DummyBuffer1 { }).has_value() == false );
 
     REQUIRE( com::BitCastBuffer<Data>(gExampleString).has_value() == true );
-    auto str =  std::string_view { com::BitCastBuffer<Data>(gExampleString).value().c_str(), gExampleStringLength };
+    auto str =  std::string { com::BitCastBuffer<Data>(gExampleString).value().c_str(), gExampleStringLength };
     REQUIRE( str == gExampleString );
 
     u32 value = 45;
