@@ -2,12 +2,12 @@
 OS | GCC | Clang
 -- | ------------------ | --------------------
 Linux | [![GCC-Linux-Debug](https://github.com/ravi688/Common/actions/workflows/debug_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/debug_unit_test.yml) | [![Clang-Linux-Debug](https://github.com/ravi688/Common/actions/workflows/clang_debug_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/clang_debug_unit_test.yml)  
-Windows | [![GCC-Win-Debug](https://github.com/ravi688/Common/actions/workflows/windows_debug_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/windows_debug_unit_test.yml) | [![GCC-Win-Debug](https://github.com/ravi688/Common/actions/workflows/clang_windows_debug_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/clang_windows_debug_unit_test.yml)  
+Windows | [![GCC-Win-Debug](https://github.com/ravi688/Common/actions/workflows/windows_debug_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/windows_debug_unit_test.yml) | [![Clang-Win-Debug](https://github.com/ravi688/Common/actions/workflows/clang_windows_debug_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/clang_windows_debug_unit_test.yml)  
 
 OS | GCC | Clang
 -- | ------------------ | --------------------
 Linux | [![GCC-Linux-Release](https://github.com/ravi688/Common/actions/workflows/release_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/release_unit_test.yml) | [![Clang-Linux-Release](https://github.com/ravi688/Common/actions/workflows/clang_release_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/clang_release_unit_test.yml)  
-Windows | [![GCC-Win-Release](https://github.com/ravi688/Common/actions/workflows/windows_release_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/windows_release_unit_test.yml) | [![GCC-Win-Release](https://github.com/ravi688/Common/actions/workflows/clang_windows_release_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/clang_windows_release_unit_test.yml)
+Windows | [![GCC-Win-Release](https://github.com/ravi688/Common/actions/workflows/windows_release_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/windows_release_unit_test.yml) | [![Clang-Win-Release](https://github.com/ravi688/Common/actions/workflows/clang_windows_release_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/clang_windows_release_unit_test.yml)
 
 
 # Common utility library
