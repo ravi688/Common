@@ -1,4 +1,4 @@
-name: Windows Release Mode Unit Test
+name: Clang Windows Release Mode Unit Test
 on: [push, pull_request]
 
 jobs:

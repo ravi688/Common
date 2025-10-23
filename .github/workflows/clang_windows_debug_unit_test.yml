@@ -1,4 +1,4 @@
-name: Windows Debug Mode Unit Test
+name: Clang Windows Debug Mode Unit Test
 on: [push, pull_request]
 
 jobs:
