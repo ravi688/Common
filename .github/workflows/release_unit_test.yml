@@ -1,0 +1,25 @@
+name: Release Mode Unit Tests
+
+on: [push, pull_request]
+
+jobs:
+  debug-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up build environment
+      run: |
+        git clone https://github.com/ravi688/BuildMaster.git
+        (cd BuildMaster && sudo ./install_build_master.sh)
+
+    - name: Build
+      run: |
+        build_master meson setup release_build --buildtype=release
+        build_master meson compile -C release_build
+
+    - name: Run Unit Tests
+      run: |
+        sudo chmod +x ./unit-test.sh
+        ./unit-test.sh release_build
