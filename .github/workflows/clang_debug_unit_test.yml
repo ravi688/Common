@@ -1,0 +1,26 @@
+name: Debug Mode Unit Tests
+
+on: [push, pull_request]
+
+jobs:
+  debug-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up build environment
+      run: |
+        sudo apt-get install clang -y
+        git clone https://github.com/ravi688/BuildMaster.git
+        (cd BuildMaster && sudo ./install_build_master.sh)
+
+    - name: Build
+      run: |
+        CC=clang CXX=clang++ build_master meson setup debug_build --buildtype=debug
+        CC=clang CXX=clang++ build_master meson compile -C debug_build
+
+    - name: Run Unit Tests
+      run: |
+        sudo chmod +x ./unit-test.sh
+        ./unit-test.sh debug_build
