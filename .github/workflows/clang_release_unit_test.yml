@@ -3,7 +3,7 @@ name: Release Mode Unit Tests
 on: [push, pull_request]
 
 jobs:
-  release-build-test:
+  clang-release-build-test:
     runs-on: ubuntu-latest
 
     steps:

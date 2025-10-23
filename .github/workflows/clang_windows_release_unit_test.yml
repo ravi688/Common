@@ -2,7 +2,7 @@ name: Windows Release Mode Unit Test
 on: [push, pull_request]
 
 jobs:
-  mingw64-release-test:
+  clang-win-release-test:
     runs-on: windows-latest
     defaults:
       run:

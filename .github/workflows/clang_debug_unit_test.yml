@@ -3,7 +3,7 @@ name: Debug Mode Unit Tests
 on: [push, pull_request]
 
 jobs:
-  debug-build-test:
+  clang-debug-build-test:
     runs-on: ubuntu-latest
 
     steps:
