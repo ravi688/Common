@@ -12,7 +12,7 @@ jobs:
     - name: Set up build environment
       run: |
         git clone https://github.com/ravi688/BuildMaster.git
-        (cd BuildMaster && ./install_build_master.sh)
+        (cd BuildMaster && sudo ./install_build_master.sh)
 
     - name: Build
       run: |
