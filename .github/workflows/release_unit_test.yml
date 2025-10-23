@@ -3,7 +3,7 @@ name: Release Mode Unit Tests
 on: [push, pull_request]
 
 jobs:
-  debug-build-test:
+  release-build-test:
     runs-on: ubuntu-latest
 
     steps:
