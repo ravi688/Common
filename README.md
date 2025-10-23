@@ -1,3 +1,10 @@
+
+OS | Debug Build Status | Release Build Status
+-- | ------------------ | --------------------
+Linux | [![Debug Mode Unit Tests](https://github.com/ravi688/Common/actions/workflows/debug_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/debug_unit_test.yml) | [![Release Mode Unit Tests](https://github.com/ravi688/Common/actions/workflows/release_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/release_unit_test.yml)
+Windows | [![Windows Debug Mode Unit Test](https://github.com/ravi688/Common/actions/workflows/windows_debug_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/windows_debug_unit_test.yml) | [![Windows Release Mode Unit Test](https://github.com/ravi688/Common/actions/workflows/windows_release_unit_test.yml/badge.svg)](https://github.com/ravi688/Common/actions/workflows/windows_release_unit_test.yml)
+
+
 # Common utility library
 This repository contains the reusabe functions, macros and constantes being used across all my projects.
 
