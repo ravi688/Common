@@ -27,4 +27,4 @@ common = common_static_dep
 Now you can add `common` as dependency into your `meson.build` file.
 
 ## Docs
-### [StringUtiliy.hpp](/StringUtility.md)
+### [StringUtiliy.hpp](StringUtility.md)
