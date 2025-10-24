@@ -38,7 +38,8 @@
                 "source/tests/UnlockOnScopeExit.cpp",
                 "source/tests/IDGenerator.cpp",
                 "source/tests/BitCastBuffer.cpp",
-                "source/tests/NullableRef.cpp"
+                "source/tests/NullableRef.cpp",
+                "source/tests/StringUtility.cpp"
             ]
         },
         {
