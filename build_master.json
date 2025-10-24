@@ -29,6 +29,7 @@
             "dependencies" : ["catch2-with-main"],
             "sources" : [ 
                 "source/tests/test.cpp",
+                "source/tests/Event.cpp",
                 "source/tests/OrderedEvent.cpp",
                 "source/tests/HashTableTest.cpp",
                 "source/tests/MultiBufferTest.cpp",

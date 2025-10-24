@@ -293,6 +293,7 @@ pkgmod.generate(common_shared,
 # -------------- Target: main_test ------------------
 main_test_sources_bm_internal__ = [
 'source/tests/test.cpp',
+'source/tests/Event.cpp',
 'source/tests/OrderedEvent.cpp',
 'source/tests/HashTableTest.cpp',
 'source/tests/MultiBufferTest.cpp',

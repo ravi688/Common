@@ -92,6 +92,11 @@ namespace com
 			id_generator_destroy(&m_id_generator);
 		}
 
+		// Description: Returns the number of subscriptions to this event
+		// Params: None
+		// Returns: an integer (unsigned)
+		COM_NO_DISCARD auto size() const noexcept { return m_handlers.size(); }
+
 		template<typename T = PublisherType>
 		requires(!std::is_same_v<T, no_publish_ptr_t>)
 		void setPublisher(T* ptr) noexcept { m_publisher = ptr; }
