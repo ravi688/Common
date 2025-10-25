@@ -17,6 +17,7 @@
 #include <iostream>
 #include <span> // for std::span<>
 #include <string_view> // for std::string_view
+#include <functional> // for std::function<>
 
 #define _DBG_LINE_ std::cout << __FILE__ << ":" << __LINE__ << std::endl
 
@@ -793,6 +794,15 @@ namespace com
 		return to_upper(std::string_view { str });
 	}
 	// ---------------------------------------------------------------------------------------
+
+	decltype(auto) to_underlying(com::concepts::EnumType auto enumValue) { return EnumClassToInt(enumValue); }
+
+	template<com::concepts::EnumType EnumClassType>
+	constexpr void VisitEnum(const std::function<void(EnumClassType)>& visitor, EnumClassType endSentinel, EnumClassType startSentinel = IntToEnumClass<EnumClassType>(0))
+	{
+		for(typename std::underlying_type<EnumClassType>::type i = com::to_underlying(startSentinel); i < com::to_underlying(endSentinel); ++i)
+			visitor(IntToEnumClass<EnumClassType>(i));
+	}
 }
 
 

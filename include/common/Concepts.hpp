@@ -71,5 +71,8 @@ namespace com
 			{ t.size() } -> std::unsigned_integral;
 			{ t.data() } -> SameAsAny<char*, u8*, void*, const char*, const u8*, const void*>;
 		};
+
+		template<typename T>
+		concept EnumType = std::is_enum<T>::value;
 	}
 }

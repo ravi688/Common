@@ -303,7 +303,8 @@ main_test_sources_bm_internal__ = [
 'source/tests/IDGenerator.cpp',
 'source/tests/BitCastBuffer.cpp',
 'source/tests/NullableRef.cpp',
-'source/tests/StringUtility.cpp'
+'source/tests/StringUtility.cpp',
+'source/tests/VisitEnum.cpp'
 ]
 main_test_include_dirs_bm_internal__ = [
 
