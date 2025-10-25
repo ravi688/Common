@@ -175,3 +175,47 @@ TEST_CASE("Complex tests on Event<>", "[Event-Complex]" )
         }
     }
 }
+
+
+class UDT
+{
+private:
+    std::size_t& m_counter;
+
+public:
+    UDT(std::size_t& counter) : m_counter(counter) { ++m_counter; }
+
+    UDT(const UDT& udt) : m_counter(udt.m_counter)
+    {
+        ++m_counter;
+    }
+};
+
+TEST_CASE("Argument type")
+{
+    com::Event<com::no_publish_ptr_t, UDT*> myEvent2;
+    myEvent2.subscribe([](const UDT*) { });
+    myEvent2.publish(nullptr);
+
+    com::Event<com::no_publish_ptr_t, UDT> myEvent;
+    myEvent.subscribe([](UDT udt) { });
+
+    std::size_t counter = 0;
+    UDT udt(counter);
+    REQUIRE(counter == 1);
+    myEvent.publish(udt);
+
+    // Pass by value causes 2 copies
+    // So total constructor calls 1 + 2 = 3
+    REQUIRE(counter == 3);
+
+    myEvent.clear();
+    myEvent.subscribe([](const UDT& udt) { });
+    counter = 0;
+    UDT udt2(counter);
+    myEvent.publish(udt2);
+
+    // Pass by reference causes only 1 copy
+    // So total constructor calls 1 + 1 = 2
+    REQUIRE(counter == 2);
+}

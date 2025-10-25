@@ -20,6 +20,15 @@ namespace com
 							>::type;
 	};
 
+	template <typename... ExpectedArgs>
+	struct args_checker {
+	    template <typename... GivenArgs>
+	    static constexpr bool check() {
+	        return sizeof...(ExpectedArgs) == sizeof...(GivenArgs) &&
+	               std::conjunction_v<std::is_convertible<std::decay_t<GivenArgs>, ExpectedArgs>...>;
+	    }
+	};
+
 	template<typename PublisherType, typename... Args>
 	class COMMON_API Event
 	{
@@ -105,10 +114,16 @@ namespace com
 		requires(!std::is_same_v<T, no_publish_ptr_t>)
 		T* getPublisher() noexcept { return m_publisher; }
 
-		SubscriptionID subscribe(EventHandler handler) noexcept
+		template<typename F>
+		SubscriptionID subscribe(F&& f) noexcept
 		{
 			auto id = id_generator_get(&m_id_generator);
-			m_handlers.insert({ id, { std::move(handler), true } });
+
+			auto wrapper = [func = std::forward<F>(f)](auto&&... callArgs) mutable {
+				func(std::forward<decltype(callArgs)>(callArgs)...); // perfect-forward
+        	};
+
+			m_handlers.insert({ id, { std::move(wrapper), true } });
 			return id;
 		}
 
@@ -149,14 +164,17 @@ namespace com
 			it->second.second = true;
 		}
 
-		void publish(Args... args) noexcept requires(!std::is_same_v<PublisherType, no_publish_ptr_t>)
+		template<typename... CallArgs>
+		void publish(CallArgs&&... args) noexcept requires(!std::is_same_v<PublisherType, no_publish_ptr_t>)
 		{
+			static_assert(args_checker<Args...>::template check<CallArgs...>(),
+                      "publish() arguments count or types do not match handler arguments");
 			m_isPublishing = true;
 			for(auto& pair : m_handlers)
 			{
 				// only invoke this handler if it is active
 				if(pair.second.second)
-					pair.second.first(m_publisher, args...);
+					pair.second.first(m_publisher, std::forward<CallArgs>(args)...);
 			}
 			m_isPublishing = false;
 			if(m_unsubscribeRequests.size() > 0)
@@ -167,14 +185,17 @@ namespace com
 			}
 		}
 
-		void publish(Args... args) noexcept requires(std::is_same_v<PublisherType, no_publish_ptr_t>)
+		template<typename... CallArgs>
+		void publish(CallArgs&&... args) noexcept requires(std::is_same_v<PublisherType, no_publish_ptr_t>)
 		{
+			static_assert(args_checker<Args...>::template check<CallArgs...>(),
+                      "publish() arguments count or types do not match handler arguments");
 			m_isPublishing = true;
 			for(auto& pair : m_handlers)
 			{
 				// only invoke this handler if it is active
 				if(pair.second.second)
-					pair.second.first(args...);
+					pair.second.first(std::forward<CallArgs>(args)...);
 			}
 			m_isPublishing = false;
 			if(m_unsubscribeRequests.size() > 0)
