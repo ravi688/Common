@@ -70,7 +70,7 @@ namespace com
 			_com_assert(id != InvalidSubscriptionID);
 			auto it = m_handlers.find(id);
 			if(it == m_handlers.end())
-				debug_log_error("You're trying to access a subscription which you never subscribed to!");
+				com_debug_log_error("You're trying to access a subscription which you never subscribed to!");
 			return it;
 		}
 
@@ -265,7 +265,7 @@ namespace com
 		{
 			if(m_exclusiveAccessID != InvalidSubscriptionID)
 			{
-				debug_log_fetal_error("You're trying to grab exclusive access twice (without releasing it first), which is not possible");
+				com_debug_log_fetal_error("You're trying to grab exclusive access twice (without releasing it first), which is not possible");
 				return;
 			}
 			m_exclusiveAccessID = id;
@@ -281,7 +281,7 @@ namespace com
 		{
 			if(m_exclusiveAccessID != id)
 			{
-				debug_log_fetal_error("You released exclusive access with a different subscription id than what was used for the grabbing");
+				com_debug_log_fetal_error("You released exclusive access with a different subscription id than what was used for the grabbing");
 				return;
 			}
 			m_exclusiveAccessID = InvalidSubscriptionID;

@@ -52,6 +52,6 @@ namespace com
 				m_free(const_cast<void*>(m_data), m_freeUserData);
 			m_isValid = com::False;
 		}
-		else DEBUG_LOG_ERROR("You're trying to destroy an invalid FileLoadResult object");
+		else COM_DEBUG_LOG_ERROR("You're trying to destroy an invalid FileLoadResult object");
 	}
 }

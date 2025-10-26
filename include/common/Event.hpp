@@ -52,7 +52,7 @@ namespace com
 			_com_assert(id != InvalidSubscriptionID);
 			auto it = m_handlers.find(id);
 			if(it == m_handlers.end())
-				debug_log_error("You're trying to access a subscription which you never subscribed to!");
+				com_debug_log_error("You're trying to access a subscription which you never subscribed to!");
 			return it;
 		}
 

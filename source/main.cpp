@@ -18,7 +18,7 @@
 
 static void static_string_test()
 {
-	debug_log_info("[static_string_t]");
+	com_debug_log_info("[static_string_t]");
 	static_string_64_t str = static_string_64("Hello World");
 	printf("static_string_64_t str: %s", str.data);
 	puts("");
@@ -152,7 +152,7 @@ int main(int argc, const char* argv[])
 	std::cout << "Cmd Args: "; std::copy(com::CmdArgs::getArgs(), com::CmdArgs::getArgs() + com::CmdArgs::getArgCount(),  std::ostream_iterator<const char*>(std::cout, " "));
 	std::cout << std::endl;
 
-	debug_log_info("Common Repository!");
+	com_debug_log_info("Common Repository!");
 
 	static_string_test();
 	UnorderedEraseSafeVectorProxyTest();
