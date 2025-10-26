@@ -39,7 +39,7 @@ COMMON_API void binary_reader_release_resources(binary_reader_t* reader)
 static const u8* checked_ptr(binary_reader_t* reader)
 {
 	if(reader->read_cursor > reader->size)
-		DEBUG_LOG_FETAL_ERROR("[Binary Reader] You are trying to read a data outside of the valid data");
+		COM_DEBUG_LOG_FETAL_ERROR("[Binary Reader] You are trying to read a data outside of the valid data");
 	return reader->data + reader->read_cursor;
 }
 
@@ -122,7 +122,7 @@ COMMON_API const char* binary_reader_str(binary_reader_t* reader)
 
 COMMON_API const void* binary_reader_at(binary_reader_t* reader, u32 index)
 {
-	_ASSERT(index < reader->size);
+	_COM_ASSERT(index < reader->size);
 	return reader->data + index;
 }
 
@@ -130,7 +130,7 @@ COMMON_API const void* __binary_reader_read(binary_reader_t* reader, u32 size)
 {
 	u32 pos = reader->read_cursor;
 	reader->read_cursor += size;
-	_ASSERT(reader->read_cursor <= reader->size);
+	_COM_ASSERT(reader->read_cursor <= reader->size);
 	return reader->data + pos;
 }
 
@@ -146,7 +146,7 @@ COMMON_API void binary_reader_reset(binary_reader_t* reader)
 
 COMMON_API void binary_reader_jump(binary_reader_t* reader, u32 pos)
 {
-	_ASSERT(pos < reader->size);
+	_COM_ASSERT(pos < reader->size);
 	reader->read_cursor = pos;
 }
 

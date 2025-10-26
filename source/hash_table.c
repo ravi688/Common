@@ -94,7 +94,7 @@ COMMON_API void* hash_table_add_get(hash_table_t* table, void* key, void* value)
 	pair_t(hash_table_ptr_t, void_ptr_t) pair = { table, key };
 	if(sub_buffer_find_index_of(&table->buffer, bucket_handle, &pair, is_equal) != BUF_INVALID_INDEX)
 	{
-		debug_log_warning("Failed to add key value pair as a key with the same hash already exists in the hash table");
+		com_debug_log_warning("Failed to add key value pair as a key with the same hash already exists in the hash table");
 		return NULL;
 	}
 

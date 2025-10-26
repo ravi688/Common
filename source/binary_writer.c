@@ -123,7 +123,7 @@ static INLINE_IF_RELEASE_MODE buf_ucount_t get_mark_entry_index_from_mark_id(bin
 	/* check if the mark ID exists in the mark table */
 	buf_ucount_t index = buf_find_index_of(&writer->mark_table, &mark_id, mark_id_comparer);
 	if(index == BUF_INVALID_INDEX)
-		debug_log_warning("[Binary Writer] There is no such mark exists with mark ID %lu", mark_id);
+		com_debug_log_warning("[Binary Writer] There is no such mark exists with mark ID %lu", mark_id);
 	return index;
 }
 
@@ -162,7 +162,7 @@ static u32 _sizeof(mark_type_t type)
 		case MARK_TYPE_UNDEFINED:
 			return 0;
 	}
-	debug_log_warning("[Binary Writer] Returning _sizeof(%lu) zero as the mark type %lu is not recognized", type, type);
+	com_debug_log_warning("[Binary Writer] Returning _sizeof(%lu) zero as the mark type %lu is not recognized", type, type);
 	return 0;
 }
 
@@ -184,7 +184,7 @@ static void mark(binary_writer_t* writer, u32 mark_id, mark_type_t type)
 		if(index != BUF_INVALID_INDEX)
 		{
 			mark_entry_t* info = buf_get_ptr_at_typeof(&writer->mark_table, mark_entry_t, index);
-			debug_log_warning("[Binary Writer] The write position %lu has already been marked with mark ID %lu, adding another mark with id %lu",
+			com_debug_log_warning("[Binary Writer] The write position %lu has already been marked with mark ID %lu, adding another mark with id %lu",
 							info->pos, info->id, mark_id);
 		}
 	)
@@ -218,7 +218,7 @@ static void set_or_insert(binary_writer_t* writer, u32 mark_id, const void* byte
 		{
 			if(size == 0)
 			{
-				DEBUG_LOG_WARNING("[Binary Writer] Nothing to write, size is equal to zero");
+				COM_DEBUG_LOG_WARNING("[Binary Writer] Nothing to write, size is equal to zero");
 				break;
 			}
 			/* insert the bytes */
@@ -242,7 +242,7 @@ static void set_or_insert(binary_writer_t* writer, u32 mark_id, const void* byte
 		default:
 		{
 			u32 _size = _sizeof(entry->type);
-			_ASSERT(_size == size);
+			_COM_ASSERT(_size == size);
 			/* get the pointer to the internal memory buffer */
 			void* ptr = writer->get_ptr(writer->user_data);
 			/* copy the data from the marked positon */
@@ -293,13 +293,13 @@ COMMON_API void binary_writer_unmark(binary_writer_t* writer, u32 mark_id)
 	buf_ucount_t index = buf_find_index_of(&writer->mark_table, &mark_id, mark_id_comparer);
 	if(index == BUF_INVALID_INDEX)
 	{
-		debug_log_warning("[Binary Writer] There is no such mark exists with mark ID %lu", mark_id);
+		com_debug_log_warning("[Binary Writer] There is no such mark exists with mark ID %lu", mark_id);
 		return;
 	}
 
 	/* remove the mark */
 	bool result = buf_remove_at(&writer->mark_table, index, NULL);
-	_assert(result == true);
+	_com_assert(result == true);
 }
 
 COMMON_API void binary_writer_insert(binary_writer_t* writer, u32 mark_id, const void* bytes, u32 size)

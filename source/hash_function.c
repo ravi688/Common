@@ -80,13 +80,13 @@ COMMON_API hash_t u64_hash(void* v)
 
 COMMON_API hash_t float_hash(void* v)
 {
-	debug_log_warning("You are trying to calculate hash of a float value %f, which is prone to miss calculation", DREF_TO(f32, v));
+	com_debug_log_warning("You are trying to calculate hash of a float value %f, which is prone to miss calculation", DREF_TO(f32, v));
 	return CAST_TO(hash_t, REINTERPRET_TO(u32, DREF_TO(f32, v)));
 }
 
 COMMON_API hash_t double_hash(void* v)
 {
-	debug_log_warning("You are trying to calculate hash of a double value %f, which is prone to miss calculation", DREF_TO(f64, v));
+	com_debug_log_warning("You are trying to calculate hash of a double value %f, which is prone to miss calculation", DREF_TO(f64, v));
 	return CAST_TO(hash_t, REINTERPRET_TO(u64, DREF_TO(f64, v)));
 }
 
