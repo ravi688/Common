@@ -218,4 +218,11 @@ TEST_CASE("Argument type")
     // Pass by reference causes only 1 copy
     // So total constructor calls 1 + 1 = 2
     REQUIRE(counter == 2);
+
+    counter = 0;
+    auto& udt4 = udt2;
+    myEvent.publish(udt4);
+
+    // Only copy should be made
+    REQUIRE(counter == 1);
 }
