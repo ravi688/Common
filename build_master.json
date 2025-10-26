@@ -5,6 +5,7 @@
     "dependencies" : [ "bufferlib", "diskmanager" ],
     "release_defines": [ "-DCOMMON_RELEASE" ],
     "debug_defines": [ "-DCOMMON_DEBUG" ],
+    "defines" : [ "-DPREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM" ],
     "install_header_dirs" : [ "include/common" ],
     "include_dirs" : [ "include" ],
     "targets" :
