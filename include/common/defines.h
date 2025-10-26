@@ -102,14 +102,18 @@ typedef struct com_immutable_data_t
 #define FALLTHROUGH __attribute__((fallthrough))
 #define INLINE_FUNCTION inline
 #if defined(__cplusplus) && __cplusplus >= 202302L
-#       include <utility>
-#       define UNREACHABLE() std::unreachable()
+#   include <utility>
+#   define COM_UNREACHABLE() std::unreachable()
 #elif defined(COMPILER_CLANG) || defined(COMPILER_MINGW) || defined(COMPILER_GCC)
-#       define UNREACHABLE() __builtin_unreachable()
+#   define COM_UNREACHABLE() __builtin_unreachable()
 #else
-#       include <cstdlib>
-#       define UNREACHABLE() abort()
+#   include <cstdlib>
+#   define COM_UNREACHABLE() abort()
 #endif
+
+#ifndef PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
+#   define UNREACHABLE() COM_UNREACHABLE()
+#endif // PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
 
 #define DEPRECATED DEPRECATED_FUNCTION
 #define INLINE INLINE_FUNCTION
