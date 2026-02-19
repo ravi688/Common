@@ -1,3 +1,4 @@
+#pragma once
 
 #include <common/Concepts.hpp> // for com::concepts::BufferLike<>
 #include <optional> // for std::optional<>
