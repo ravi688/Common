@@ -41,7 +41,8 @@
                 "source/tests/BitCastBuffer.cpp",
                 "source/tests/NullableRef.cpp",
                 "source/tests/StringUtility.cpp",
-                "source/tests/VisitEnum.cpp"
+                "source/tests/VisitEnum.cpp",
+                "source/tests/DynamicPool.cpp"
             ]
         },
         {
