@@ -338,6 +338,40 @@ main_test = executable('main_test',
 	gnu_symbol_visibility: 'hidden'
 )
 
+# -------------- Target: DynamicPoolFast ------------------
+DynamicPoolFast_sources_bm_internal__ = [
+'source/manual_tests/DynamicPoolFast.cpp'
+]
+DynamicPoolFast_include_dirs_bm_internal__ = [
+
+]
+DynamicPoolFast_dependencies_bm_internal__ = [
+
+]
+DynamicPoolFast_link_args_bm_internal__ = {
+'windows' : [],
+'linux' : [],
+'darwin' : []
+}
+DynamicPoolFast_platform_src_bm_internal__ = {
+'windows' : [],
+'linux' : [],
+'darwin' : []
+}
+DynamicPoolFast_defines_bm_internal__ = [
+
+]
+DynamicPoolFast = executable('DynamicPoolFast',
+	DynamicPoolFast_sources_bm_internal__ + DynamicPoolFast_platform_src_bm_internal__[host_machine.system()] + sources_bm_internal__,
+	dependencies: dependencies_bm_internal__ + DynamicPoolFast_dependencies_bm_internal__,
+	include_directories: [inc_bm_internal__, DynamicPoolFast_include_dirs_bm_internal__],
+	install: false,
+	c_args: DynamicPoolFast_defines_bm_internal__ + project_build_mode_defines_bm_internal__,
+	cpp_args: DynamicPoolFast_defines_bm_internal__ + project_build_mode_defines_bm_internal__, 
+	link_args: DynamicPoolFast_link_args_bm_internal__[host_machine.system()],
+	gnu_symbol_visibility: 'hidden'
+)
+
 # -------------- Target: main ------------------
 main_sources_bm_internal__ = [
 'source/main.cpp'

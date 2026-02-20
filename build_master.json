@@ -46,6 +46,13 @@
                 "source/tests/DynamicPoolFast.cpp"
             ]
         },
+	{
+		"name" : "DynamicPoolFast",
+		"is_executable" : true,
+		"sources" : [
+			"source/manual_tests/DynamicPoolFast.cpp"
+		]
+	},
         {
             "name" : "main",
             "is_executable" : true,
