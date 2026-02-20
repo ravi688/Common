@@ -18,13 +18,12 @@
 #	define DEBUG_LOG_ERROR(...) debug_log("[Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
 #	define DEBUG_LOG_ERROR_EXIT(...) __debug_log_exit("[Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
 #	define DEBUG_LOG_FETAL_ERROR(...) debug_log_break("[Fetal Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
-#else
-#	define COM_DEBUG_LOG_INFO(...) com_debug_log("[Info] ", __LINE__, __FUNCTION__, __FILE__,  __VA_ARGS__)
-#	define COM_DEBUG_LOG_WARNING(...) com_debug_log("[Warning] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
-#	define COM_DEBUG_LOG_ERROR(...) com_debug_log("[Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
-#	define COM_DEBUG_LOG_ERROR_EXIT(...) __com_debug_log_exit("[Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
-#	define COM_DEBUG_LOG_FETAL_ERROR(...) com_debug_log_break("[Fetal Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
 #endif // PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
+#define COM_DEBUG_LOG_INFO(...) com_debug_log("[Info] ", __LINE__, __FUNCTION__, __FILE__,  __VA_ARGS__)
+#define COM_DEBUG_LOG_WARNING(...) com_debug_log("[Warning] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
+#define COM_DEBUG_LOG_ERROR(...) com_debug_log("[Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
+#define COM_DEBUG_LOG_ERROR_EXIT(...) __com_debug_log_exit("[Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
+#define COM_DEBUG_LOG_FETAL_ERROR(...) com_debug_log_break("[Fetal Error] ", __LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
 
 #ifdef COMMON_DEBUG
 #	ifndef PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
@@ -33,13 +32,12 @@
 #		define debug_log_error(...) DEBUG_LOG_ERROR(__VA_ARGS__)
 #   	define debug_log_exit(...) DEBUG_LOG_EXIT(__VA_ARGS__)
 #		define debug_log_fetal_error(...) DEBUG_LOG_FETAL_ERROR(__VA_ARGS__)
-#	else
-#		define com_debug_log_info(...) COM_DEBUG_LOG_INFO(__VA_ARGS__)
-#		define com_debug_log_warning(...) COM_DEBUG_LOG_WARNING(__VA_ARGS__)
-#		define com_debug_log_error(...) COM_DEBUG_LOG_ERROR(__VA_ARGS__)
-#   	define com_debug_log_exit(...) COM_DEBUG_LOG_EXIT(__VA_ARGS__)
-#		define com_debug_log_fetal_error(...) COM_DEBUG_LOG_FETAL_ERROR(__VA_ARGS__)
 #	endif // PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
+#	define com_debug_log_info(...) COM_DEBUG_LOG_INFO(__VA_ARGS__)
+#	define com_debug_log_warning(...) COM_DEBUG_LOG_WARNING(__VA_ARGS__)
+#	define com_debug_log_error(...) COM_DEBUG_LOG_ERROR(__VA_ARGS__)
+#   define com_debug_log_exit(...) COM_DEBUG_LOG_EXIT(__VA_ARGS__)
+#	define com_debug_log_fetal_error(...) COM_DEBUG_LOG_FETAL_ERROR(__VA_ARGS__)
 #else
 #	ifndef PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
 #		define debug_log_info(...)
@@ -47,13 +45,12 @@
 # 		define debug_log_error(...)
 #   	define debug_log_exit(...)
 #		define debug_log_fetal_error(...)
-#	else
-#		define com_debug_log_info(...)
-#		define com_debug_log_warning(...)
-# 		define com_debug_log_error(...)
-#   	define com_debug_log_exit(...)
-#		define com_debug_log_fetal_error(...)
 #	endif // PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
+#	define com_debug_log_info(...)
+#	define com_debug_log_warning(...)
+# 	define com_debug_log_error(...)
+#   define com_debug_log_exit(...)
+#	define com_debug_log_fetal_error(...)
 #endif
 
 #ifdef COM_VERBOSE
@@ -64,14 +61,13 @@
 #		define DEBUG_LOG_INFO_VERBOSE(...) DEBUG_LOG_INFO(__VA_ARGS__)
 #		define DEBUG_LOG_WARNING_VERBOSE(...) DEBUG_LOG_WARNING(__VA_ARGS__)
 #		define DEBUG_LOG_ERROR_VERBOSE(...) DEBUG_LOG_ERROR(__VA_ARGS__)
-#	else
-#		define com_debug_log_info_verbose(...) com_debug_log_info(__VA_ARGS__)
-#		define com_debug_log_warning_verbose(...) com_debug_log_warning(__VA_ARGS__)
-#		define com_debug_log_error_verbose(...) com_debug_log_error(__VA_ARGS__)
-#		define COM_DEBUG_LOG_INFO_VERBOSE(...) COM_DEBUG_LOG_INFO(__VA_ARGS__)
-#		define COM_DEBUG_LOG_WARNING_VERBOSE(...) COM_DEBUG_LOG_WARNING(__VA_ARGS__)
-#		define COM_DEBUG_LOG_ERROR_VERBOSE(...) COM_DEBUG_LOG_ERROR(__VA_ARGS__)
 #	endif // PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
+#	define com_debug_log_info_verbose(...) com_debug_log_info(__VA_ARGS__)
+#	define com_debug_log_warning_verbose(...) com_debug_log_warning(__VA_ARGS__)
+#	define com_debug_log_error_verbose(...) com_debug_log_error(__VA_ARGS__)
+#	define COM_DEBUG_LOG_INFO_VERBOSE(...) COM_DEBUG_LOG_INFO(__VA_ARGS__)
+#	define COM_DEBUG_LOG_WARNING_VERBOSE(...) COM_DEBUG_LOG_WARNING(__VA_ARGS__)
+#	define COM_DEBUG_LOG_ERROR_VERBOSE(...) COM_DEBUG_LOG_ERROR(__VA_ARGS__)
 #else
 #	ifndef PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
 #		define debug_log_info_verbose(...)
@@ -80,14 +76,13 @@
 #		define DEBUG_LOG_INFO_VERBOSE(...)
 #		define DEBUG_LOG_WARNING_VERBOSE(...)
 #		define DEBUG_LOG_ERROR_VERBOSE(...)
-#	else
-#		define com_debug_log_info_verbose(...)
-#		define com_debug_log_warning_verbose(...)
-#		define com_debug_log_error_verbose(...)
-#		define COM_DEBUG_LOG_INFO_VERBOSE(...)
-#		define COM_DEBUG_LOG_WARNING_VERBOSE(...)
-#		define COM_DEBUG_LOG_ERROR_VERBOSE(...)
 #	endif // PREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM
+#	define com_debug_log_info_verbose(...)
+#	define com_debug_log_warning_verbose(...)
+#	define com_debug_log_error_verbose(...)
+#	define COM_DEBUG_LOG_INFO_VERBOSE(...)
+#	define COM_DEBUG_LOG_WARNING_VERBOSE(...)
+#	define COM_DEBUG_LOG_ERROR_VERBOSE(...)
 #endif
 
 
