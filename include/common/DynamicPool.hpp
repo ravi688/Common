@@ -12,13 +12,14 @@
 namespace com
 {
 	template<typename T>
-	class DynamicPool final
+	class DynamicPool
 	{
 	public:
 		typedef std::function<T()> OnCreate;
 		typedef std::function<void(T&)> OnDestroy;
 		typedef std::function<void(T&)> OnReturn;
 		typedef std::function<void(T&)> OnRecycle;
+		typedef std::function<typename std::vector<T>::iterator(const T&)> FindValueCallback;
 
 	private:
 		std::vector<T> m_storage;
@@ -29,6 +30,18 @@ namespace com
 		OnRecycle m_onRecycle;
 
 		typename std::vector<T>::iterator getLastActive() noexcept;
+
+	protected:
+		void put_(T value, FindValueCallback findValueCallback) noexcept;
+
+		std::vector<T>& getStorage() { return m_storage; }
+
+		void setOnCreate(OnCreate onCreate) { m_onCreate = onCreate; }
+		void setOnDestroy(OnDestroy onDestroy) { m_onDestroy = onDestroy; }
+		void setOnReturn(OnReturn onReturn) { m_onReturn = onReturn; }
+		void setOnRecycle(OnRecycle onRecycle) { m_onRecycle = onRecycle; }
+
+		DynamicPool(OnDestroy onDestroy = [](T&) { }, OnReturn onReturn = [](T&) { }, OnRecycle onRecycle = [](T&) { }) noexcept;
 
 	public:
 		DynamicPool(OnCreate onCreate, OnDestroy onDestroy = [](T&) { }, 
@@ -63,6 +76,12 @@ namespace com
 			return { begin, std::next(begin, m_activeCount) };
 		}
 	};
+
+	template<typename T>
+	DynamicPool<T>::DynamicPool(OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle) noexcept : m_activeCount(0),
+																										m_onDestroy(onDestroy),
+																										m_onReturn(onReturn),
+																										m_onRecycle(onRecycle) { }
 
 
 	template<typename T>
@@ -136,20 +155,31 @@ namespace com
 	template<typename T>
 	void DynamicPool<T>::put(T value) noexcept
 	{
+		put_(value, [this](const T& value)
+			{
+				auto lastActive = getLastActive();
+				return std::find(m_storage.begin(), lastActive, value);;
+			});
+	}
+
+	template<typename T>
+	void DynamicPool<T>::put_(T value, FindValueCallback findValueCallback) noexcept
+	{
 		_com_assert(m_activeCount > 0);
 
 		// Check if such value was ever taken out of the pool
 		auto lastActive = getLastActive();
-		auto it = std::find(m_storage.begin(), lastActive, value);
+		auto it = findValueCallback(value);
 		if(it == m_storage.end())
 		{
-			debug_log_error("No such value ever gotten from the pool, but you're still trying to return/put back into it");
+			com_debug_log_error("No such value ever gotten from the pool, but you're still trying to return/put back into it");
 			return;
 		}
+		*it = std::move(value);
 
 		// If yes then swap this value with the last active value
 		std::swap(*it, *lastActive);
-		m_onReturn(value);
+		m_onReturn(*lastActive);
 		--m_activeCount;
 	}
 

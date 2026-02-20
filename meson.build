@@ -55,7 +55,7 @@ project('Common', 'c', 'cpp',
 
 # Defines
 defines_bm_internal__ = [
-
+'-DPREFIX_MACROS_AND_QUALIFY_SYMBOLS_WITH_COM'
 ]
 
 # Release Build Defines
@@ -305,7 +305,8 @@ main_test_sources_bm_internal__ = [
 'source/tests/NullableRef.cpp',
 'source/tests/StringUtility.cpp',
 'source/tests/VisitEnum.cpp',
-'source/tests/DynamicPool.cpp'
+'source/tests/DynamicPool.cpp',
+'source/tests/DynamicPoolFast.cpp'
 ]
 main_test_include_dirs_bm_internal__ = [
 
