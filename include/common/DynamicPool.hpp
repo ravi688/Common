@@ -217,6 +217,7 @@ namespace com
 		_com_assert(count >= m_storage.size());
 
 		auto diff = count - m_storage.size();
+		m_storage.reserve(count);
 		for(std::size_t i = 0; i < diff; ++i)
 		{
 			m_storage.push_back(m_onCreate());
