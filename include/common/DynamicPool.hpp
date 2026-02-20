@@ -2,6 +2,7 @@
 
 #include <common/defines.hpp>
 #include <common/assert.h> // for _com_assert
+#include <common/debug.h> // for debug_log_error()
 
 #include <functional> // for std::function
 #include <utility> // for std::swap
@@ -30,7 +31,11 @@ namespace com
 		typename std::vector<T>::iterator getLastActive() noexcept;
 
 	public:
-		DynamicPool(OnCreate onCreate, OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle, bool isReturn = false, std::size_t initialCount = 0) noexcept;
+		DynamicPool(OnCreate onCreate, OnDestroy onDestroy = [](T&) { }, 
+										OnReturn onReturn = [](T&) { }, 
+										OnRecycle onRecycle = [](T&) { }, 
+										bool isReturn = false, 
+										std::size_t initialCount = 0) noexcept;
 		DynamicPool(DynamicPool&& pool) noexcept;
 		~DynamicPool() noexcept;
 
@@ -61,16 +66,17 @@ namespace com
 
 
 	template<typename T>
-	DynamicPool<T>::DynamicPool(OnCreate onCreate, OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle, bool isReturn, std::size_t initialCount) noexcept : m_storage(initialCount), 
+	DynamicPool<T>::DynamicPool(OnCreate onCreate, OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle, bool isReturn, std::size_t initialCount) noexcept : 
 																																				m_activeCount(0),
 																																				m_onCreate(onCreate),
 																																				m_onDestroy(onDestroy),
 																																				m_onReturn(onReturn),
 																																				m_onRecycle(onRecycle)
 	{
-		for(std::size_t i = 0; i < m_storage.size(); ++i)
+		m_storage.reserve(initialCount);
+		for(std::size_t i = 0; i < initialCount; ++i)
 		{
-			m_storage[i] = onCreate();
+			m_storage.push_back(onCreate());
 			if(isReturn)
 				m_onReturn(m_storage[i]);
 		}
