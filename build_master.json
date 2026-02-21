@@ -53,6 +53,13 @@
 			"source/manual_tests/DynamicPoolFast.cpp"
 		]
 	},
+    {
+        "name" : "ProducerConsumerBuffer",
+        "is_executable" : true,
+        "sources" : [
+            "source/manual_tests/ProducerConsumerBuffer.cpp"
+        ]
+    },
         {
             "name" : "main",
             "is_executable" : true,

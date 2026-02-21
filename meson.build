@@ -372,6 +372,40 @@ DynamicPoolFast = executable('DynamicPoolFast',
 	gnu_symbol_visibility: 'hidden'
 )
 
+# -------------- Target: ProducerConsumerBuffer ------------------
+ProducerConsumerBuffer_sources_bm_internal__ = [
+'source/manual_tests/ProducerConsumerBuffer.cpp'
+]
+ProducerConsumerBuffer_include_dirs_bm_internal__ = [
+
+]
+ProducerConsumerBuffer_dependencies_bm_internal__ = [
+
+]
+ProducerConsumerBuffer_link_args_bm_internal__ = {
+'windows' : [],
+'linux' : [],
+'darwin' : []
+}
+ProducerConsumerBuffer_platform_src_bm_internal__ = {
+'windows' : [],
+'linux' : [],
+'darwin' : []
+}
+ProducerConsumerBuffer_defines_bm_internal__ = [
+
+]
+ProducerConsumerBuffer = executable('ProducerConsumerBuffer',
+	ProducerConsumerBuffer_sources_bm_internal__ + ProducerConsumerBuffer_platform_src_bm_internal__[host_machine.system()] + sources_bm_internal__,
+	dependencies: dependencies_bm_internal__ + ProducerConsumerBuffer_dependencies_bm_internal__,
+	include_directories: [inc_bm_internal__, ProducerConsumerBuffer_include_dirs_bm_internal__],
+	install: false,
+	c_args: ProducerConsumerBuffer_defines_bm_internal__ + project_build_mode_defines_bm_internal__,
+	cpp_args: ProducerConsumerBuffer_defines_bm_internal__ + project_build_mode_defines_bm_internal__, 
+	link_args: ProducerConsumerBuffer_link_args_bm_internal__[host_machine.system()],
+	gnu_symbol_visibility: 'hidden'
+)
+
 # -------------- Target: main ------------------
 main_sources_bm_internal__ = [
 'source/main.cpp'
