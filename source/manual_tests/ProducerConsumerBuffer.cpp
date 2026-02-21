@@ -4,8 +4,11 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <lock_guard>
 
 #include <iostream>
+
+std::mutex randomTimeMutex;
 
 int getRandomNumber()
 {
@@ -24,6 +27,7 @@ int getRandomTime()
 	static std::default_random_engine e1(r());
 	static std::uniform_int_distribution<int> uniform_dist(100, 1000);
 
+	std::lock_guard<std::mutex> lock(randomTimeMutex);
 	int value = uniform_dist(e1);
 
 	return value;
