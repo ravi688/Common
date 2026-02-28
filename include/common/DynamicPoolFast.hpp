@@ -72,7 +72,8 @@ namespace com
 		{
 			DynamicPool<DynamicPoolFastElement<T>>::setOnCreate([this]()
 			{
-				return com::DynamicPoolFastElement<T> { std::move(m_onCreate()), m_counter++ };
+				// NOTE: we can't do std::move(m_onCreate()) as move on temporary objects prevents copy elision
+				return com::DynamicPoolFastElement<T> { m_onCreate(), m_counter++ };
 			});
 			DynamicPool<DynamicPoolFastElement<T>>::setOnDestroy([this](DynamicPoolFastElement<T>& el)
 			{
