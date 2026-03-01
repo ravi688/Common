@@ -440,6 +440,40 @@ ThreadNaming = executable('ThreadNaming',
 	gnu_symbol_visibility: 'hidden'
 )
 
+# -------------- Target: Pipeline ------------------
+Pipeline_sources_bm_internal__ = [
+'source/manual_tests/Pipeline.cpp'
+]
+Pipeline_include_dirs_bm_internal__ = [
+
+]
+Pipeline_dependencies_bm_internal__ = [
+
+]
+Pipeline_link_args_bm_internal__ = {
+'windows' : [],
+'linux' : [],
+'darwin' : []
+}
+Pipeline_platform_src_bm_internal__ = {
+'windows' : [],
+'linux' : [],
+'darwin' : []
+}
+Pipeline_defines_bm_internal__ = [
+
+]
+Pipeline = executable('Pipeline',
+	Pipeline_sources_bm_internal__ + Pipeline_platform_src_bm_internal__[host_machine.system()] + sources_bm_internal__,
+	dependencies: dependencies_bm_internal__ + Pipeline_dependencies_bm_internal__,
+	include_directories: [inc_bm_internal__, Pipeline_include_dirs_bm_internal__],
+	install: false,
+	c_args: Pipeline_defines_bm_internal__ + project_build_mode_defines_bm_internal__,
+	cpp_args: Pipeline_defines_bm_internal__ + project_build_mode_defines_bm_internal__, 
+	link_args: Pipeline_link_args_bm_internal__[host_machine.system()],
+	gnu_symbol_visibility: 'hidden'
+)
+
 # -------------- Target: main ------------------
 main_sources_bm_internal__ = [
 'source/main.cpp'
