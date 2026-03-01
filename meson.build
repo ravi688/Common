@@ -70,7 +70,7 @@ debug_defines_bm_internal__ = [
 
 # Source files (common to all targets)
 sources_bm_internal__ = files(
-'source/Bool.cpp', 'source/Formatters.cpp', 'source/Utility.cpp', 'source/allocation_callbacks.c', 'source/binary_reader.c', 'source/binary_writer.c', 'source/debug.c', 'source/debug.cpp', 'source/defines.cpp', 'source/id_generator.c', 'source/iterator.c', 'source/static_string.c', 'source/string.c', 'source/utility.c', 'source/hash_table.c', 'source/hash_function.c', 'source/comparer.c', 'source/multi_buffer.c', 'source/dictionary.c'
+'source/ThreadNaming.cpp', 'source/Bool.cpp', 'source/Formatters.cpp', 'source/Utility.cpp', 'source/allocation_callbacks.c', 'source/binary_reader.c', 'source/binary_writer.c', 'source/debug.c', 'source/debug.cpp', 'source/defines.cpp', 'source/id_generator.c', 'source/iterator.c', 'source/static_string.c', 'source/string.c', 'source/utility.c', 'source/hash_table.c', 'source/hash_function.c', 'source/comparer.c', 'source/multi_buffer.c', 'source/dictionary.c'
 )
 
 # Include directories
@@ -403,6 +403,40 @@ ProducerConsumerBuffer = executable('ProducerConsumerBuffer',
 	c_args: ProducerConsumerBuffer_defines_bm_internal__ + project_build_mode_defines_bm_internal__,
 	cpp_args: ProducerConsumerBuffer_defines_bm_internal__ + project_build_mode_defines_bm_internal__, 
 	link_args: ProducerConsumerBuffer_link_args_bm_internal__[host_machine.system()],
+	gnu_symbol_visibility: 'hidden'
+)
+
+# -------------- Target: ThreadNaming ------------------
+ThreadNaming_sources_bm_internal__ = [
+'source/manual_tests/ThreadNaming.cpp'
+]
+ThreadNaming_include_dirs_bm_internal__ = [
+
+]
+ThreadNaming_dependencies_bm_internal__ = [
+
+]
+ThreadNaming_link_args_bm_internal__ = {
+'windows' : [],
+'linux' : [],
+'darwin' : []
+}
+ThreadNaming_platform_src_bm_internal__ = {
+'windows' : [],
+'linux' : [],
+'darwin' : []
+}
+ThreadNaming_defines_bm_internal__ = [
+
+]
+ThreadNaming = executable('ThreadNaming',
+	ThreadNaming_sources_bm_internal__ + ThreadNaming_platform_src_bm_internal__[host_machine.system()] + sources_bm_internal__,
+	dependencies: dependencies_bm_internal__ + ThreadNaming_dependencies_bm_internal__,
+	include_directories: [inc_bm_internal__, ThreadNaming_include_dirs_bm_internal__],
+	install: false,
+	c_args: ThreadNaming_defines_bm_internal__ + project_build_mode_defines_bm_internal__,
+	cpp_args: ThreadNaming_defines_bm_internal__ + project_build_mode_defines_bm_internal__, 
+	link_args: ThreadNaming_link_args_bm_internal__[host_machine.system()],
 	gnu_symbol_visibility: 'hidden'
 )
 
