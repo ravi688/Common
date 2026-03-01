@@ -12,7 +12,7 @@ namespace com
 		std::memcpy(nullTermFilePath, filePath.data(), filePath.size());
 		nullTermFilePath[filePath.size()] = 0;
 		buffer_t* fileData = load_binary_from_file(nullTermFilePath);
-		if(fileData)
+		if(!fileData)
 			return { };
 		auto freeCallback = buf_get_free_callback(fileData);
 		auto freeUserData = buf_get_malloc_callback_user_data(fileData);
@@ -27,7 +27,7 @@ namespace com
 		std::memcpy(nullTermFilePath, filePath.data(), filePath.size());
 		nullTermFilePath[filePath.size()] = 0;
 		buffer_t* fileData = load_text_from_file(nullTermFilePath);
-		if(fileData)
+		if(!fileData)
 			return { };
 		auto freeCallback = buf_get_free_callback(fileData);
 		auto freeUserData = buf_get_malloc_callback_user_data(fileData);
