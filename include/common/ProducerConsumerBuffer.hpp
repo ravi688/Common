@@ -38,6 +38,12 @@ namespace com
 		// The internal buffer will expand unboundedly by default
 		ProducerConsumerBuffer(std::size_t maxCount = std::numeric_limits<std::size_t>::max()) : m_maxCount(maxCount) { }
 
+		bool isEmpty()
+		{
+			std::lock_guard<std::mutex> lock(m_mutex);
+			return m_storage.size() == 0;
+		}
+
 		void push(T&& value)
 		{
 			auto lock = acquirePushLock();

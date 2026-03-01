@@ -4,6 +4,7 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <cassert>
 
 #include <iostream>
 
@@ -70,6 +71,7 @@ void thread2Handler(com::ProducerConsumerBuffer<int>& buffer)
 int main()
 {
 	com::ProducerConsumerBuffer<int> m_buffer(10);
+	assert(m_buffer.isEmpty());
 	std::thread thread1(thread1Handler, std::ref(m_buffer));
 	std::thread thread2(thread2Handler, std::ref(m_buffer));
 	thread1.join();
