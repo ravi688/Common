@@ -67,6 +67,13 @@
             "source/manual_tests/ThreadNaming.cpp"
         ]
     },
+    {
+        "name" : "Pipeline",
+        "is_executable" : true,
+        "sources" : [
+            "source/manual_tests/Pipeline.cpp"
+        ]
+    },
         {
             "name" : "main",
             "is_executable" : true,

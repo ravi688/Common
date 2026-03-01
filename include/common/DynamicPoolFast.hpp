@@ -2,6 +2,8 @@
 
 #include <common/DynamicPool.hpp>
 
+#include <type_traits>
+
 namespace com
 {
 	template<typename T>
@@ -17,6 +19,8 @@ namespace com
 		std::size_t getIndex() const noexcept { return m_index; }
 		T& getValue() { return m_value; }
 	public:
+		DynamicPoolFastElement() requires std::is_default_constructible_v<T>
+		{ }
 		DynamicPoolFastElement(T value, std::size_t index) : m_value(std::move(value)), m_index(index) { }
 
 		DynamicPoolFastElement(DynamicPoolFastElement&& el) : m_value(std::move(el.m_value)), m_index(el.m_index) { }
