@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <thread>
+#include <mutex>
 #include <vector>
 #include <random>
 #include <cassert>
@@ -29,6 +30,9 @@ struct Context
 {
 	com::DynamicPoolFast<int> pool12;
 	com::DynamicPoolFast<int> pool23;
+
+	std::mutex pool12Mutex;
+	std::mutex pool23Mutex;
 
 	com::ProducerConsumerBuffer<com::DynamicPoolFast<int>::ElementType> pipe1;
 	com::ProducerConsumerBuffer<com::DynamicPoolFast<int>::ElementType> pipe2;
@@ -70,7 +74,11 @@ static void pipe1Process()
 	auto dataCount = gDataCount;
 	while(dataCount)
 	{
-		auto value = gContext.pool12.get();
+		com::DynamicPoolFast<int>::ElementType value;
+		{
+			std::lock_guard<std::mutex> lock(gContext.pool12Mutex);
+			value = gContext.pool12.get();	
+		} 
 		_pipe1Process(value);
 		gContext.pipe1.push(value);
 		--dataCount;
@@ -91,14 +99,21 @@ static void pipe2Process()
 		auto value = gContext.pipe1.pop();
 
 		// Process it
-		auto value2 = gContext.pool23.get();
+		com::DynamicPoolFast<int>::ElementType value2;
+		{
+			std::lock_guard<std::mutex> lock(gContext.pool23Mutex);
+			value2 = gContext.pool23.get();
+		}
 		_pipe2Process(value, value2);
 		
 		// Push the output of pipe2
 		gContext.pipe2.push(value2);
 
 		// Return the output of pipe1 back to pipe1's pool
-		gContext.pool12.putFast(value);
+		{
+			std::lock_guard<std::mutex> lock(gContext.pool12Mutex);
+			gContext.pool12.putFast(value);
+		}
 		--dataCount;
 	}
 }
@@ -114,7 +129,10 @@ static void pipe3Process()
 		gProcessedRandomNumberList.push_back(*value);
 
 		// Return the output of pipe2 back to pipe2's pool
-		gContext.pool23.putFast(value);
+		{
+			std::lock_guard<std::mutex> lock(gContext.pool23Mutex);
+			gContext.pool23.putFast(value);
+		}
 		--dataCount;
 	}
 }
