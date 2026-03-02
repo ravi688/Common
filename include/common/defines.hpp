@@ -803,6 +803,17 @@ namespace com
 		for(typename std::underlying_type<EnumClassType>::type i = com::to_underlying(startSentinel); i < com::to_underlying(endSentinel); ++i)
 			visitor(IntToEnumClass<EnumClassType>(i));
 	}
+
+	// Example:
+	// window.present(com::span_cast<const u8>(fileData1.span()));
+	// This function casts one type of std::span() to another type
+	template<typename To, typename From>
+	std::span<To> span_cast(std::span<From> s)
+	{
+	    static_assert(sizeof(To) == sizeof(From));
+	    return { reinterpret_cast<To*>(s.data()), s.size() };
+	}
+
 }
 
 
