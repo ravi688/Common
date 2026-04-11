@@ -32,7 +32,8 @@ namespace com
 		typename std::vector<T>::iterator getLastActive() noexcept;
 
 	protected:
-		void put_(T value, FindValueCallback findValueCallback) noexcept;
+		template<typename SwapFn>
+		void put_(T value, FindValueCallback findValueCallback, SwapFn swap) noexcept;
 
 		std::vector<T>& getStorage() { return m_storage; }
 
@@ -159,11 +160,13 @@ namespace com
 			{
 				auto lastActiveEnd = std::next(getLastActive(), 1);
 				return std::find(m_storage.begin(), lastActiveEnd, value);;
-			});
+			},
+			[](auto&& a, auto&& b) { std::swap(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b)); });
 	}
 
 	template<typename T>
-	void DynamicPool<T>::put_(T value, FindValueCallback findValueCallback) noexcept
+	template<typename SwapFn>
+	void DynamicPool<T>::put_(T value, FindValueCallback findValueCallback, SwapFn swap) noexcept
 	{
 		_com_assert(m_activeCount > 0);
 
@@ -178,7 +181,7 @@ namespace com
 		*it = std::move(value);
 
 		// If yes then swap this value with the last active value
-		std::swap(*it, *lastActive);
+		swap(*it, *lastActive);
 		m_onReturn(*lastActive);
 		--m_activeCount;
 	}
