@@ -157,8 +157,8 @@ namespace com
 	{
 		put_(value, [this](const T& value)
 			{
-				auto lastActive = getLastActive();
-				return std::find(m_storage.begin(), lastActive, value);;
+				auto lastActiveEnd = std::next(getLastActive(), 1);
+				return std::find(m_storage.begin(), lastActiveEnd, value);;
 			});
 	}
 
