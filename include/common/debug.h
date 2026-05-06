@@ -98,3 +98,12 @@ COMMON_API NO_RETURN_FUNCTION void __com_debug_log_exit(const char* description,
 COMMON_API void com_debug_log_break(const char* description, u32 line, const char* function, const char* file, const char* format, ...);
 
 END_CPP_COMPATIBLE
+
+
+// The following macro definitions correct the meaning of COM_DEBUG_* macros, the macros in uppercase letters are meant to be visible in release and debug mode both
+// For doing logging in release mode
+#define com_log_info(...) COM_DEBUG_LOG_INFO(__VA_ARGS__)
+#define com_log_warning(...) COM_DEBUG_LOG_WARNING(__VA_ARGS__)
+#define com_log_error(...) COM_DEBUG_LOG_ERROR(__VA_ARGS__)
+#define com_log_exit(...) COM_DEBUG_LOG_EXIT(__VA_ARGS__)
+#define com_log_fetal_error(...) COM_DEBUG_LOG_FETAL_ERROR(__VA_ARGS__)
