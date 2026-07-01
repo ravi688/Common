@@ -45,6 +45,9 @@ namespace com
 			return m_index == rhs.m_index;
 		}
 
+		operator T&() { return m_value; }
+		operator const T&() const { return m_value; }
+
 		T* operator->() { return &m_value; }
 
 		T& operator*() { return m_value; }
