@@ -6,6 +6,28 @@
 
 // Standard Headers
 #include <vector>
+#include <span>
+
+TEST_CASE("std::span on DynamicPool<>", "[DynamicPool-stdspan]")
+{
+    com::DynamicPool<std::span<u8>> pool([]()
+    {
+        static std::size_t counter = 0;
+        ++counter;
+        return std::span<u8>(static_cast<u8*>(nullptr), std::size_t(counter));
+    }, [](std::span<u8>& s1, std::span<u8>& s2) -> bool
+    {
+        return s1.size() == s2.size();
+    });
+
+    REQUIRE(pool.get().size() == 1);
+    REQUIRE(pool.get().size() == 2);
+    pool.put(std::span<u8>(static_cast<u8*>(nullptr), std::size_t(1)));
+    REQUIRE(pool.get().size() == 1);
+    REQUIRE(pool.get().size() == 3);
+    pool.put(std::span<u8>(static_cast<u8*>(nullptr), std::size_t(3)));
+    REQUIRE(pool.get().size() == 3);
+}
 
 TEST_CASE("Simple tests on DynamicPool<>", "[DynamicPool-Simple]" )
 {

@@ -19,6 +19,7 @@ namespace com
 		typedef std::function<void(T&)> OnDestroy;
 		typedef std::function<void(T&)> OnReturn;
 		typedef std::function<void(T&)> OnRecycle;
+		typedef std::function<bool(T&, T&)> OnEqual;
 		typedef std::function<typename std::vector<T>::iterator(const T&)> FindValueCallback;
 		using ElementType = T;
 
@@ -26,6 +27,7 @@ namespace com
 		std::vector<T> m_storage;
 		std::size_t m_activeCount;
 		OnCreate m_onCreate;
+		OnEqual m_onEqual;
 		OnDestroy m_onDestroy;
 		OnReturn m_onReturn;
 		OnRecycle m_onRecycle;
@@ -46,9 +48,9 @@ namespace com
 		DynamicPool(OnDestroy onDestroy = [](T&) { }, OnReturn onReturn = [](T&) { }, OnRecycle onRecycle = [](T&) { }) noexcept;
 
 	public:
-		DynamicPool(OnCreate onCreate, OnDestroy onDestroy = [](T&) { }, 
+		DynamicPool(OnCreate onCreate, OnEqual onEqual = nullptr, OnDestroy onDestroy = [](T&) { }, 
 										OnReturn onReturn = [](T&) { }, 
-										OnRecycle onRecycle = [](T&) { }, 
+										OnRecycle onRecycle = [](T&) { },
 										bool isReturn = false, 
 										std::size_t initialCount = 0) noexcept;
 		DynamicPool(DynamicPool&& pool) noexcept;
@@ -87,9 +89,10 @@ namespace com
 
 
 	template<typename T>
-	DynamicPool<T>::DynamicPool(OnCreate onCreate, OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle, bool isReturn, std::size_t initialCount) noexcept : 
+	DynamicPool<T>::DynamicPool(OnCreate onCreate, OnEqual onEqual, OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle, bool isReturn, std::size_t initialCount) noexcept : 
 																																				m_activeCount(0),
 																																				m_onCreate(onCreate),
+																																				m_onEqual(onEqual),
 																																				m_onDestroy(onDestroy),
 																																				m_onReturn(onReturn),
 																																				m_onRecycle(onRecycle)
@@ -109,7 +112,8 @@ namespace com
 																m_onCreate(std::move(m_onCreate)),
 																m_onDestroy(std::move(m_onDestroy)),
 																m_onReturn(std::move(m_onReturn)),
-																m_onRecycle(std::move(m_onRecycle))
+																m_onRecycle(std::move(m_onRecycle)),
+																m_onEqual(std::move(m_onEqual))
 	{
 
 	}
@@ -129,6 +133,7 @@ namespace com
 		m_onDestroy = pool.m_onDestroy;
 		m_onReturn = pool.m_onReturn;
 		m_onRecycle = pool.m_onRecycle;
+		m_onEqual = pool.m_onEqual;
 		return *this;
 	}
 
@@ -154,13 +159,32 @@ namespace com
 		return std::next(m_storage.begin(), m_activeCount - 1);
 	}
 
+	decltype(auto) findOnEqual(auto itbegin, auto itend, auto value, auto onEqual)
+	{
+		for(auto it = itbegin; it != itend; ++it)
+			if(onEqual(*it, value))
+				return it;
+		return itend;
+	}
+
 	template<typename T>
 	void DynamicPool<T>::put(T value) noexcept
 	{
 		put_(value, [this](const T& value)
 			{
 				auto lastActiveEnd = std::next(getLastActive(), 1);
-				return std::find(m_storage.begin(), lastActiveEnd, value);;
+				if constexpr(std::equality_comparable<T>)
+				{
+					// I don't trust if(m_onEqual)
+					if(m_onEqual != nullptr)
+						return findOnEqual(m_storage.begin(), lastActiveEnd, value, m_onEqual);
+					return std::find(m_storage.begin(), lastActiveEnd, value);;
+				}
+				else
+				{
+					_com_assert(m_onEqual != nullptr);
+					return findOnEqual(m_storage.begin(), lastActiveEnd, value, m_onEqual);
+				}
 			},
 			[](auto&& a, auto&& b) { std::swap(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b)); });
 	}
