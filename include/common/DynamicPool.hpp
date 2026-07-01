@@ -20,6 +20,7 @@ namespace com
 		typedef std::function<void(T&)> OnReturn;
 		typedef std::function<void(T&)> OnRecycle;
 		typedef std::function<typename std::vector<T>::iterator(const T&)> FindValueCallback;
+		using ElementType = T;
 
 	private:
 		std::vector<T> m_storage;

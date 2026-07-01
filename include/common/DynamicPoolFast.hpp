@@ -55,7 +55,6 @@ namespace com
 	class DynamicPoolFast : public DynamicPool<DynamicPoolFastElement<T>>
 	{
 	public:
-		using ElementType = DynamicPoolFastElement<T>;
 		using OnCreate = std::function<T()>;
 		using OnDestroy = std::function<void(T&)>;
 		using OnReturn = std::function<void(T&)>;
@@ -96,7 +95,7 @@ namespace com
 		}
 
 		// Constant time complexity
-		void putFast(DynamicPoolFastElement<T> el)
+		void put(DynamicPoolFastElement<T> el)
 		{
 			DynamicPool<DynamicPoolFastElement<T>>::put_(std::move(el), [this](const DynamicPoolFastElement<T>& el)
 				{

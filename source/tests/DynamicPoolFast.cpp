@@ -119,7 +119,7 @@ TEST_CASE("Putfast tests", "[DynamicPoolFast-PutFast]")
         return counter++;
     });
 
-    SECTION("Modified state parameters check, putFast()")
+    SECTION("Modified state parameters check, put()")
     {
         auto v1 = pool.get();
         REQUIRE(pool.activeCount() == 1);
@@ -137,7 +137,7 @@ TEST_CASE("Putfast tests", "[DynamicPoolFast-PutFast]")
         REQUIRE(std::next(pool.begin(), 3) == pool.end());
         REQUIRE(std::next(pool.getActives().begin(), 3) == pool.getActives().end());
 
-        pool.putFast(v1);
+        pool.put(v1);
         REQUIRE(pool.activeCount() == 2);
         REQUIRE(pool.size() == 3);
         REQUIRE(pool.begin() != pool.end());
@@ -195,7 +195,7 @@ TEST_CASE("Putfast tests", "[DynamicPoolFast-PutFast]")
         REQUIRE(std::next(pool.getActives().begin(), 6) == pool.getActives().end());
 
         for(int i = 0; i < 6; ++i)
-            pool.putFast(v[i]);
+            pool.put(v[i]);
 
         REQUIRE(pool.activeCount() == 0);
         REQUIRE(pool.size() == 10);

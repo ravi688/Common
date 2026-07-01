@@ -112,7 +112,7 @@ static void pipe2Process()
 		// Return the output of pipe1 back to pipe1's pool
 		{
 			std::lock_guard<std::mutex> lock(gContext.pool12Mutex);
-			gContext.pool12.putFast(value);
+			gContext.pool12.put(value);
 		}
 		--dataCount;
 	}
@@ -131,7 +131,7 @@ static void pipe3Process()
 		// Return the output of pipe2 back to pipe2's pool
 		{
 			std::lock_guard<std::mutex> lock(gContext.pool23Mutex);
-			gContext.pool23.putFast(value);
+			gContext.pool23.put(value);
 		}
 		--dataCount;
 	}

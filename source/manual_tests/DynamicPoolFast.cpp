@@ -8,8 +8,11 @@
 
 #include <common/DynamicPoolFast.hpp>
 
+#include <concepts> // for std::same_as_v
+
 int main()
 {
+	static_assert(std::same_as<com::DynamicPoolFast<int>::ElementType, com::DynamicPoolFastElement<int>>);
 	com::DynamicPoolFast<int> myPool([]()
 			{
 				static int counter = 0;
@@ -22,7 +25,7 @@ int main()
 		v.push_back(myPool.get());
 
 	for(int i = 0; i < 50; ++i)
-		myPool.putFast(v[i]);
+		myPool.put(v[i]);
 
 	for(int i = 0; i < 100; ++i)
 	{
@@ -33,7 +36,7 @@ int main()
 		}
 		for(int j = 0; j < 50; ++j)
 		{
-			myPool.putFast(v[j]);
+			myPool.put(v[j]);
 		}
 	}
 	return 0;
