@@ -15,7 +15,7 @@ TEST_CASE("std::span on DynamicPool<>", "[DynamicPool-stdspan]")
         static std::size_t counter = 0;
         ++counter;
         return std::span<u8>(static_cast<u8*>(nullptr), std::size_t(counter));
-    }, [](std::span<u8>& s1, std::span<u8>& s2) -> bool
+    }, nullptr, nullptr, nullptr, [](std::span<u8>& s1, std::span<u8>& s2) -> bool
     {
         return s1.size() == s2.size();
     });

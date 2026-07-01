@@ -27,10 +27,10 @@ namespace com
 		std::vector<T> m_storage;
 		std::size_t m_activeCount;
 		OnCreate m_onCreate;
-		OnEqual m_onEqual;
 		OnDestroy m_onDestroy;
 		OnReturn m_onReturn;
 		OnRecycle m_onRecycle;
+		OnEqual m_onEqual;
 
 		typename std::vector<T>::iterator getLastActive() noexcept;
 
@@ -45,14 +45,18 @@ namespace com
 		void setOnReturn(OnReturn onReturn) { m_onReturn = onReturn; }
 		void setOnRecycle(OnRecycle onRecycle) { m_onRecycle = onRecycle; }
 
-		DynamicPool(OnDestroy onDestroy = [](T&) { }, OnReturn onReturn = [](T&) { }, OnRecycle onRecycle = [](T&) { }) noexcept;
+		DynamicPool(OnDestroy onDestroy = nullptr,
+					OnReturn onReturn = nullptr,
+					OnRecycle onRecycle = nullptr) noexcept;
 
 	public:
-		DynamicPool(OnCreate onCreate, OnEqual onEqual = nullptr, OnDestroy onDestroy = [](T&) { }, 
-										OnReturn onReturn = [](T&) { }, 
-										OnRecycle onRecycle = [](T&) { },
-										bool isReturn = false, 
-										std::size_t initialCount = 0) noexcept;
+		DynamicPool(OnCreate onCreate,
+					OnDestroy onDestroy = nullptr, 
+					OnReturn onReturn = nullptr, 
+					OnRecycle onRecycle = nullptr,
+					OnEqual onEqual = nullptr,
+					bool isReturn = false, 
+					std::size_t initialCount = 0) noexcept;
 		DynamicPool(DynamicPool&& pool) noexcept;
 		~DynamicPool() noexcept;
 
@@ -89,19 +93,19 @@ namespace com
 
 
 	template<typename T>
-	DynamicPool<T>::DynamicPool(OnCreate onCreate, OnEqual onEqual, OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle, bool isReturn, std::size_t initialCount) noexcept : 
+	DynamicPool<T>::DynamicPool(OnCreate onCreate, OnDestroy onDestroy, OnReturn onReturn, OnRecycle onRecycle, OnEqual onEqual, bool isReturn, std::size_t initialCount) noexcept : 
 																																				m_activeCount(0),
 																																				m_onCreate(onCreate),
-																																				m_onEqual(onEqual),
 																																				m_onDestroy(onDestroy),
 																																				m_onReturn(onReturn),
-																																				m_onRecycle(onRecycle)
+																																				m_onRecycle(onRecycle),
+																																				m_onEqual(onEqual)
 	{
 		m_storage.reserve(initialCount);
 		for(std::size_t i = 0; i < initialCount; ++i)
 		{
 			m_storage.push_back(onCreate());
-			if(isReturn)
+			if(isReturn && m_onReturn)
 				m_onReturn(m_storage[i]);
 		}
 	}
@@ -147,7 +151,8 @@ namespace com
 			m_storage.push_back(m_onCreate());
 		// Otherwise recycle the existing one
 		else
-			m_onRecycle(m_storage[m_activeCount]);
+			if(m_onRecycle)
+				m_onRecycle(m_storage[m_activeCount]);
 		// And return
 		return m_storage[m_activeCount++];
 	}
@@ -175,14 +180,13 @@ namespace com
 				auto lastActiveEnd = std::next(getLastActive(), 1);
 				if constexpr(std::equality_comparable<T>)
 				{
-					// I don't trust if(m_onEqual)
-					if(m_onEqual != nullptr)
+					if(m_onEqual)
 						return findOnEqual(m_storage.begin(), lastActiveEnd, value, m_onEqual);
 					return std::find(m_storage.begin(), lastActiveEnd, value);;
 				}
 				else
 				{
-					_com_assert(m_onEqual != nullptr);
+					_com_assert(m_onEqual);
 					return findOnEqual(m_storage.begin(), lastActiveEnd, value, m_onEqual);
 				}
 			},
@@ -207,7 +211,8 @@ namespace com
 
 		// If yes then swap this value with the last active value
 		swap(*it, *lastActive);
-		m_onReturn(*lastActive);
+		if(m_onReturn)
+			m_onReturn(*lastActive);
 		--m_activeCount;
 	}
 
@@ -218,8 +223,11 @@ namespace com
 			return;
 
 		auto lastActiveEnd = std::next(getLastActive(), 1);
-		for(auto it = m_storage.begin(); it != lastActiveEnd; it++)
-			m_onReturn(*it);
+		if(m_onReturn)
+		{
+			for(auto it = m_storage.begin(); it != lastActiveEnd; it++)
+				m_onReturn(*it);
+		}
 		m_activeCount = 0;
 	}
 
@@ -228,8 +236,11 @@ namespace com
 	{
 		if(m_activeCount == 0)
 			return;
-		for(auto it = m_storage.begin(); it != m_storage.end(); it++)
-			m_onDestroy(*it);
+		if(m_onDestroy)
+		{
+			for(auto it = m_storage.begin(); it != m_storage.end(); it++)
+				m_onDestroy(*it);
+		}
 		m_storage.clear();
 		m_activeCount = 0;
 	}
@@ -249,7 +260,7 @@ namespace com
 		for(std::size_t i = 0; i < diff; ++i)
 		{
 			m_storage.push_back(m_onCreate());
-			if(isReturn)
+			if(isReturn && m_onReturn)
 				m_onReturn(m_storage.back());
 		}
 	}

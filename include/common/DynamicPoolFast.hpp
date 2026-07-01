@@ -70,13 +70,14 @@ namespace com
 		OnRecycle m_onRecycle;
 
 	public:
-		DynamicPoolFast(OnCreate onCreate, OnDestroy onDestroy = [](T&) { },
-											OnReturn onReturn = [](T&) { },
-											OnRecycle onRecycle = [](T&) { }) : m_counter(0),
-																				m_onCreate(onCreate),
-																				m_onDestroy(onDestroy),
-																				m_onReturn(onReturn),
-																				m_onRecycle(onRecycle)
+		DynamicPoolFast(OnCreate onCreate,
+						OnDestroy onDestroy = nullptr,
+						OnReturn onReturn = nullptr,
+						OnRecycle onRecycle = nullptr) : m_counter(0),
+														m_onCreate(onCreate),
+														m_onDestroy(onDestroy),
+														m_onReturn(onReturn),
+														m_onRecycle(onRecycle)
 		{
 			DynamicPool<DynamicPoolFastElement<T>>::setOnCreate([this]()
 			{
@@ -85,15 +86,18 @@ namespace com
 			});
 			DynamicPool<DynamicPoolFastElement<T>>::setOnDestroy([this](DynamicPoolFastElement<T>& el)
 			{
-				m_onDestroy(el.getValue());
+				if(m_onDestroy)
+					m_onDestroy(el.getValue());
 			});
 			DynamicPool<DynamicPoolFastElement<T>>::setOnReturn([this](DynamicPoolFastElement<T>& el)
 			{
-				m_onReturn(el.getValue());
+				if(m_onReturn)
+					m_onReturn(el.getValue());
 			});
 			DynamicPool<DynamicPoolFastElement<T>>::setOnRecycle([this](DynamicPoolFastElement<T>& el)
 			{
-				m_onRecycle(el.getValue());
+				if(m_onRecycle)
+					m_onRecycle(el.getValue());
 			});
 		}
 
