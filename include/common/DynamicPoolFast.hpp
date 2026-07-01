@@ -108,10 +108,9 @@ namespace com
 				{
 					return std::next(DynamicPool<DynamicPoolFastElement<T>>::getStorage().begin(), el.getIndex());
 				},
-				[](auto&& a, auto&& b)
+				[](DynamicPoolFastElement<T>& a, DynamicPoolFastElement<T>& b)
 				{
-					std::swap(a.m_index, b.m_index);
-					std::swap(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
+					std::swap(a.m_value, b.m_value);
 				});
 		}
 	};

@@ -190,7 +190,7 @@ namespace com
 					return findOnEqual(m_storage.begin(), lastActiveEnd, value, m_onEqual);
 				}
 			},
-			[](auto&& a, auto&& b) { std::swap(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b)); });
+			[](T& a, T& b) { std::swap(a, b); });
 	}
 
 	template<typename T>
@@ -202,7 +202,7 @@ namespace com
 		// Check if such value was ever taken out of the pool
 		auto lastActive = getLastActive();
 		auto it = findValueCallback(value);
-		if(it == m_storage.end())
+		if(it == std::next(lastActive, 1))
 		{
 			com_debug_log_error("No such value ever gotten from the pool, but you're still trying to return/put back into it");
 			return;
